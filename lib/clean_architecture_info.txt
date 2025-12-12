@@ -1,0 +1,19 @@
+------------------------------------------
+|       Clean Architecture Apps Flow     |
+------------------------------------------
+
+UI 
+↓
+Call Riverpod Function
+↓
+Call Usecase 
+↓
+Call Abstract Repository 
+↓
+Call Implement Repository 
+↓
+Call Datasources 
+↓
+Return List DataModel 
+↓
+Show on UI
