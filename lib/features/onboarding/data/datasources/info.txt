@@ -1,0 +1,2 @@
+Folder ini berisi kelas-kelas yang bertanggung jawab untuk mengambil data mentah dari sumber data (remote atau lokal).
+Misalnya, kelas datasource dapat membuat panggilan HTTP ke API atau mengambil data dari database SQLite.

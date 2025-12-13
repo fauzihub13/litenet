@@ -1,10 +1,8 @@
-
 import 'package:flutter/material.dart';
 
-
 class FontSize {
-  static const h1 = 31.0;
-  static const h2 = 25.0;
+  static const h1 = 30.0;
+  static const h2 = 24.0;
   static const h3 = 20.0;
   static const body = 16.0;
   static const caption = 13.0;
@@ -16,7 +14,6 @@ class PaddingSize {
 }
 
 class DefaultColors {
-
   // =========== BLACK ===========
   static const black50 = Color(0xffe6e6ec);
   static const black100 = Color(0xffb3b0c4);
@@ -45,9 +42,7 @@ class DefaultColors {
   static const lightRed = Color(0xffFF383C);
   static const lightYellow = Color(0xffFFCC00);
   static const black = Color(0xff090040);
-  
 }
-
 
 class AppTheme {
   static ThemeData get light {
@@ -64,10 +59,7 @@ class AppTheme {
           fontSize: FontSize.h2,
           color: DefaultColors.black,
         ),
-        bodyLarge: TextStyle(
-          fontSize: FontSize.h3,
-          color: DefaultColors.black,
-        ),
+        bodyLarge: TextStyle(fontSize: FontSize.h3, color: DefaultColors.black),
         bodyMedium: TextStyle(
           fontSize: FontSize.body,
           color: DefaultColors.black,
@@ -82,7 +74,6 @@ class AppTheme {
         selectionColor: DefaultColors.purple100,
         selectionHandleColor: DefaultColors.purple500,
       ),
-
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.white,

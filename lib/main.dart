@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-// import 'package:litenet/presentation/pages/home_page.dart';
+import 'package:litenet/core/constants/theme.dart';
+import 'package:litenet/core/constants/variable.dart';
+import 'package:litenet/features/onboarding/presentation/views/onboarding_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,12 +14,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home:  Text('hai'),
+      title: Variables.appName,
+      theme: AppTheme.light,
+      home: OnboardingPage(),
     );
   }
 }

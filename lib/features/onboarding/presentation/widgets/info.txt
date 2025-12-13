@@ -1,0 +1,3 @@
+Folder ini berisi widget UI yang dapat digunakan kembali yang spesifik untuk fitur ini. 
+Widget ini adalah komponen yang lebih kecil yang digunakan oleh beberapa view (halaman) dalam fitur yang sama untuk menjaga konsistensi dan menghindari duplikasi kode. 
+Contohnya termasuk tombol kustom, item daftar, atau dialog.

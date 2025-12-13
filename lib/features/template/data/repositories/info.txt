@@ -1,0 +1,4 @@
+Folder ini berisi implementasi konkret dari repositori yang didefinisikan dalam lapisan domain.
+Repositori di sini mengoordinasikan data dari berbagai datasource 
+(misalnya, mengambil data dari cache jika tersedia, jika tidak, ambil dari API). 
+Mereka bertanggung jawab untuk mengubah model data menjadi entitas domain.

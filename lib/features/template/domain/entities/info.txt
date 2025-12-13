@@ -1,0 +1,3 @@
+Folder ini berisi objek bisnis inti (entitas) dari aplikasi. 
+Ini adalah kelas Dart biasa yang mewakili model domain dan tidak memiliki ketergantungan pada kerangka kerja atau pustaka apa pun. 
+Mereka adalah tulang punggung dari logika bisnis Anda.
