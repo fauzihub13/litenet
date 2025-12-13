@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:litenet/core/constants/theme.dart';
+import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/gen/assets.gen.dart';
 
 class OnboardingPage extends StatefulWidget {
@@ -46,9 +47,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: DefaultColors.white,
       body: Stack(
         children: [
+          Container(color: DefaultColors.purple500),
           Positioned(
             top: 0,
             left: 0,
@@ -146,62 +147,36 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   const SizedBox(height: 30),
 
                   // Tombol Selanjutnya
-                  SizedBox(
-                    width: double.infinity,
-                    height: 55,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (_currentPage < onboardingData.length - 1) {
-                          _textPageController.nextPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeIn,
-                          );
-                        } else {
-                          // Aksi Masuk ke Dashboard
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF6B52FF),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        _currentPage == onboardingData.length - 1
-                            ? "Mulai Sekarang"
-                            : "Selanjutnya",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
+                  Button(
+                    onPressed: () {
+                      if (_currentPage < onboardingData.length - 1) {
+                        _textPageController.nextPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeIn,
+                        );
+                      } else {
+                        // Aksi Masuk ke Dashboard
+                      }
+                    },
+                    text: _currentPage == onboardingData.length - 1
+                        ? "Mulai Sekarang"
+                        : "Selanjutnya",
                   ),
-
+                  const SizedBox(height: 6),
                   // Tombol Lewati (Hanya muncul jika bukan halaman terakhir)
-                  SizedBox(
-                    height: 50,
-                    child: _currentPage != onboardingData.length - 1
-                        ? TextButton(
-                            onPressed: () {
-                              _textPageController.animateToPage(
-                                onboardingData.length - 1,
-                                duration: const Duration(milliseconds: 400),
-                                curve: Curves.easeInOut,
-                              );
-                            },
-                            child: const Text(
-                              "Lewati",
-                              style: TextStyle(
-                                color: DefaultColors.purple500,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          )
-                        : const SizedBox.shrink(),
-                  ),
+                  _currentPage != onboardingData.length - 1
+                      ? Button(
+                          onPressed: () {
+                            _textPageController.animateToPage(
+                              onboardingData.length - 1,
+                              duration: const Duration(milliseconds: 400),
+                              curve: Curves.easeInOut,
+                            );
+                          },
+                          text: "Lewati",
+                          buttonType: ButtonType.outlined,
+                        )
+                      : const SizedBox(height: 50),
                 ],
               ),
             ),
@@ -233,26 +208,29 @@ class OnboardingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          title,
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-            height: 1.2,
-            fontSize: 22,
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              height: 1.2,
+              fontSize: 22,
+            ),
           ),
-        ),
-        const SizedBox(height: 15),
-        Text(
-          desc,
-          textAlign: TextAlign.center,
-          style: Theme.of(
-            context,
-          ).textTheme.bodySmall?.copyWith(color: DefaultColors.black200),
-        ),
-      ],
+          const SizedBox(height: 15),
+          Text(
+            desc,
+            textAlign: TextAlign.center,
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: DefaultColors.black200),
+          ),
+        ],
+      ),
     );
   }
 }
