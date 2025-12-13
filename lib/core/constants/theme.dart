@@ -5,7 +5,7 @@ class FontSize {
   static const h2 = 24.0;
   static const h3 = 20.0;
   static const body = 16.0;
-  static const caption = 13.0;
+  static const caption = 14.0;
 }
 
 class PaddingSize {
@@ -42,6 +42,7 @@ class DefaultColors {
   static const lightRed = Color(0xffFF383C);
   static const lightYellow = Color(0xffFFCC00);
   static const black = Color(0xff090040);
+  static const white = Color(0xffFBFBFB);
 }
 
 class AppTheme {

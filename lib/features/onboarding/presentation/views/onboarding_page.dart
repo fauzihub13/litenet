@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/gen/assets.gen.dart';
 
 class OnboardingPage extends StatefulWidget {
@@ -9,9 +10,7 @@ class OnboardingPage extends StatefulWidget {
 }
 
 class _OnboardingPageState extends State<OnboardingPage> {
-  // Controller untuk PageView teks (yang utama dan bisa di-swipe pengguna)
   final PageController _textPageController = PageController();
-  // Controller untuk PageView gambar (dikontrol secara programatik)
   final PageController _imagePageController = PageController();
   int _currentPage = 0;
 
@@ -21,13 +20,13 @@ class _OnboardingPageState extends State<OnboardingPage> {
       "title": "Tambah dan Kelola Perangkat Satelit",
       "desc":
           "Daftarkan perangkat terminal satelitmu untuk mulai memantau dan mengelola koneksi internet kapan pun, di mana pun.",
-      "image": "assets/images/onboarding1.png",
+      "image": Assets.images.onboarding1.path,
     },
     {
       "title": "Isi Kuota Internet Satelit Secara Praktis",
       "desc":
           "Lakukan top up kuota dengan cepat dan aman melalui berbagai metode pembayaran digital tanpa ribet.",
-      "image": Assets.images.icon.path,
+      "image": Assets.images.onboarding2.path,
     },
     {
       "title": "Monitoring Perangkat dengan mudah",
@@ -47,50 +46,40 @@ class _OnboardingPageState extends State<OnboardingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF6B52FF),
+      backgroundColor: DefaultColors.white,
       body: Stack(
         children: [
-          // 1. Bagian Gambar (Mengikuti PageView)
           Positioned(
             top: 0,
             left: 0,
             right: 0,
-            height: MediaQuery.of(context).size.height * 0.6,
-            child: PageView.builder(
-              controller: _imagePageController,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: onboardingData.length,
-              itemBuilder: (context, index) {
-                return Container(
-                  padding: const EdgeInsets.only(top: 60),
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 25),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    // Menggunakan ClipRRect agar gambar tetap mengikuti radius container
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(24),
-                      child: Image.asset(
-                        onboardingData[index]["image"],
-                        fit: BoxFit.cover,
-                        // Tambahkan errorBuilder untuk mempermudah debugging
-                        errorBuilder: (context, error, stackTrace) {
-                          print(error.toString());
-                          return const Center(
-                            child: Icon(
-                              Icons.error,
-                              color: Colors.white,
-                              size: 40,
-                            ),
-                          );
-                        },
-                      ),
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height * 0.65,
+              child: Container(
+                padding: const EdgeInsets.only(top: 60),
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 25),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  // Menggunakan ClipRRect agar gambar tetap mengikuti radius container
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: PageView.builder(
+                      controller: _imagePageController,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: onboardingData.length,
+                      itemBuilder: (context, index) {
+                        return Image.asset(
+                          onboardingData[index]["image"],
+                          fit: BoxFit.cover,
+                          alignment: Alignment.topCenter,
+                        );
+                      },
                     ),
                   ),
-                );
-              },
+                ),
+              ),
             ),
           ),
 
@@ -101,9 +90,19 @@ class _OnboardingPageState extends State<OnboardingPage> {
             right: 0,
             height: MediaQuery.of(context).size.height * 0.40,
             child: Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(40),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: DefaultColors.black.withValues(alpha: 0.10),
+                    spreadRadius: 0,
+                    blurRadius: 20,
+                    offset: const Offset(0, -5),
+                  ),
+                ],
               ),
               padding: const EdgeInsets.fromLTRB(30, 40, 30, 20),
               child: Column(
@@ -115,7 +114,13 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           _textPageController, // Menggunakan controller teks
                       onPageChanged: (index) {
                         // Sinkronkan PageView gambar saat halaman teks berubah
-                        _imagePageController.jumpToPage(index);
+                        if (_imagePageController.hasClients) {
+                          _imagePageController.animateToPage(
+                            index,
+                            duration: const Duration(milliseconds: 400),
+                            curve: Curves.easeInOut,
+                          );
+                        }
                         setState(() {
                           _currentPage = index;
                         });
@@ -190,12 +195,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             child: const Text(
                               "Lewati",
                               style: TextStyle(
-                                color: Color(0xFF6B52FF),
+                                color: DefaultColors.purple500,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                           )
-                        : const SizedBox.shrink(), // Menghilangkan widget
+                        : const SizedBox.shrink(),
                   ),
                 ],
               ),
@@ -215,8 +220,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         color: _currentPage == index
-            ? const Color(0xFF6B52FF)
-            : const Color(0xFF6B52FF).withOpacity(0.2),
+            ? DefaultColors.purple500
+            : DefaultColors.purple500.withValues(alpha: 0.2),
       ),
     );
   }
@@ -233,18 +238,19 @@ class OnboardingContent extends StatelessWidget {
         Text(
           title,
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF1A1A40),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w700,
             height: 1.2,
+            fontSize: 22,
           ),
         ),
         const SizedBox(height: 15),
         Text(
           desc,
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 14, color: Colors.grey[600], height: 1.5),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: DefaultColors.black200),
         ),
       ],
     );
