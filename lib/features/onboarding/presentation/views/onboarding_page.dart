@@ -182,6 +182,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           },
                           text: "Lewati",
                           buttonType: ButtonType.outlined,
+                          borderColor: Colors.transparent,
                         )
                       : const SizedBox(height: 50),
                 ],

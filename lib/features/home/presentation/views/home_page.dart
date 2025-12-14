@@ -3,6 +3,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/promo_card.dart';
 import 'package:litenet/core/widgets/quota_card.dart';
+import 'package:litenet/features/promo/presentation/views/promo_page.dart';
+import 'package:litenet/features/quota/presentation/views/quota_page.dart';
 import 'package:litenet/gen/assets.gen.dart';
 
 class HomePage extends StatefulWidget {
@@ -83,10 +85,30 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   _buildAccountCard(),
                   const SizedBox(height: 24),
-                  _buildSectionHeader("Promo"),
+                  _buildSectionHeader(
+                    title: 'Promo',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PromoPage(),
+                        ),
+                      );
+                    },
+                  ),
                   _buildPromoSlider(),
                   const SizedBox(height: 24),
-                  _buildSectionHeader("Kuota"),
+                  _buildSectionHeader(
+                    title: "Kuota",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const QuotaPage(),
+                        ),
+                      );
+                    },
+                  ),
                   _buildQuotaList(),
                   const SizedBox(
                     height: 30,
@@ -101,30 +123,36 @@ class _HomePageState extends State<HomePage> {
   }
 
   // Build Promo Section
-  Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: PaddingSize.horizontal,
-        vertical: 12,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-          ),
-          Text(
-            "Lihat semua",
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: DefaultColors.purple500,
-              fontSize: 14,
+  Widget _buildSectionHeader({
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: PaddingSize.horizontal,
+          vertical: 12,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
-          ),
-        ],
+            Text(
+              "Lihat semua",
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: DefaultColors.purple500,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

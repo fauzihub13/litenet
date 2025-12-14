@@ -1,0 +1,3 @@
+Folder ini berisi implementasi dari lapisan data. 
+Tanggung jawabnya adalah untuk mengambil dan menyimpan data dari berbagai sumber seperti API, database lokal, dll. 
+Folder ini bergantung pada lapisan domain tetapi tidak sebaliknya.

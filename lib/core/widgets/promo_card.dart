@@ -15,9 +15,7 @@ class PromoCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: DefaultColors.purple50.withValues(alpha: 0.5),
-        ),
+        border: Border.all(color: DefaultColors.purple50),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

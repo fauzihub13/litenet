@@ -1,0 +1,4 @@
+Folder ini berisi layar atau halaman UI utama dari fitur tersebut. 
+Setiap view adalah widget yang mewakili seluruh layar atau bagian utama dari layar. 
+Mereka membangun UI berdasarkan status yang dikelola oleh pengontrol (mis., BLoC) dan meneruskan peristiwa pengguna ke pengontrol. 
+Folder ini sebelumnya bernama 'pages'.

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/features/home/presentation/views/home_page.dart';
+import 'package:litenet/features/quota/presentation/views/quota_page.dart';
 import 'package:litenet/gen/assets.gen.dart';
 
 class MainPage extends StatefulWidget {
@@ -15,7 +16,7 @@ class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
   final List<Widget> _pageOptions = [
     HomePage(),
-    Container(),
+    QuotaPage(),
     Container(),
     Container(),
   ];

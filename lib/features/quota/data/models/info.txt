@@ -1,0 +1,4 @@
+Folder ini berisi model data yang spesifik untuk lapisan data.
+Model-model ini merepresentasikan data seperti yang diterima dari sumber data (misalnya, respons JSON dari API).
+Mereka seringkali menyertakan metode untuk serialisasi/deserialisasi data (misalnya, fromJson, toJson) 
+dan dapat dikonversi ke/dari entitas domain.

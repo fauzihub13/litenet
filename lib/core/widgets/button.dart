@@ -10,6 +10,8 @@ class Button extends StatelessWidget {
   final bool isDisabled;
   final double? width;
   final double? height;
+  final double? fontSize;
+  final Color borderColor;
 
   const Button({
     super.key,
@@ -19,6 +21,8 @@ class Button extends StatelessWidget {
     this.isDisabled = false,
     this.width = double.infinity,
     this.height,
+    this.fontSize =16,
+    this.borderColor = DefaultColors.purple500,
   });
 
   @override
@@ -45,6 +49,8 @@ class Button extends StatelessWidget {
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: DefaultColors.white,
               fontWeight: FontWeight.w500,
+              fontSize: fontSize
+
             ),
           ),
         ),
@@ -61,8 +67,8 @@ class Button extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               side: BorderSide(
                 color: isDisabled
-                    ? DefaultColors.purple100
-                    : DefaultColors.purple500,
+                    ? Colors.transparent
+                    : borderColor,
                 width: 1.5,
               ),
             ),
@@ -73,6 +79,7 @@ class Button extends StatelessWidget {
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: DefaultColors.purple500,
               fontWeight: FontWeight.w500,
+              fontSize: fontSize
             ),
           ),
         ),
