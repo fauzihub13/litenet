@@ -1,0 +1,3 @@
+Lapisan presentasi bertanggung jawab atas antarmuka pengguna (UI) dan manajemen status. 
+Ini termasuk semua yang terkait dengan apa yang dilihat dan berinteraksi dengan pengguna. 
+Lapisan ini bergantung pada lapisan domain (melalui use case) tetapi tidak boleh berinteraksi langsung dengan lapisan data.

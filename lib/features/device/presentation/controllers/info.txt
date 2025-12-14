@@ -1,0 +1,3 @@
+Folder ini berisi pengelola status (state management) untuk UI, seperti BLoC (Business Logic Component), Provider, atau lainnya. 
+Mereka mengambil input pengguna, memanggil use case yang sesuai dari lapisan domain, 
+dan mengelola status UI berdasarkan hasilnya (misalnya, memuat data, menampilkan data, atau menampilkan kesalahan).
