@@ -1,0 +1,4 @@
+Folder ini berisi kasus penggunaan (use case) atau interactor. 
+Setiap use case mewakili satu tindakan atau operasi bisnis tertentu. 
+Use case mengoordinasikan alur data dari repositori untuk mencapai tujuan bisnis, dan mereka dipanggil oleh lapisan presentasi. 
+Mereka berisi logika bisnis inti untuk tindakan tertentu.
