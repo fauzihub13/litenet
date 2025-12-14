@@ -1,0 +1,3 @@
+Lapisan domain adalah inti dari aplikasi dan berisi logika bisnis. 
+Lapisan ini sepenuhnya independen dari lapisan lain seperti data dan presentasi. 
+Ini mendefinisikan kontrak (melalui kelas abstrak atau antarmuka) yang harus dipenuhi oleh lapisan luar.

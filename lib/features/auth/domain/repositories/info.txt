@@ -1,0 +1,3 @@
+Folder ini berisi definisi abstrak (kelas abstrak atau antarmuka) dari repositori. 
+Repositori ini mendefinisikan kontrak tentang bagaimana data harus diambil dan dimanipulasi untuk entitas domain tertentu. 
+Implementasi konkret dari antarmuka ini berada di lapisan data.

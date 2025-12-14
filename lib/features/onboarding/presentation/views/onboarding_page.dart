@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/button.dart';
+import 'package:litenet/features/auth/presentation/views/login_page.dart';
 import 'package:litenet/gen/assets.gen.dart';
 
 class OnboardingPage extends StatefulWidget {
@@ -156,6 +157,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         );
                       } else {
                         // Aksi Masuk ke Dashboard
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginPage(),
+                          ),
+                        );
                       }
                     },
                     text: _currentPage == onboardingData.length - 1
