@@ -53,13 +53,20 @@ class Button extends StatelessWidget {
       return SizedBox(
         width: width,
         height: height ?? 50,
-        child: TextButton(
+        child: ElevatedButton(
           onPressed: isDisabled ? null : onPressed,
-          style: TextButton.styleFrom(
-            foregroundColor: DefaultColors.purple500,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.transparent,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
+              side: BorderSide(
+                color: isDisabled
+                    ? DefaultColors.purple100
+                    : DefaultColors.purple500,
+                width: 1.5,
+              ),
             ),
+            elevation: 0,
           ),
           child: Text(
             text,

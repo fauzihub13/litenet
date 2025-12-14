@@ -5,6 +5,7 @@ import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/form_input.dart';
 import 'package:litenet/core/widgets/row_title.dart';
 import 'package:litenet/features/auth/presentation/views/register_page.dart';
+import 'package:litenet/features/home/presentation/views/main_page.dart';
 import 'package:litenet/gen/assets.gen.dart';
 // Import file assets gen dan theme Anda di sini
 // import 'gen/assets.gen.dart';
@@ -67,9 +68,9 @@ class _LoginPageState extends State<LoginPage> {
                     Text(
                       "Masuk",
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 10),
                     Padding(
@@ -160,7 +161,12 @@ class _LoginPageState extends State<LoginPage> {
                         text: "Masuk",
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                           
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const MainPage(),
+                              ),
+                            );
                           }
                         },
                       ),
@@ -173,14 +179,12 @@ class _LoginPageState extends State<LoginPage> {
                           children: [
                             Text(
                               "Belum punya akun? ",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
+                              style: Theme.of(context).textTheme.bodySmall
                                   ?.copyWith(color: DefaultColors.black200),
                             ),
                             GestureDetector(
                               onTap: () {
-                                 Navigator.push(
+                                Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => const RegisterPage(),
@@ -189,9 +193,7 @@ class _LoginPageState extends State<LoginPage> {
                               },
                               child: Text(
                                 "Daftar",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
+                                style: Theme.of(context).textTheme.bodySmall
                                     ?.copyWith(
                                       color: DefaultColors.purple500,
                                       fontWeight: FontWeight.bold,
