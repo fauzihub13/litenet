@@ -30,6 +30,9 @@ class $AssetsIconsGen {
   /// File path: assets/icons/arrow_dropdown.svg
   String get arrowDropdown => 'assets/icons/arrow_dropdown.svg';
 
+  /// File path: assets/icons/arrow_forward.svg
+  String get arrowForward => 'assets/icons/arrow_forward.svg';
+
   /// File path: assets/icons/calendar.svg
   String get calendar => 'assets/icons/calendar.svg';
 
@@ -116,6 +119,7 @@ class $AssetsIconsGen {
     appIcon,
     arrowBack,
     arrowDropdown,
+    arrowForward,
     calendar,
     cancel,
     checklist,

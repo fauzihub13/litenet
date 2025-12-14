@@ -4,6 +4,7 @@ import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/features/device/presentation/views/device_list_page.dart';
 import 'package:litenet/features/home/presentation/views/home_page.dart';
 import 'package:litenet/features/order/presentation/views/order_history_page.dart';
+import 'package:litenet/features/setting/presentation/views/setting_page.dart';
 import 'package:litenet/gen/assets.gen.dart';
 
 class MainPage extends StatefulWidget {
@@ -19,7 +20,7 @@ class _MainPageState extends State<MainPage> {
     HomePage(),
     DeviceListPage(),
     OrderHistoryPage(),
-    Container(),
+    SettingPage(),
   ];
 
   @override
