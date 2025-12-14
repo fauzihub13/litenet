@@ -12,6 +12,8 @@ class Button extends StatelessWidget {
   final double? height;
   final double? fontSize;
   final Color borderColor;
+  final Color backgroundColor;
+  final Color textColor;
 
   const Button({
     super.key,
@@ -21,8 +23,10 @@ class Button extends StatelessWidget {
     this.isDisabled = false,
     this.width = double.infinity,
     this.height,
-    this.fontSize =16,
+    this.fontSize = 16,
     this.borderColor = DefaultColors.purple500,
+    this.backgroundColor = DefaultColors.purple500,
+    this.textColor = DefaultColors.white,
   });
 
   @override
@@ -38,7 +42,7 @@ class Button extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: isDisabled
                 ? DefaultColors.purple100
-                : DefaultColors.purple500,
+                : backgroundColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -47,10 +51,9 @@ class Button extends StatelessWidget {
           child: Text(
             text,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: DefaultColors.white,
+              color: textColor,
               fontWeight: FontWeight.w500,
-              fontSize: fontSize
-
+              fontSize: fontSize,
             ),
           ),
         ),
@@ -62,13 +65,10 @@ class Button extends StatelessWidget {
         child: ElevatedButton(
           onPressed: isDisabled ? null : onPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.transparent,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
               side: BorderSide(
-                color: isDisabled
-                    ? Colors.transparent
-                    : borderColor,
+                color: isDisabled ? Colors.transparent : borderColor,
                 width: 1.5,
               ),
             ),
@@ -79,7 +79,7 @@ class Button extends StatelessWidget {
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: DefaultColors.purple500,
               fontWeight: FontWeight.w500,
-              fontSize: fontSize
+              fontSize: fontSize,
             ),
           ),
         ),
