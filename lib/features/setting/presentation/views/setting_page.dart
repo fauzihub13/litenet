@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
+import 'package:litenet/features/setting/presentation/views/change_password.dart';
+import 'package:litenet/features/setting/presentation/views/change_profile.dart';
+import 'package:litenet/features/setting/presentation/views/faq_page.dart';
+import 'package:litenet/features/setting/presentation/views/terms_and_conditions.dart';
 import 'package:litenet/gen/assets.gen.dart';
 
 class SettingPage extends StatelessWidget {
@@ -50,25 +54,61 @@ class SettingPage extends StatelessWidget {
                     context,
                     icon: Assets.icons.profile,
                     title: "Ubah Profil",
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return ChangeProfile();
+                          },
+                        ),
+                      );
+                    },
                   ),
                   _buildSettingItem(
                     context,
                     icon: Assets.icons.lock,
                     title: "Ubah Kata Sandi",
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return ChangePassword();
+                          },
+                        ),
+                      );
+                    },
                   ),
                   _buildSettingItem(
                     context,
                     icon: Assets.icons.faq,
                     title: "FAQ",
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return FAQPage();
+                          },
+                        ),
+                      );
+                    },
                   ),
                   _buildSettingItem(
                     context,
                     icon: Assets.icons.info,
                     title: "Kebijakan Privasi",
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return TermsAndConditionsPage();
+                          },
+                        ),
+                      );
+                    },
                   ),
                   _buildSettingItem(
                     context,
