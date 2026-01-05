@@ -239,7 +239,9 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.only(left: PaddingSize.horizontal),
         itemCount: 4,
         itemBuilder: (context, index) {
-          return PromoCard();
+          return PromoCard(onTap: () {
+            
+          },);
         },
       ),
     );

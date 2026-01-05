@@ -5,7 +5,7 @@ import 'package:litenet/core/widgets/button.dart';
 void showLogoutModal(BuildContext context) {
   showModalBottomSheet(
     context: context,
-    backgroundColor: Colors.transparent, // Agar rounded corner terlihat
+    backgroundColor: Colors.transparent,
     isScrollControlled: true,
     builder: (context) {
       return Container(

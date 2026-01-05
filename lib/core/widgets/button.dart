@@ -43,6 +43,7 @@ class Button extends StatelessWidget {
             backgroundColor: isDisabled
                 ? DefaultColors.purple100
                 : backgroundColor,
+            shadowColor: Colors.transparent,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -65,6 +66,9 @@ class Button extends StatelessWidget {
         child: ElevatedButton(
           onPressed: isDisabled ? null : onPressed,
           style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            overlayColor: DefaultColors.purple400,
+            shadowColor: Colors.transparent,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
               side: BorderSide(

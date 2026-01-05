@@ -3,6 +3,7 @@ import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/custom_search_bar.dart';
 import 'package:litenet/core/widgets/promo_card.dart';
+import 'package:litenet/features/promo/presentation/widgets/modal_promo.dart';
 
 class PromoPage extends StatelessWidget {
   const PromoPage({super.key});
@@ -31,7 +32,11 @@ class PromoPage extends StatelessWidget {
                     left: PaddingSize.horizontal,
                     bottom: 10,
                   ),
-                  child: PromoCard(),
+                  child: PromoCard(
+                    onTap: () {
+                      showPromoModal(context);
+                    },
+                  ),
                 );
               },
             ),
