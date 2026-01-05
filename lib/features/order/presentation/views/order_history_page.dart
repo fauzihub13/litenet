@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:litenet/core/constants/enum.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/custom_search_bar.dart';
+import 'package:litenet/features/order/presentation/views/detail_order_history_page.dart';
 import 'package:litenet/features/order/presentation/widgets/order_history_card.dart';
 
 class OrderHistoryPage extends StatefulWidget {
@@ -66,7 +68,17 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
               padding: const EdgeInsets.symmetric(horizontal: 18),
               itemCount: _orders.length,
               itemBuilder: (context, index) {
-                return OrderHistoryCard(order: _orders[index]);
+                return OrderHistoryCard(
+                  order: _orders[index],
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>  DetailOrderPage(status: _orders[index].status),
+                      ),
+                    );
+                  },
+                );
               },
             ),
           ),
@@ -98,7 +110,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
   }
 }
 
-enum TransactionStatus { selesai, diproses, gagal }
+
 
 class OrderHistory {
   final String trxId;

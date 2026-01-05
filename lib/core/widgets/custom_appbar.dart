@@ -6,7 +6,13 @@ import 'package:litenet/gen/assets.gen.dart';
 class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool isLeading;
-  const CustomAppbar({super.key, required this.title, this.isLeading = true});
+  final bool isRounded;
+  const CustomAppbar({
+    super.key,
+    required this.title,
+    this.isLeading = true,
+    this.isRounded = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +39,10 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
           fontWeight: FontWeight.w600,
         ),
       ),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          bottom: Radius.circular(isRounded ? 30 : 0),
+        ),
       ),
       toolbarHeight: 80,
     );
