@@ -6,10 +6,12 @@ class FormInput extends StatelessWidget {
   final TextEditingController textController;
   final String? hintText;
   final bool obscureText;
+  final bool readOnly;
   final TextInputType keyboardType;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
   final VoidCallback? onSuffixIconTap;
+  final Function(String)? onChanged;
   final String? Function(String?)? validator;
   final List<TextInputFormatter>? inputFormatters;
 
@@ -18,10 +20,12 @@ class FormInput extends StatelessWidget {
     required this.textController,
     this.hintText,
     this.obscureText = false,
+    this.readOnly = false,
     this.keyboardType = TextInputType.text,
     this.prefixIcon,
     this.suffixIcon,
     this.onSuffixIconTap,
+    this.onChanged,
     this.validator,
     this.inputFormatters,
   });
@@ -33,7 +37,9 @@ class FormInput extends StatelessWidget {
       keyboardType: keyboardType,
       controller: textController,
       validator: validator,
+      onChanged: onChanged,
       inputFormatters: inputFormatters,
+      readOnly: readOnly,
       style: Theme.of(
         context,
       ).textTheme.bodySmall?.copyWith(color: DefaultColors.black500),
