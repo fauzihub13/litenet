@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/custom_badge.dart';
 import 'package:litenet/gen/assets.gen.dart';
 
-class DetailDevicePage extends StatelessWidget {
+class DetailDevicePage extends StatefulWidget {
   const DetailDevicePage({super.key});
+
+  @override
+  State<DetailDevicePage> createState() => _DetailDevicePageState();
+}
+
+class _DetailDevicePageState extends State<DetailDevicePage> {
+  final MapController _mapController = MapController();
+  LatLng _currentLatLng = const LatLng(-6.5971, 106.8060);
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +110,35 @@ class DetailDevicePage extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
                   color: Colors.amber,
+                ),
+                child: FlutterMap(
+                  mapController: _mapController,
+                  options: MapOptions(
+                    initialCenter: _currentLatLng,
+                    initialZoom: 15.0,
+                    onTap: (tapPosition, point) {},
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate:
+                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      userAgentPackageName: 'com.litenet.app',
+                    ),
+                    MarkerLayer(
+                      markers: [
+                        Marker(
+                          point: _currentLatLng,
+                          width: 80,
+                          height: 80,
+                          child: const Icon(
+                            Icons.location_on,
+                            color: DefaultColors.purple500,
+                            size: 40,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ],
