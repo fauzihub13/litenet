@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:litenet/core/constants/theme.dart';
+import 'package:litenet/core/helper/permission.dart';
 import 'package:litenet/core/widgets/promo_card.dart';
 import 'package:litenet/core/widgets/quota_card.dart';
 import 'package:litenet/features/promo/presentation/views/promo_page.dart';
@@ -15,6 +16,23 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    _loadLocation();
+  }
+  Future<void> _loadLocation() async {
+    final latLng = await LocationHelper.initLocation();
+    if (latLng != null) {
+      print("✅ LatLng: $latLng");
+      
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Izin lokasi ditolak")));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

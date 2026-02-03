@@ -6,6 +6,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:litenet/core/constants/theme.dart';
+import 'package:litenet/core/helper/permission.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/form_input.dart';
@@ -17,14 +18,93 @@ class CoordinateDevicePage extends StatefulWidget {
   State<CoordinateDevicePage> createState() => _CoordinateDevicePageState();
 }
 
-class _CoordinateDevicePageState extends State<CoordinateDevicePage> {
+class _CoordinateDevicePageState extends State<CoordinateDevicePage>
+    with TickerProviderStateMixin {
+  void _animatedMapMove(LatLng destLocation, double destZoom) {
+    // Ambil posisi kamera saat ini
+    final latTween = Tween<double>(
+      begin: _mapController.camera.center.latitude,
+      end: destLocation.latitude,
+    );
+    final lngTween = Tween<double>(
+      begin: _mapController.camera.center.longitude,
+      end: destLocation.longitude,
+    );
+    final zoomTween = Tween<double>(
+      begin: _mapController.camera.zoom,
+      end: destZoom,
+    );
+
+    // Buat AnimationController
+    final controller = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    );
+
+    // Tentukan kurva animasi (misal: fastOutSlowIn agar terlihat natural)
+    final Animation<double> animation = CurvedAnimation(
+      parent: controller,
+      curve: Curves.fastOutSlowIn,
+    );
+
+    controller.addListener(() {
+      _mapController.move(
+        LatLng(latTween.evaluate(animation), lngTween.evaluate(animation)),
+        zoomTween.evaluate(animation),
+      );
+    });
+
+    // Hapus controller setelah selesai
+    animation.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        controller.dispose();
+      } else if (status == AnimationStatus.dismissed) {
+        controller.dispose();
+      }
+    });
+
+    controller.forward();
+  }
+
   final TextEditingController _coordinatController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
   final MapController _mapController = MapController();
   Timer? _debounce;
 
-  LatLng _currentLatLng = const LatLng(-6.5971, 106.8060);
+  LatLng? _currentLatLng;
   bool _isSearching = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLocation();
+  }
+
+  Future<void> _loadLocation() async {
+    final latLng = await LocationHelper.initLocation();
+
+    if (latLng != null) {
+      setState(() {
+        _currentLatLng = latLng;
+        // Update juga controller koordinat jika ada
+        _coordinatController.text = "${latLng.latitude}, ${latLng.longitude}";
+      });
+
+      // Gunakan latLng langsung agar lebih instan dan aman
+      // _mapController.move(latLng, 15.0);
+      await Future.delayed(const Duration(milliseconds: 1000));
+      _animatedMapMove(latLng, 15.0);
+    } else {
+      if (mounted) {
+        // Cek mounted agar tidak error jika user sudah pindah page
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Izin lokasi ditolak atau GPS tidak aktif"),
+          ),
+        );
+      }
+    }
+  }
 
   // Variabel baru untuk menampung hasil saran pencarian
   List<dynamic> _searchResults = [];
@@ -84,8 +164,8 @@ class _CoordinateDevicePageState extends State<CoordinateDevicePage> {
           FlutterMap(
             mapController: _mapController,
             options: MapOptions(
-              initialCenter: _currentLatLng,
-              initialZoom: 15.0,
+              initialCenter: _currentLatLng ?? const LatLng(-2.5489, 118.0149),
+              initialZoom: _currentLatLng == null ? 4.0 : 15.0,
               onTap: (tapPosition, point) {
                 setState(() {
                   _currentLatLng = point;
@@ -103,18 +183,20 @@ class _CoordinateDevicePageState extends State<CoordinateDevicePage> {
                 userAgentPackageName: 'com.litenet.app',
               ),
               MarkerLayer(
-                markers: [
-                  Marker(
-                    point: _currentLatLng,
-                    width: 80,
-                    height: 80,
-                    child: const Icon(
-                      Icons.location_on,
-                      color: DefaultColors.purple500,
-                      size: 40,
-                    ),
-                  ),
-                ],
+                markers: _currentLatLng == null
+                    ? []
+                    : [
+                        Marker(
+                          point: _currentLatLng!,
+                          width: 80,
+                          height: 80,
+                          child: const Icon(
+                            Icons.location_on,
+                            color: DefaultColors.purple500,
+                            size: 40,
+                          ),
+                        ),
+                      ],
               ),
             ],
           ),

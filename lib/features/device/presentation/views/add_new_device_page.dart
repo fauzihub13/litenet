@@ -145,7 +145,7 @@ class _AddNewDevicePageState extends State<AddNewDevicePage> {
                   child: Button(
                     text: "Tandai Lokasi",
                     height: 44,
-                    width: MediaQuery.of(context).size.width * 0.4,
+                    width: MediaQuery.of(context).size.width * 0.5,
                     onPressed: () {
                       Navigator.push(
                         context,
