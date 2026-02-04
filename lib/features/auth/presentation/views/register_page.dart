@@ -264,7 +264,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                context.goNamed(RouteName.loginPage);
+                                context.pushNamed(RouteName.loginPage);
                               },
                               child: Text(
                                 "Masuk",

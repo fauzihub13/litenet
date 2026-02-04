@@ -81,7 +81,7 @@ class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
           onPressed: () {
             if (_selectedPaymentId.isNotEmpty) {
               // print(_selectedPaymentId);
-              context.goNamed(RouteName.paymentPage);
+              context.pushNamed(RouteName.paymentPage);
             }
           },
         ),

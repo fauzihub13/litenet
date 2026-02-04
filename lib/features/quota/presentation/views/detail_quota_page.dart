@@ -322,7 +322,7 @@ class _DetailQuotaPageState extends ConsumerState<DetailQuotaPage>
           Button(
             text: "Pilih Metode Pembayaran",
             onPressed: () {
-              context.goNamed(RouteName.paymentMethodPage);
+              context.pushNamed(RouteName.paymentMethodPage);
             },
           ),
         ],

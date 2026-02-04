@@ -158,7 +158,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                           curve: Curves.easeIn,
                         );
                       } else {
-                        context.goNamed(RouteName.loginPage);
+                        context.pushNamed(RouteName.loginPage);
                       }
                     },
                     text: _currentPage == onboardingData.length - 1

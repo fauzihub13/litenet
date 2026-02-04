@@ -73,7 +73,7 @@ class _OrderHistoryPageState extends ConsumerState<OrderHistoryPage> {
                 return OrderHistoryCard(
                   order: _orders[index],
                   onTap: () {
-                    context.goNamed(
+                    context.pushNamed(
                       RouteName.detailOrderHistoryPage,
                       extra: _orders[index].status,
                     );

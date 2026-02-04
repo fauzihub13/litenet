@@ -31,178 +31,169 @@ GoRouter appRouter(Ref ref) {
   return GoRouter(
     debugLogDiagnostics: true,
 
-    /// Start page
     initialLocation: '/${RouteName.onboardingPage}',
 
     routes: [
       // =====================
-      // MAIN PAGE
-      // =====================
-      GoRoute(
-        path: '/${RouteName.mainPage}',
-        name: RouteName.mainPage,
-        builder: (context, state) => const MainPage(),
-      ),
-
-      // =====================
-      // ONBOARDING
+      // AUTH & ONBOARDING
       // =====================
       GoRoute(
         path: '/${RouteName.onboardingPage}',
         name: RouteName.onboardingPage,
-        builder: (context, state) => const OnboardingPage(),
+        builder: (_, __) => const OnboardingPage(),
       ),
 
-      // =====================
-      // AUTH
-      // =====================
       GoRoute(
         path: '/${RouteName.loginPage}',
         name: RouteName.loginPage,
-        builder: (context, state) => const LoginPage(),
+        builder: (_, __) => const LoginPage(),
       ),
 
       GoRoute(
         path: '/${RouteName.registerPage}',
         name: RouteName.registerPage,
-        builder: (context, state) => const RegisterPage(),
+        builder: (_, __) => const RegisterPage(),
       ),
 
-      // =====================
-      // HOME (ROOT)
-      // =====================
+      // -----------------
+      // PRODUCT
+      // -----------------
       GoRoute(
-        path: '/${RouteName.homePage}',
-        name: RouteName.homePage,
-        builder: (context, state) => const HomePage(),
+        path: '/${RouteName.productPage}',
+        name: RouteName.productPage,
+        builder: (_, __) => const QuotaPage(),
 
         routes: [
-          // =====================
-          // SETTINGS
-          // =====================
-          GoRoute(
-            path: RouteName.settingPage,
-            name: RouteName.settingPage,
-            builder: (context, state) => const SettingPage(),
-          ),
-
-          GoRoute(
-            path: RouteName.changeProfilePage,
-            name: RouteName.changeProfilePage,
-            builder: (context, state) => const ChangeProfilePage(),
-          ),
-
-          GoRoute(
-            path: RouteName.changePasswordPage,
-            name: RouteName.changePasswordPage,
-            builder: (context, state) => const ChangePasswordPage(),
-          ),
-
-          // =====================
-          // FAQ & TNC
-          // =====================
-          GoRoute(
-            path: RouteName.faqPage,
-            name: RouteName.faqPage,
-            builder: (context, state) => FAQPage(),
-          ),
-
-          GoRoute(
-            path: RouteName.tncPage,
-            name: RouteName.tncPage,
-            builder: (context, state) => const TermsAndConditionsPage(),
-          ),
-
-          // =====================
-          // ORDER
-          // =====================
-          GoRoute(
-            path: RouteName.orderHistoryPage,
-            name: RouteName.orderHistoryPage,
-            builder: (context, state) => const OrderHistoryPage(),
-          ),
-
-          GoRoute(
-            path: RouteName.detailOrderHistoryPage,
-            name: RouteName.detailOrderHistoryPage,
-            builder: (context, state) {
-              final status = state.extra as TransactionStatus;
-              return DetailOrderHistoryPage(status: status);
-
-            },
-          ),
-
-          // =====================
-          // PRODUCT
-          // =====================
-          GoRoute(
-            path: RouteName.productPage,
-            name: RouteName.productPage,
-            builder: (context, state) => const QuotaPage(),
-          ),
-
           GoRoute(
             path: RouteName.detailProductPage,
             name: RouteName.detailProductPage,
-            builder: (context, state) {
-              return DetailQuotaPage();
-            },
+            builder: (_, __) => const DetailQuotaPage(),
           ),
 
-          // =====================
-          // PROMO
-          // =====================
-          GoRoute(
-            path: RouteName.promoPage,
-            name: RouteName.promoPage,
-            builder: (context, state) => const PromoPage(),
-          ),
-
-          // =====================
-          // DEVICE
-          // =====================
-          GoRoute(
-            path: RouteName.addNewDevicePage,
-            name: RouteName.addNewDevicePage,
-            builder: (context, state) => const AddNewDevicePage(),
-          ),
-
-          GoRoute(
-            path: RouteName.deviceCoordinatePage,
-            name: RouteName.deviceCoordinatePage,
-            builder: (context, state) => const CoordinateDevicePage(),
-          ),
-
-          // =====================
-          // PAYMENT
-          // =====================
           GoRoute(
             path: RouteName.paymentMethodPage,
             name: RouteName.paymentMethodPage,
-            builder: (context, state) => const PaymentMethodPage(),
+            builder: (_, __) => const PaymentMethodPage(),
           ),
 
           GoRoute(
             path: RouteName.paymentPage,
             name: RouteName.paymentPage,
-            builder: (context, state) => const PaymentOrderPage(),
+            builder: (_, __) => const PaymentOrderPage(),
+          ),
+        ],
+      ),
+
+      // -----------------
+      // PROMO
+      // -----------------
+      GoRoute(
+        path: '/${RouteName.promoPage}',
+        name: RouteName.promoPage,
+        builder: (_, __) => const PromoPage(),
+      ),
+
+      GoRoute(
+        path: '/${RouteName.changeProfilePage}',
+        name: RouteName.changeProfilePage,
+        builder: (_, __) => const ChangeProfilePage(),
+      ),
+
+      GoRoute(
+        path: '/${RouteName.changePasswordPage}',
+        name: RouteName.changePasswordPage,
+        builder: (_, __) => const ChangePasswordPage(),
+      ),
+
+      GoRoute(
+        path: "/${RouteName.faqPage}",
+        name: RouteName.faqPage,
+        builder: (_, __) => FAQPage(),
+      ),
+
+      GoRoute(
+        path: "/${RouteName.tncPage}",
+        name: RouteName.tncPage,
+        builder: (_, __) => const TermsAndConditionsPage(),
+      ),
+
+      // -----------------
+      // DEVICE EXTRA
+      // -----------------
+      GoRoute(
+        path: '/${RouteName.addNewDevicePage}',
+        name: RouteName.addNewDevicePage,
+        builder: (_, __) => const AddNewDevicePage(),
+      ),
+
+      GoRoute(
+        path: '/${RouteName.deviceCoordinatePage}',
+        name: RouteName.deviceCoordinatePage,
+        builder: (_, __) => const CoordinateDevicePage(),
+      ),
+
+      GoRoute(
+        path: "/${RouteName.detailMonitoringPage}",
+        name: RouteName.detailMonitoringPage,
+        builder: (_, __) => const DetailDevicePage(),
+      ),
+
+      GoRoute(
+        path: "/${RouteName.detailOrderHistoryPage}",
+        name: RouteName.detailOrderHistoryPage,
+        builder: (_, state) {
+          final status = state.extra as TransactionStatus;
+          return DetailOrderHistoryPage(status: status);
+        },
+      ),
+
+      // =====================
+      // MAIN SHELL
+      // =====================
+      ShellRoute(
+        pageBuilder: (context, state, child) {
+          return NoTransitionPage(child: MainPage(child: child));
+        },
+
+        routes: [
+          // -----------------
+          // HOME
+          // -----------------
+          GoRoute(
+            path: '/${RouteName.homePage}',
+            name: RouteName.homePage,
+            pageBuilder: (_, __) => NoTransitionPage(child: const HomePage()),
           ),
 
-          // =====================
-          // MONITORING
-          // =====================
+          // -----------------
+          // DEVICE
+          // -----------------
           GoRoute(
-            path: RouteName.monitoringPage,
+            path: '/${RouteName.monitoringPage}',
             name: RouteName.monitoringPage,
-            builder: (context, state) => const DeviceListPage(),
+            pageBuilder: (_, __) => NoTransitionPage(child: const DeviceListPage()),
+
+            routes: [],
           ),
 
+          // -----------------
+          // ORDER
+          // -----------------
           GoRoute(
-            path: '${RouteName.detailMonitoringPage}',
-            name: RouteName.detailMonitoringPage,
-            builder: (context, state) {
-              return DetailDevicePage();
-            },
+            path: '/${RouteName.orderHistoryPage}',
+            name: RouteName.orderHistoryPage,
+            pageBuilder: (_, __) => NoTransitionPage(child: const OrderHistoryPage()),
+
+            routes: [],
+          ),
+
+          // -----------------
+          // SETTING
+          // -----------------
+          GoRoute(
+            path: '/${RouteName.settingPage}',
+            name: RouteName.settingPage,
+            pageBuilder: (_, __) => NoTransitionPage(child: const SettingPage()),
           ),
         ],
       ),

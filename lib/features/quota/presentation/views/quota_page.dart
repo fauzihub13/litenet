@@ -10,7 +10,7 @@ class QuotaPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-    appBar: CustomAppbar(title: 'Pilihan Kuota'),
+      appBar: CustomAppbar(title: 'Pilihan Kuota', isLeading: true),
       body: Column(
         children: [
           // 1. Search Bar

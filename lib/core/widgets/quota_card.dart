@@ -13,8 +13,7 @@ class QuotaCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap: () {
-        context.goNamed(RouteName.detailProductPage);
-        
+        context.pushNamed(RouteName.detailProductPage);
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: PaddingSize.horizontal),

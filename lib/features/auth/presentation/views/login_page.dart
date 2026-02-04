@@ -168,7 +168,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         text: "Masuk",
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            context.goNamed(RouteName.mainPage);
+                            context.pushNamed(RouteName.homePage);
                           }
                         },
                       ),
@@ -186,7 +186,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                context.goNamed(RouteName.registerPage);
+                                context.pushNamed(RouteName.registerPage);
                               },
                               child: Text(
                                 "Daftar",

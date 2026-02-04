@@ -148,7 +148,7 @@ class _AddNewDevicePageState extends ConsumerState<AddNewDevicePage> {
                     height: 44,
                     width: MediaQuery.of(context).size.width * 0.5,
                     onPressed: () {
-                      context.goNamed(RouteName.deviceCoordinatePage);
+                      context.pushNamed(RouteName.deviceCoordinatePage);
                     },
                   ),
                 ),
@@ -163,7 +163,7 @@ class _AddNewDevicePageState extends ConsumerState<AddNewDevicePage> {
           text: "Simpan",
           onPressed: () {
             if (_formKey.currentState!.validate()) {
-              // context.goNamed(RouteName.);
+              // context.pushNamed(RouteName.);
             }
           },
         ),

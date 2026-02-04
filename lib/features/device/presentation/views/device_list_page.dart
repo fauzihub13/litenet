@@ -39,8 +39,7 @@ class _DeviceListPageState extends ConsumerState<DeviceListPage> {
       // Floating Action Button Tambah (+)
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.goNamed(RouteName.addNewDevicePage);
-          
+          context.pushNamed(RouteName.addNewDevicePage);
         },
         backgroundColor: DefaultColors.purple50,
         elevation: 0,

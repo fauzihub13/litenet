@@ -13,7 +13,7 @@ class DeviceCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap: () {
-        context.goNamed(RouteName.detailProductPage);
+        context.pushNamed(RouteName.detailProductPage);
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),

@@ -60,7 +60,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                     icon: Assets.icons.profile,
                     title: "Ubah Profil",
                     onTap: () {
-                      context.goNamed(RouteName.changeProfilePage);
+                      context.pushNamed(RouteName.changeProfilePage);
                     },
                   ),
                   _buildSettingItem(
@@ -68,7 +68,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                     icon: Assets.icons.lock,
                     title: "Ubah Kata Sandi",
                     onTap: () {
-                      context.goNamed(RouteName.changePasswordPage);
+                      context.pushNamed(RouteName.changePasswordPage);
                     },
                   ),
                   _buildSettingItem(
@@ -76,7 +76,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                     icon: Assets.icons.faq,
                     title: "FAQ",
                     onTap: () {
-                      context.goNamed(RouteName.faqPage);
+                      context.pushNamed(RouteName.faqPage);
                     },
                   ),
                   _buildSettingItem(
@@ -84,7 +84,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                     icon: Assets.icons.info,
                     title: "Kebijakan Privasi",
                     onTap: () {
-                      context.goNamed(RouteName.tncPage);
+                      context.pushNamed(RouteName.tncPage);
                     },
                   ),
                   _buildSettingItem(

@@ -107,7 +107,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   _buildSectionHeader(
                     title: 'Promo',
                     onTap: () {
-                      context.goNamed(RouteName.productPage);
+                      context.pushNamed(RouteName.productPage);
                     },
                   ),
                   _buildPromoSlider(),
@@ -115,7 +115,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   _buildSectionHeader(
                     title: "Kuota",
                     onTap: () {
-                      context.goNamed(RouteName.productPage);
+                      context.pushNamed(RouteName.productPage);
                     },
                   ),
                   _buildQuotaList(),
