@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/form_input.dart';
 import 'package:litenet/core/widgets/row_title.dart';
-import 'package:litenet/features/quota/presentation/views/payment_method.page.dart';
+import 'package:litenet/routes/route_name.dart';
 
-class DetailQuotaPage extends StatefulWidget {
+class DetailQuotaPage extends ConsumerStatefulWidget {
   const DetailQuotaPage({super.key});
 
   @override
-  State<DetailQuotaPage> createState() => _DetailQuotaPageState();
+  ConsumerState<DetailQuotaPage> createState() => _DetailQuotaPageState();
 }
 
-class _DetailQuotaPageState extends State<DetailQuotaPage>
+class _DetailQuotaPageState extends ConsumerState<DetailQuotaPage>
     with TickerProviderStateMixin {
   late TabController _tabController;
   int _currentIndex = 0;
@@ -320,15 +322,7 @@ class _DetailQuotaPageState extends State<DetailQuotaPage>
           Button(
             text: "Pilih Metode Pembayaran",
             onPressed: () {
-              // Logika pembayaran
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return PaymentMethodPage();
-                  },
-                ),
-              );
+              context.goNamed(RouteName.paymentMethodPage);
             },
           ),
         ],

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/custom_search_bar.dart';
 import 'package:litenet/core/widgets/quota_card.dart';
 
-class QuotaPage extends StatelessWidget {
+class QuotaPage extends ConsumerWidget {
   const QuotaPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
     appBar: CustomAppbar(title: 'Pilihan Kuota'),
       body: Column(

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 
-class TermsAndConditionsPage extends StatelessWidget {
+class TermsAndConditionsPage extends ConsumerWidget {
   const TermsAndConditionsPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const CustomAppbar(title: 'Syarat dan Ketentuan'),

@@ -153,12 +153,7 @@ class _DetailDevicePageState extends State<DetailDevicePage> {
         child: Button(
           text: "Beli Kuota",
           onPressed: () {
-            //  Navigator.push(
-            //     context,
-            //     MaterialPageRoute(
-            //       builder: (context) {},
-            //     ),
-            //   );
+            // context.goNamed(RouteName.mainPage);
           },
         ),
       ),

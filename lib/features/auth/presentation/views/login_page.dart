@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/form_input.dart';
 import 'package:litenet/core/widgets/row_title.dart';
-import 'package:litenet/features/auth/presentation/views/register_page.dart';
-import 'package:litenet/features/home/presentation/views/main_page.dart';
 import 'package:litenet/gen/assets.gen.dart';
+import 'package:litenet/routes/route_name.dart';
 // Import file assets gen dan theme Anda di sini
 // import 'gen/assets.gen.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -117,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                       // Field Email
                       RowTitle(title: "Email"),
                       const SizedBox(height: 8),
-                       FormInput(
+                      FormInput(
                         textController: _emailController,
                         hintText: "sahroni@gmail.com",
                         validator: (value) {
@@ -167,12 +168,7 @@ class _LoginPageState extends State<LoginPage> {
                         text: "Masuk",
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const MainPage(),
-                              ),
-                            );
+                            context.goNamed(RouteName.mainPage);
                           }
                         },
                       ),
@@ -190,12 +186,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const RegisterPage(),
-                                  ),
-                                );
+                                context.goNamed(RouteName.registerPage);
                               },
                               child: Text(
                                 "Daftar",

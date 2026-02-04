@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/features/device/presentation/views/device_list_page.dart';
@@ -7,14 +8,14 @@ import 'package:litenet/features/order/presentation/views/order_history_page.dar
 import 'package:litenet/features/setting/presentation/views/setting_page.dart';
 import 'package:litenet/gen/assets.gen.dart';
 
-class MainPage extends StatefulWidget {
+class MainPage extends ConsumerStatefulWidget {
   const MainPage({super.key});
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  ConsumerState<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends ConsumerState<MainPage> {
   int _selectedIndex = 0;
   final List<Widget> _pageOptions = [
     HomePage(),

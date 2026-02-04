@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/button.dart';
 
@@ -50,7 +51,7 @@ void showLogoutModal(BuildContext context) {
                     buttonType: ButtonType.filled,
                     backgroundColor: DefaultColors.purple50,
                     textColor: DefaultColors.purple500,
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () => context.pop(),
                   ),
                 ),
 
@@ -64,7 +65,8 @@ void showLogoutModal(BuildContext context) {
                     onPressed: () {
                       // Tambahkan logika logout di sini (clear session, dll)
                       // Contoh: pindah ke halaman login
-                      Navigator.pop(context);
+                      
+                      context.pop();
                     },
                   ),
                 ),

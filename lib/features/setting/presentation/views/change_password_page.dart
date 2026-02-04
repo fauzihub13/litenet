@@ -5,14 +5,14 @@ import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/form_input.dart';
 import 'package:litenet/core/widgets/row_title.dart';
 
-class ChangePassword extends StatefulWidget {
-  const ChangePassword({super.key});
+class ChangePasswordPage extends StatefulWidget {
+  const ChangePasswordPage({super.key});
 
   @override
-  State<ChangePassword> createState() => _ChangePasswordState();
+  State<ChangePasswordPage> createState() => _ChangePasswordPageState();
 }
 
-class _ChangePasswordState extends State<ChangePassword> {
+class _ChangePasswordPageState extends State<ChangePasswordPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _oldPassswordController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();

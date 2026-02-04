@@ -6,14 +6,14 @@ import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/form_input.dart';
 import 'package:litenet/core/widgets/row_title.dart';
 
-class ChangeProfile extends StatefulWidget {
-  const ChangeProfile({super.key});
+class ChangeProfilePage extends StatefulWidget {
+  const ChangeProfilePage({super.key});
 
   @override
-  State<ChangeProfile> createState() => _ChangeProfileState();
+  State<ChangeProfilePage> createState() => _ChangeProfilePageState();
 }
 
-class _ChangeProfileState extends State<ChangeProfile> {
+class _ChangeProfilePageState extends State<ChangeProfilePage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();

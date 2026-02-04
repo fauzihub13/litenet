@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 
-class FAQPage extends StatelessWidget {
+class FAQPage extends ConsumerWidget {
   FAQPage({super.key});
 
   final List<FAQModel> faqs = [
@@ -36,7 +37,7 @@ class FAQPage extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const CustomAppbar(title: 'FAQ'),

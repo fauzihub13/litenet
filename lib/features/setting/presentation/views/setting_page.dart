@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/custom_modal.dart';
-import 'package:litenet/features/setting/presentation/views/change_password.dart';
-import 'package:litenet/features/setting/presentation/views/change_profile.dart';
-import 'package:litenet/features/setting/presentation/views/faq_page.dart';
-import 'package:litenet/features/setting/presentation/views/terms_and_conditions.dart';
 import 'package:litenet/gen/assets.gen.dart';
+import 'package:litenet/routes/route_name.dart';
 
-class SettingPage extends StatefulWidget {
+class SettingPage extends ConsumerStatefulWidget {
   const SettingPage({super.key});
 
   @override
-  State<SettingPage> createState() => _SettingPageState();
+  ConsumerState<SettingPage> createState() => _SettingPageState();
 }
 
-class _SettingPageState extends State<SettingPage> {
+class _SettingPageState extends ConsumerState<SettingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,14 +60,7 @@ class _SettingPageState extends State<SettingPage> {
                     icon: Assets.icons.profile,
                     title: "Ubah Profil",
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return ChangeProfile();
-                          },
-                        ),
-                      );
+                      context.goNamed(RouteName.changeProfilePage);
                     },
                   ),
                   _buildSettingItem(
@@ -76,14 +68,7 @@ class _SettingPageState extends State<SettingPage> {
                     icon: Assets.icons.lock,
                     title: "Ubah Kata Sandi",
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return ChangePassword();
-                          },
-                        ),
-                      );
+                      context.goNamed(RouteName.changePasswordPage);
                     },
                   ),
                   _buildSettingItem(
@@ -91,14 +76,7 @@ class _SettingPageState extends State<SettingPage> {
                     icon: Assets.icons.faq,
                     title: "FAQ",
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return FAQPage();
-                          },
-                        ),
-                      );
+                      context.goNamed(RouteName.faqPage);
                     },
                   ),
                   _buildSettingItem(
@@ -106,14 +84,7 @@ class _SettingPageState extends State<SettingPage> {
                     icon: Assets.icons.info,
                     title: "Kebijakan Privasi",
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return TermsAndConditionsPage();
-                          },
-                        ),
-                      );
+                      context.goNamed(RouteName.tncPage);
                     },
                   ),
                   _buildSettingItem(

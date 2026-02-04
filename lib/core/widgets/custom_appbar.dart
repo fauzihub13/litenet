@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/gen/assets.gen.dart';
 
-class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
+class CustomAppbar extends ConsumerWidget implements PreferredSizeWidget {
   final String title;
   final bool isLeading;
   final bool isRounded;
@@ -15,7 +17,7 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return AppBar(
       backgroundColor: DefaultColors.purple500,
       elevation: 0,
@@ -29,7 +31,7 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
                   BlendMode.srcIn,
                 ),
               ),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => context.pop(),
             )
           : Container(),
       title: Text(

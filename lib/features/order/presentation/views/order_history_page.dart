@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/enum.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/custom_search_bar.dart';
-import 'package:litenet/features/order/presentation/views/detail_order_history_page.dart';
 import 'package:litenet/features/order/presentation/widgets/order_history_card.dart';
+import 'package:litenet/routes/route_name.dart';
 
-class OrderHistoryPage extends StatefulWidget {
+class OrderHistoryPage extends ConsumerStatefulWidget {
   const OrderHistoryPage({super.key});
 
   @override
-  State<OrderHistoryPage> createState() => _OrderHistoryPageState();
+  ConsumerState<OrderHistoryPage> createState() => _OrderHistoryPageState();
 }
 
-class _OrderHistoryPageState extends State<OrderHistoryPage> {
+class _OrderHistoryPageState extends ConsumerState<OrderHistoryPage> {
   String _selectedStatus = "Selesai";
   final List<String> _categories = ["Selesai", "Diproses", "Gagal"];
 
@@ -71,11 +73,9 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
                 return OrderHistoryCard(
                   order: _orders[index],
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>  DetailOrderPage(status: _orders[index].status),
-                      ),
+                    context.goNamed(
+                      RouteName.detailOrderHistoryPage,
+                      extra: _orders[index].status,
                     );
                   },
                 );
@@ -109,8 +109,6 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
     );
   }
 }
-
-
 
 class OrderHistory {
   final String trxId;

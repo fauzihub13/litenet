@@ -1,31 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/helper/permission.dart';
 import 'package:litenet/core/widgets/promo_card.dart';
 import 'package:litenet/core/widgets/quota_card.dart';
-import 'package:litenet/features/promo/presentation/views/promo_page.dart';
-import 'package:litenet/features/quota/presentation/views/quota_page.dart';
 import 'package:litenet/gen/assets.gen.dart';
+import 'package:litenet/routes/route_name.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   @override
   void initState() {
     super.initState();
     _loadLocation();
   }
+
   Future<void> _loadLocation() async {
     final latLng = await LocationHelper.initLocation();
     if (latLng != null) {
       print("✅ LatLng: $latLng");
-      
     } else {
       ScaffoldMessenger.of(
         context,
@@ -106,12 +107,7 @@ class _HomePageState extends State<HomePage> {
                   _buildSectionHeader(
                     title: 'Promo',
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const PromoPage(),
-                        ),
-                      );
+                      context.goNamed(RouteName.productPage);
                     },
                   ),
                   _buildPromoSlider(),
@@ -119,12 +115,7 @@ class _HomePageState extends State<HomePage> {
                   _buildSectionHeader(
                     title: "Kuota",
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const QuotaPage(),
-                        ),
-                      );
+                      context.goNamed(RouteName.productPage);
                     },
                   ),
                   _buildQuotaList(),
@@ -257,9 +248,7 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.only(left: PaddingSize.horizontal),
         itemCount: 4,
         itemBuilder: (context, index) {
-          return PromoCard(onTap: () {
-            
-          },);
+          return PromoCard(onTap: () {});
         },
       ),
     );

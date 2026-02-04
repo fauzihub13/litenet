@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/gen/assets.gen.dart';
@@ -81,7 +82,7 @@ void showPromoModal(BuildContext context) {
               text: "Salin Kode Promo",
               buttonType: ButtonType.filled,
               onPressed: () {
-                Navigator.pop(context);
+                context.pop();
               },
             ),
             const SizedBox(height: 20), // Memberikan padding bawah agar aman

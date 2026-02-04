@@ -1,24 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/custom_badge.dart';
-import 'package:litenet/features/quota/presentation/views/detail_quota_page.dart';
+import 'package:litenet/routes/route_name.dart';
 
-class QuotaCard extends StatelessWidget {
+class QuotaCard extends ConsumerWidget {
   const QuotaCard({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return DetailQuotaPage();
-            },
-          ),
-        );
+        context.goNamed(RouteName.detailProductPage);
+        
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: PaddingSize.horizontal),

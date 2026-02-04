@@ -1,24 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/theme.dart';
-import 'package:litenet/features/device/presentation/views/detail_device_page.dart';
 import 'package:litenet/gen/assets.gen.dart';
+import 'package:litenet/routes/route_name.dart';
 
-class DeviceCard extends StatelessWidget {
+class DeviceCard extends ConsumerWidget {
   const DeviceCard({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return DetailDevicePage();
-            },
-          ),
-        );
+        context.goNamed(RouteName.detailProductPage);
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),

@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/custom_search_bar.dart';
-import 'package:litenet/features/device/presentation/views/add_new_device_page.dart';
 import 'package:litenet/features/device/presentation/widgets/device_card.dart';
+import 'package:litenet/routes/route_name.dart';
 
-class DeviceListPage extends StatefulWidget {
+class DeviceListPage extends ConsumerStatefulWidget {
   const DeviceListPage({super.key});
 
   @override
-  State<DeviceListPage> createState() => _DeviceListPageState();
+  ConsumerState<DeviceListPage> createState() => _DeviceListPageState();
 }
 
-class _DeviceListPageState extends State<DeviceListPage> {
+class _DeviceListPageState extends ConsumerState<DeviceListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,14 +39,8 @@ class _DeviceListPageState extends State<DeviceListPage> {
       // Floating Action Button Tambah (+)
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return AddNewDevicePage();
-              },
-            ),
-          );
+          context.goNamed(RouteName.addNewDevicePage);
+          
         },
         backgroundColor: DefaultColors.purple50,
         elevation: 0,

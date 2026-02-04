@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/form_input.dart';
 import 'package:litenet/core/widgets/row_title.dart';
-import 'package:litenet/features/auth/presentation/views/login_page.dart';
 import 'package:litenet/gen/assets.gen.dart';
+import 'package:litenet/routes/route_name.dart';
 
-class RegisterPage extends StatefulWidget {
+class RegisterPage extends ConsumerStatefulWidget {
   const RegisterPage({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  ConsumerState<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterPageState extends ConsumerState<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -135,7 +137,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       // Field Email
                       RowTitle(title: "Email"),
                       const SizedBox(height: 8),
-                       FormInput(
+                      FormInput(
                         textController: _emailController,
                         hintText: "sahroni@gmail.com",
                         validator: (value) {
@@ -262,12 +264,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const LoginPage(),
-                                  ),
-                                );
+                                context.goNamed(RouteName.loginPage);
                               },
                               child: Text(
                                 "Masuk",

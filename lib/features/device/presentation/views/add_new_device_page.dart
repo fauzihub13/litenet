@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/form_input.dart';
 import 'package:litenet/core/widgets/row_title.dart';
-import 'package:litenet/features/device/presentation/views/coordinate_device_page.dart';
+import 'package:litenet/routes/route_name.dart';
 
-class AddNewDevicePage extends StatefulWidget {
+class AddNewDevicePage extends ConsumerStatefulWidget {
   const AddNewDevicePage({super.key});
 
   @override
-  State<AddNewDevicePage> createState() => _AddNewDevicePageState();
+  ConsumerState<AddNewDevicePage> createState() => _AddNewDevicePageState();
 }
 
-class _AddNewDevicePageState extends State<AddNewDevicePage> {
+class _AddNewDevicePageState extends ConsumerState<AddNewDevicePage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -101,7 +103,6 @@ class _AddNewDevicePageState extends State<AddNewDevicePage> {
                 ),
                 const SizedBox(height: 16),
 
-                // TODO: GOOGLE MAPS PREVIEW
                 Container(
                   width: double.infinity,
                   height: 200,
@@ -147,14 +148,7 @@ class _AddNewDevicePageState extends State<AddNewDevicePage> {
                     height: 44,
                     width: MediaQuery.of(context).size.width * 0.5,
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return CoordinateDevicePage();
-                          },
-                        ),
-                      );
+                      context.goNamed(RouteName.deviceCoordinatePage);
                     },
                   ),
                 ),
@@ -169,12 +163,7 @@ class _AddNewDevicePageState extends State<AddNewDevicePage> {
           text: "Simpan",
           onPressed: () {
             if (_formKey.currentState!.validate()) {
-              //  Navigator.push(
-              //     context,
-              //     MaterialPageRoute(
-              //       builder: (context) {},
-              //     ),
-              //   );
+              // context.goNamed(RouteName.);
             }
           },
         ),

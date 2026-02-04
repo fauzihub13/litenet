@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/button.dart';
-import 'package:litenet/features/auth/presentation/views/login_page.dart';
 import 'package:litenet/gen/assets.gen.dart';
+import 'package:litenet/routes/route_name.dart';
 
-class OnboardingPage extends StatefulWidget {
+class OnboardingPage extends ConsumerStatefulWidget {
   const OnboardingPage({super.key});
 
   @override
-  State<OnboardingPage> createState() => _OnboardingPageState();
+  ConsumerState<OnboardingPage> createState() => _OnboardingPageState();
 }
 
-class _OnboardingPageState extends State<OnboardingPage> {
+class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   final PageController _textPageController = PageController();
   final PageController _imagePageController = PageController();
   int _currentPage = 0;
@@ -156,13 +158,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           curve: Curves.easeIn,
                         );
                       } else {
-                        // Aksi Masuk ke Dashboard
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginPage(),
-                          ),
-                        );
+                        context.goNamed(RouteName.loginPage);
                       }
                     },
                     text: _currentPage == onboardingData.length - 1
@@ -210,12 +206,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
   }
 }
 
-class OnboardingContent extends StatelessWidget {
+class OnboardingContent extends ConsumerWidget {
   final String title, desc;
   const OnboardingContent({super.key, required this.title, required this.desc});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return SingleChildScrollView(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
-import 'package:litenet/features/quota/presentation/views/payment_order_page.dart';
+import 'package:litenet/routes/route_name.dart';
 
-class PaymentMethodPage extends StatefulWidget {
+class PaymentMethodPage extends ConsumerStatefulWidget {
   const PaymentMethodPage({super.key});
 
   @override
-  State<PaymentMethodPage> createState() => _PaymentMethodPageState();
+  ConsumerState<PaymentMethodPage> createState() => _PaymentMethodPageState();
 }
 
-class _PaymentMethodPageState extends State<PaymentMethodPage> {
+class _PaymentMethodPageState extends ConsumerState<PaymentMethodPage> {
   String _selectedPaymentId = "bca";
 
   final List<PaymentMethod> _methods = [
@@ -79,14 +81,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
           onPressed: () {
             if (_selectedPaymentId.isNotEmpty) {
               // print(_selectedPaymentId);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return PaymentOrderPage();
-                  },
-                ),
-              );
+              context.goNamed(RouteName.paymentPage);
             }
           },
         ),

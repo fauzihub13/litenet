@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/enum.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/gen/assets.gen.dart';
 
-class DetailOrderPage extends StatelessWidget {
+class DetailOrderHistoryPage extends ConsumerWidget {
   final TransactionStatus status;
-  const DetailOrderPage({super.key, required this.status});
+  const DetailOrderHistoryPage({super.key, required this.status});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -102,7 +104,7 @@ class DetailOrderPage extends StatelessWidget {
                   buttonType: ButtonType.outlined,
                   backgroundColor: DefaultColors.purple50,
                   textColor: DefaultColors.purple500,
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => context.pop(),
                 ),
                 const SizedBox(height: 30),
               ],
