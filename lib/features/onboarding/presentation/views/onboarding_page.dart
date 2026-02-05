@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/button.dart';
+import 'package:litenet/features/onboarding/presentation/controllers/onboarding_provider.dart';
 import 'package:litenet/gen/assets.gen.dart';
 import 'package:litenet/routes/route_name.dart';
 
@@ -151,14 +152,20 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
                   // Tombol Selanjutnya
                   Button(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_currentPage < onboardingData.length - 1) {
                         _textPageController.nextPage(
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeIn,
                         );
                       } else {
-                        context.pushNamed(RouteName.loginPage);
+                        await storage.write(
+                          key: 'seenOnboarding',
+                          value: 'true',
+                        );
+                        if (context.mounted) {
+                          context.pushNamed(RouteName.loginPage);
+                        }
                       }
                     },
                     text: _currentPage == onboardingData.length - 1

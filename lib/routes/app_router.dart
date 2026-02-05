@@ -8,6 +8,7 @@ import 'package:litenet/features/device/presentation/views/detail_device_page.da
 import 'package:litenet/features/device/presentation/views/device_list_page.dart';
 import 'package:litenet/features/home/presentation/views/home_page.dart';
 import 'package:litenet/features/home/presentation/views/main_page.dart';
+import 'package:litenet/features/onboarding/presentation/controllers/onboarding_provider.dart';
 import 'package:litenet/features/onboarding/presentation/views/onboarding_page.dart';
 import 'package:litenet/features/order/presentation/views/detail_order_history_page.dart';
 import 'package:litenet/features/order/presentation/views/order_history_page.dart';
@@ -28,10 +29,26 @@ part 'app_router.g.dart';
 
 @riverpod
 GoRouter appRouter(Ref ref) {
+  final seenOnboardingAsync = ref.watch(seenOnboardingProvider);
+
+  // sementara tunggu async selesai → splash
+  // if (!seenOnboardingAsync.hasValue) {
+  //   return GoRouter(
+  //     initialLocation: '/splash',
+  //     routes: [
+  //       GoRoute(path: '/splash', builder: (_, __) => const SplashPage()),
+  //     ],
+  //   );
+  // }
+
+  final seenOnboarding = seenOnboardingAsync.value ?? false;
+
   return GoRouter(
     debugLogDiagnostics: true,
 
-    initialLocation: '/${RouteName.onboardingPage}',
+    initialLocation: seenOnboarding
+        ? '/${RouteName.loginPage}'
+        : '/${RouteName.onboardingPage}',
 
     routes: [
       // =====================
@@ -171,7 +188,8 @@ GoRouter appRouter(Ref ref) {
           GoRoute(
             path: '/${RouteName.monitoringPage}',
             name: RouteName.monitoringPage,
-            pageBuilder: (_, __) => NoTransitionPage(child: const DeviceListPage()),
+            pageBuilder: (_, __) =>
+                NoTransitionPage(child: const DeviceListPage()),
 
             routes: [],
           ),
@@ -182,7 +200,8 @@ GoRouter appRouter(Ref ref) {
           GoRoute(
             path: '/${RouteName.orderHistoryPage}',
             name: RouteName.orderHistoryPage,
-            pageBuilder: (_, __) => NoTransitionPage(child: const OrderHistoryPage()),
+            pageBuilder: (_, __) =>
+                NoTransitionPage(child: const OrderHistoryPage()),
 
             routes: [],
           ),
@@ -193,7 +212,8 @@ GoRouter appRouter(Ref ref) {
           GoRoute(
             path: '/${RouteName.settingPage}',
             name: RouteName.settingPage,
-            pageBuilder: (_, __) => NoTransitionPage(child: const SettingPage()),
+            pageBuilder: (_, __) =>
+                NoTransitionPage(child: const SettingPage()),
           ),
         ],
       ),
