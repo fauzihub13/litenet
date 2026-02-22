@@ -5,7 +5,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'repository_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 LoginRepository loginRepository(Ref ref) {
-  return LoginRepositoryImpl(loginDatasource: ref.watch(loginDatasourceProvider));
+  // Use read() instead of watch() since datasource doesn't need to be reactive
+  return LoginRepositoryImpl(
+    loginDatasource: ref.read(loginDatasourceProvider),
+  );
 }

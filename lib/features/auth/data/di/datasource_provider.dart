@@ -4,7 +4,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'datasource_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 LoginDatasource loginDatasource(Ref ref) {
-  return LoginDatasourceImpl(httpClient: ref.watch(dioProvider));
+  // Use read() instead of watch() since Dio doesn't need to be reactive
+  return LoginDatasourceImpl(httpClient: ref.read(dioProvider));
 }

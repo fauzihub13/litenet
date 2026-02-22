@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:litenet/core/constants/theme.dart';
+import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/form_input.dart';
 import 'package:litenet/core/widgets/row_title.dart';
@@ -10,40 +12,64 @@ import 'package:litenet/features/auth/presentation/controllers/login_provider.da
 import 'package:litenet/gen/assets.gen.dart';
 import 'package:litenet/routes/route_name.dart';
 
-class LoginPage extends ConsumerStatefulWidget {
+class LoginPage extends HookConsumerWidget {
   const LoginPage({super.key});
 
   @override
-  ConsumerState<LoginPage> createState() => _LoginPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final formKey = useMemoized(() => GlobalKey<FormState>());
+    final emailController = useTextEditingController();
+    final passwordController = useTextEditingController();
+    final isObscure = useState(true);
 
-class _LoginPageState extends ConsumerState<LoginPage> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+    final loginState = ref.watch(loginProvider);
+    ref.listen(loginProvider, (previous, next) {
+      if (next is AsyncError && next != previous) {
+        final error = (next.error) as Failure;
+        ScaffoldMessenger.of(context).clearSnackBars();
+        print('GAGAL LOGINXXXX');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error.message ?? 'Terjadi kesalahan'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
 
-  bool _isObscure = true;
+      if (next.hasValue) {
+        final data = next.value;
+        if (data != null) {
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Login berhasil!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          Future.delayed(const Duration(milliseconds: 500), () {
+            if (Navigator.of(context).mounted)
+              context.goNamed(RouteName.homePage);
+          });
+        }
+      }
+    });
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
+    // Register listener once using useEffect
+    // useEffect(() {
 
-  @override
-  Widget build(BuildContext context) {
+    //   return null; // no cleanup
+    // }, const []);
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // 1. Header Background Ungu (Dinamis tanpa Stack)
+            // Header Background Ungu
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.only(
-                bottom: 80,
-              ), // Ruang ekstra untuk overlap card
+              padding: const EdgeInsets.only(bottom: 80),
               decoration: const BoxDecoration(color: DefaultColors.purple500),
               child: SafeArea(
                 child: Column(
@@ -60,7 +86,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      "Daftar",
+                      "Masuk",
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -70,7 +96,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 40),
                       child: Text(
-                        "Buat akun baru untuk menggunakan aplikasi LiteNet",
+                        "Masuk ke akun Anda untuk menggunakan aplikasi LiteNet",
                         textAlign: TextAlign.center,
                         style: Theme.of(
                           context,
@@ -82,7 +108,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               ),
             ),
 
-            // 2. Form Card (Menggunakan Transform agar tetap overlap secara aman)
+            // Form Card
             Transform.translate(
               offset: const Offset(0, -90),
               child: Padding(
@@ -103,7 +129,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     ],
                   ),
                   child: Form(
-                    key: _formKey,
+                    key: formKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
@@ -112,15 +138,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         const RowTitle(title: "Email"),
                         const SizedBox(height: 8),
                         FormInput(
-                          textController: _emailController,
-                          hintText: "sahroni@gmail.com",
-                          keyboardType: TextInputType.text,
+                          textController: emailController,
+                          hintText: "user@example.com",
+                          keyboardType: TextInputType.emailAddress,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Email tidak boleh kosong';
                             }
                             final emailRegex = RegExp(
-                              r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                              r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
                             );
                             if (!emailRegex.hasMatch(value)) {
                               return 'Format email salah';
@@ -134,17 +160,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         const RowTitle(title: "Kata Sandi"),
                         const SizedBox(height: 8),
                         FormInput(
-                          textController: _passwordController,
+                          textController: passwordController,
                           hintText: "*******",
-                          obscureText: _isObscure,
+                          obscureText: isObscure.value,
                           suffixIcon: Icon(
-                            _isObscure
+                            isObscure.value
                                 ? Icons.visibility_off_outlined
                                 : Icons.visibility_outlined,
                             size: 22,
                           ),
                           onSuffixIconTap: () =>
-                              setState(() => _isObscure = !_isObscure),
+                              isObscure.value = !isObscure.value,
                           validator: (value) => (value == null || value.isEmpty)
                               ? 'Sandi tidak boleh kosong'
                               : null,
@@ -154,29 +180,20 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         // Tombol Masuk
                         Button(
                           text: "Masuk",
-                          onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              try {
-                                final response = await ref.read(
-                                  loginProvider(
-                                    email: _emailController.text,
-                                    password: _passwordController.text,
-                                  ).future,
-                                );
-                                print(response);
-
-                                // sukses login
-                                context.goNamed(RouteName.homePage);
-                              } catch (e) {
-                                // gagal login
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text("Login gagal: $e")),
-                                );
-                              }
+                          isLoading: loginState.isLoading,
+                          isDisabled: loginState.isLoading,
+                          onPressed: () {
+                            if (formKey.currentState!.validate()) {
+                              print('presss');
+                              ref
+                                  .read(loginProvider.notifier)
+                                  .login(
+                                    email: emailController.text.trim(),
+                                    password: passwordController.text,
+                                  );
                             }
                           },
                         ),
-
                         const SizedBox(height: 20),
 
                         // Link Daftar

@@ -13,10 +13,9 @@ part 'dio_provider.g.dart';
 
 final baseUrl = dotenv.env['BASE_URL'];
 
-@riverpod
+@Riverpod(keepAlive: true)
 Dio dio(Ref ref) {
   final dio = Dio();
-  print("BASE URL -> $baseUrl");
   dio.options.baseUrl = baseUrl!;
   dio.options.connectTimeout = const Duration(seconds: 120);
   dio.options.receiveTimeout = const Duration(seconds: 120);
@@ -29,34 +28,41 @@ Dio dio(Ref ref) {
   dio.interceptors.add(
     InterceptorsWrapper(
       onRequest: (options, handler) async {
-        TokenManager tokenManager = await ref.watch(
-          tokenManagerProvider.future,
-        );
-        final authToken = await tokenManager.getToken();
+        try {
+          final tokenManager = await ref.read(tokenManagerProvider.future);
+          final authToken = await tokenManager.getToken();
+          options.headers['Authorization'] = 'Bearer $authToken';
 
-        options.headers['Authorization'] = 'Bearer $authToken';
+          // Get the User-Agent
+          final String userAgent = await UserAgentHelper.initUserAgentState();
+          options.headers['User-Agent'] = userAgent;
 
-        // Get the User-Agent
-        String userAgent = await UserAgentHelper.initUserAgentState();
-        options.headers['User-Agent'] = userAgent;
-
-        return handler.next(options);
+          return handler.next(options);
+        } catch (e) {
+          return handler.next(options);
+        }
       },
       onError: (error, handler) async {
         if (error.response?.statusCode == 401) {
-          final tokenManager = await ref.read(tokenManagerProvider.future);
-          final userManager = await ref.read(userManagerProvider.future);
+          try {
+            final tokenManager = await ref.read(tokenManagerProvider.future);
+            final userManager = await ref.read(userManagerProvider.future);
 
-          if (await userManager.hasUser()) {
-            await tokenManager.removeToken();
-            await userManager.removeUser();
+            if (await userManager.hasUser()) {
+              await tokenManager.removeToken();
+              await userManager.removeUser();
 
-            ref.read(appRouterProvider).pushReplacementNamed(RouteName.loginPage);
+              ref
+                  .read(appRouterProvider)
+                  .pushReplacementNamed(RouteName.loginPage);
+            }
+          } catch (e) {
+            print('Error handling 401: $e');
           }
+          return handler.next(error);
         } else {
           return handler.next(error);
         }
-        return handler.next(error);
       },
     ),
   );
@@ -70,5 +76,11 @@ Dio dio(Ref ref) {
       ),
     );
   }
+
+  // Handle cleanup
+  ref.onDispose(() {
+    dio.close(force: true);
+  });
+
   return dio;
 }

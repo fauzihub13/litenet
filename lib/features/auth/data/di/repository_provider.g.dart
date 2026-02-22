@@ -22,7 +22,7 @@ final class LoginRepositoryProvider
         argument: null,
         retry: null,
         name: r'loginRepositoryProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -49,4 +49,4 @@ final class LoginRepositoryProvider
   }
 }
 
-String _$loginRepositoryHash() => r'f60d65aca32f315b21922b1187e00d147d86d144';
+String _$loginRepositoryHash() => r'30ee18c7d48021ba1386f39ece162ccb7f9ebdba';

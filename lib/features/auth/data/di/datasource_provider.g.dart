@@ -22,7 +22,7 @@ final class LoginDatasourceProvider
         argument: null,
         retry: null,
         name: r'loginDatasourceProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -49,4 +49,4 @@ final class LoginDatasourceProvider
   }
 }
 
-String _$loginDatasourceHash() => r'c307da19dc4cbc484a9610cd74fc32a597a059df';
+String _$loginDatasourceHash() => r'5c6ea5767269b791b5a3cab16707a111d0a8aab3';

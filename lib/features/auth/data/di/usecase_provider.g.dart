@@ -21,7 +21,7 @@ final class LoginUsecaseProvider
         argument: null,
         retry: null,
         name: r'loginUsecaseProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -48,4 +48,4 @@ final class LoginUsecaseProvider
   }
 }
 
-String _$loginUsecaseHash() => r'a7112ebb3991b603828956421053e8ea47336842';
+String _$loginUsecaseHash() => r'190cbae45e6f55b40b79a392827f83bae182543a';

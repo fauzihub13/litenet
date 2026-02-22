@@ -8,6 +8,7 @@ class Button extends StatelessWidget {
   final String text;
   final ButtonType buttonType;
   final bool isDisabled;
+  final bool isLoading;
   final double? width;
   final double? height;
   final double? fontSize;
@@ -21,6 +22,7 @@ class Button extends StatelessWidget {
     required this.text,
     this.buttonType = ButtonType.filled,
     this.isDisabled = false,
+    this.isLoading = false,
     this.width = double.infinity,
     this.height,
     this.fontSize = 16,
@@ -32,15 +34,16 @@ class Button extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isFilled = buttonType == ButtonType.filled;
+    final isButtonDisabled = isDisabled || isLoading;
 
     if (isFilled) {
       return SizedBox(
         width: width,
         height: height ?? 55,
         child: ElevatedButton(
-          onPressed: isDisabled ? null : onPressed,
+          onPressed: isButtonDisabled ? null : onPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: isDisabled
+            backgroundColor: isButtonDisabled
                 ? DefaultColors.purple100
                 : backgroundColor,
             shadowColor: Colors.transparent,
@@ -49,14 +52,25 @@ class Button extends StatelessWidget {
             ),
             elevation: 0,
           ),
-          child: Text(
-            text,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: textColor,
-              fontWeight: FontWeight.w500,
-              fontSize: fontSize,
-            ),
-          ),
+          child: isLoading
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      DefaultColors.white,
+                    ),
+                  ),
+                )
+              : Text(
+                  text,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: textColor,
+                    fontWeight: FontWeight.w500,
+                    fontSize: fontSize,
+                  ),
+                ),
         ),
       );
     } else {
@@ -64,7 +78,7 @@ class Button extends StatelessWidget {
         width: width,
         height: height ?? 50,
         child: ElevatedButton(
-          onPressed: isDisabled ? null : onPressed,
+          onPressed: isButtonDisabled ? null : onPressed,
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.transparent,
             overlayColor: DefaultColors.purple400,
@@ -72,20 +86,31 @@ class Button extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
               side: BorderSide(
-                color: isDisabled ? Colors.transparent : borderColor,
+                color: isButtonDisabled ? Colors.transparent : borderColor,
                 width: 1.5,
               ),
             ),
             elevation: 0,
           ),
-          child: Text(
-            text,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: DefaultColors.purple500,
-              fontWeight: FontWeight.w500,
-              fontSize: fontSize,
-            ),
-          ),
+          child: isLoading
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      DefaultColors.purple500,
+                    ),
+                  ),
+                )
+              : Text(
+                  text,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: DefaultColors.purple500,
+                    fontWeight: FontWeight.w500,
+                    fontSize: fontSize,
+                  ),
+                ),
         ),
       );
     }
