@@ -6,6 +6,7 @@ import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/form_input.dart';
 import 'package:litenet/core/widgets/row_title.dart';
+import 'package:litenet/features/auth/presentation/controllers/login_provider.dart';
 import 'package:litenet/gen/assets.gen.dart';
 import 'package:litenet/routes/route_name.dart';
 
@@ -153,12 +154,29 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         // Tombol Masuk
                         Button(
                           text: "Masuk",
-                          onPressed: () {
+                          onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-                              context.goNamed(RouteName.homePage);
+                              try {
+                                final response = await ref.read(
+                                  loginProvider(
+                                    email: _emailController.text,
+                                    password: _passwordController.text,
+                                  ).future,
+                                );
+                                print(response);
+
+                                // sukses login
+                                context.goNamed(RouteName.homePage);
+                              } catch (e) {
+                                // gagal login
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text("Login gagal: $e")),
+                                );
+                              }
                             }
                           },
                         ),
+
                         const SizedBox(height: 20),
 
                         // Link Daftar
