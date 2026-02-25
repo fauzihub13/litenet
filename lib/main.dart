@@ -3,19 +3,23 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/constants/variable.dart';
+import 'package:litenet/core/provider/user_manager_provider.dart';
+import 'package:litenet/features/onboarding/presentation/controllers/onboarding_provider.dart';
 import 'package:litenet/routes/app_router.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
-  final baseUrl = dotenv.env['BASE_URL'];
-  print("BASE URL -> $baseUrl");
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(ProviderScope(child: const MyApp()));
+  final container = ProviderContainer();
+  await Future.wait([
+    container.read(seenOnboardingProvider.future),
+    container.read(userManagerProvider.future),
+  ]);
+  runApp(UncontrolledProviderScope(container: container, child: const MyApp()));
 }
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
-  
 
   // This widget is the root of your application.
   @override

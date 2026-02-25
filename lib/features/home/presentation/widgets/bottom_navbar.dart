@@ -8,15 +8,13 @@ import 'package:litenet/routes/route_name.dart';
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
 
-  const BottomNavBar({required this.currentIndex});
+  const BottomNavBar({super.key, required this.currentIndex});
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 90,
+    return SafeArea(
       child: BottomNavigationBar(
         currentIndex: currentIndex,
-
         onTap: (index) {
           switch (index) {
             case 0:
@@ -36,7 +34,7 @@ class BottomNavBar extends StatelessWidget {
               break;
           }
         },
-
+        elevation: 0,
         type: BottomNavigationBarType.fixed,
         backgroundColor: DefaultColors.white,
         selectedItemColor: DefaultColors.purple500,
@@ -46,9 +44,7 @@ class BottomNavBar extends StatelessWidget {
           fontWeight: FontWeight.w600,
           fontSize: 12,
         ),
-
         unselectedLabelStyle: const TextStyle(fontSize: 12),
-
         items: [
           BottomNavigationBarItem(
             icon: _NavIcon(Assets.icons.home, currentIndex == 0),
@@ -70,7 +66,6 @@ class BottomNavBar extends StatelessWidget {
             label: 'Pengaturan',
           ),
         ],
-
       ),
     );
   }
@@ -80,12 +75,13 @@ class _NavIcon extends StatelessWidget {
   final String asset;
   final bool isSelected;
 
-  const _NavIcon(this.asset, this.isSelected );
+  const _NavIcon(this.asset, this.isSelected);
 
   @override
   Widget build(BuildContext context) {
-    return SvgPicture.asset(asset,
-    colorFilter: ColorFilter.mode(
+    return SvgPicture.asset(
+      asset,
+      colorFilter: ColorFilter.mode(
         isSelected
             ? DefaultColors.purple500
             : DefaultColors.purple100.withValues(alpha: 0.6),

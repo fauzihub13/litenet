@@ -6,7 +6,7 @@ class LocationHelper {
   static Future<LatLng?> initLocation() async {
     // minta izin dulu
     var status = await Permission.location.request();
-    print(status.toString());
+    // print(status.toString());
     if (status.isGranted) {
       print("✅ Izin lokasi diberikan");
       Position position = await Geolocator.getCurrentPosition(

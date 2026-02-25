@@ -4,6 +4,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/helper/permission.dart';
+import 'package:litenet/core/provider/user_manager_provider.dart';
+import 'package:litenet/core/widgets/custom_snackbar.dart';
 import 'package:litenet/core/widgets/promo_card.dart';
 import 'package:litenet/core/widgets/quota_card.dart';
 import 'package:litenet/gen/assets.gen.dart';
@@ -28,14 +30,14 @@ class _HomePageState extends ConsumerState<HomePage> {
     if (latLng != null) {
       print("✅ LatLng: $latLng");
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Izin lokasi ditolak")));
+      if (mounted) context.showError("Izin lokasi ditolak");
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final userAsync = ref.watch(getCurrentUserProvider);
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
       body: SingleChildScrollView(
@@ -79,13 +81,33 @@ class _HomePageState extends ConsumerState<HomePage> {
                       ],
                     ),
                     const SizedBox(height: 30),
-                    Text(
-                      "Halo Tonald,",
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: DefaultColors.purple50,
-                        fontWeight: FontWeight.bold,
+                    userAsync.when(
+                      data: (user) => Text(
+                        "Halo ${user.name}",
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: DefaultColors.purple50,
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                      loading: () => Text(
+                        "Halo ",
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: DefaultColors.purple50,
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ), // Muncul loading sebentar
+                      error: (err, stack) => Text(
+                        "Halo ",
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: DefaultColors.purple50,
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                     ),
+
                     Text(
                       "selamat datang kembali!",
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -107,7 +129,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   _buildSectionHeader(
                     title: 'Promo',
                     onTap: () {
-                      context.pushNamed(RouteName.productPage);
+                      context.pushNamed(RouteName.promoPage);
                     },
                   ),
                   _buildPromoSlider(),

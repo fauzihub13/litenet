@@ -48,4 +48,38 @@ class User {
     required this.updatedAt,
     required this.deletedAt,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'avatar': avatar,
+      'email': email,
+      'phoneNumber': phoneNumber,
+      'role': role,
+      'emailOtp': emailOtp,
+      'emailOtpExpiredAt': emailOtpExpiredAt.toIso8601String(),
+      'emailVerifiedAt': emailVerifiedAt.toIso8601String(),
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+      'deletedAt': deletedAt.toIso8601String(),
+    };
+  }
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['id'],
+      name: json['name'],
+      avatar: json['avatar'],
+      email: json['email'],
+      phoneNumber: json['phoneNumber'],
+      role: json['role'],
+      emailOtp: json['emailOtp'],
+      emailOtpExpiredAt: DateTime.parse(json['emailOtpExpiredAt']),
+      emailVerifiedAt: DateTime.parse(json['emailVerifiedAt']),
+      createdAt: DateTime.parse(json['createdAt']),
+      updatedAt: DateTime.parse(json['updatedAt']),
+      deletedAt: DateTime.parse(json['deletedAt']),
+    );
+  }
 }

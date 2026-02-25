@@ -1,8 +1,7 @@
 import 'dart:convert';
 
-
 import 'package:litenet/core/provider/shared_preference_provider.dart';
-import 'package:litenet/features/auth/data/models/login_model.dart';
+import 'package:litenet/features/auth/domain/entities/login.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,9 +14,9 @@ FutureOr<UserManager> userManager(Ref ref) async {
 }
 
 @riverpod
-FutureOr<UserModel> getCurrentUser(Ref ref) async {
+FutureOr<User> getCurrentUser(Ref ref) async {
   final userManager = await ref.watch(userManagerProvider.future);
-  final user = await userManager.getUser();
+  final user =  userManager.getUser();
   if (user != null) {
     return user;
   } else {
@@ -30,29 +29,25 @@ class UserManager {
 
   UserManager({required this.sharedPreferences});
 
-  Future<void> saveUser(UserModel user) async {
+  Future<void> saveUser(User user) async {
     final userJson = user.toJson();
     final userString = jsonEncode(userJson);
-
     await sharedPreferences.setString('user', userString);
   }
 
-  Future<UserModel?> getUser() async {
+  User? getUser() {
     final userString = sharedPreferences.getString('user');
     if (userString != null) {
-      final userJson = jsonDecode(userString);
-      return UserModel.fromJson(userJson);
-    } else {
-      return null;
+      return User.fromJson(jsonDecode(userString));
     }
+    return null;
   }
 
   Future<void> removeUser() async {
     await sharedPreferences.remove('user');
   }
 
-  Future<bool> hasUser() async {
-    final user = await getUser();
-    return user != null;
+  bool hasUser() {
+    return sharedPreferences.containsKey('user');
   }
 }

@@ -19,16 +19,16 @@ class TokenManager {
     await sharedPreferences.setString('token', token);
   }
 
-  Future<String?> getToken() async {
+  String? getToken() {
     return sharedPreferences.getString('token');
+  }
+
+  bool isLogin() {
+    final token = getToken();
+    return token != null;
   }
 
   Future<void> removeToken() async {
     await sharedPreferences.remove('token');
-  }
-
-  Future<bool> isLogin() async {
-    final token = await getToken();
-    return token != null;
   }
 }

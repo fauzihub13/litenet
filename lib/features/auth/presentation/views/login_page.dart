@@ -6,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/core/widgets/button.dart';
+import 'package:litenet/core/widgets/custom_snackbar.dart';
 import 'package:litenet/core/widgets/form_input.dart';
 import 'package:litenet/core/widgets/row_title.dart';
 import 'package:litenet/features/auth/presentation/controllers/login_provider.dart';
@@ -26,31 +27,21 @@ class LoginPage extends HookConsumerWidget {
     ref.listen(loginProvider, (previous, next) {
       if (next is AsyncError && next != previous) {
         final error = (next.error) as Failure;
-        ScaffoldMessenger.of(context).clearSnackBars();
-        print('GAGAL LOGINXXXX');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(error.message ?? 'Terjadi kesalahan'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        context.showError(error.message ?? 'Terjadi kesalahan');
         return;
       }
 
       if (next.hasValue) {
         final data = next.value;
         if (data != null) {
-          ScaffoldMessenger.of(context).clearSnackBars();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Login berhasil!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-          Future.delayed(const Duration(milliseconds: 500), () {
-            if (Navigator.of(context).mounted)
-              context.goNamed(RouteName.homePage);
-          });
+          // ScaffoldMessenger.of(context).clearSnackBars();
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   const SnackBar(
+          //     content: Text('Login berhasil!'),
+          //     backgroundColor: Colors.green,
+          //   ),
+          // );
+          context.goNamed(RouteName.homePage);
         }
       }
     });
@@ -184,7 +175,6 @@ class LoginPage extends HookConsumerWidget {
                           isDisabled: loginState.isLoading,
                           onPressed: () {
                             if (formKey.currentState!.validate()) {
-                              print('presss');
                               ref
                                   .read(loginProvider.notifier)
                                   .login(

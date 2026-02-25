@@ -52,13 +52,8 @@ String _$userManagerHash() => r'299f78471569e1d71604de745c09df7dc3e2a087';
 const getCurrentUserProvider = GetCurrentUserProvider._();
 
 final class GetCurrentUserProvider
-    extends
-        $FunctionalProvider<
-          AsyncValue<UserModel>,
-          UserModel,
-          FutureOr<UserModel>
-        >
-    with $FutureModifier<UserModel>, $FutureProvider<UserModel> {
+    extends $FunctionalProvider<AsyncValue<User>, User, FutureOr<User>>
+    with $FutureModifier<User>, $FutureProvider<User> {
   const GetCurrentUserProvider._()
     : super(
         from: null,
@@ -75,13 +70,13 @@ final class GetCurrentUserProvider
 
   @$internal
   @override
-  $FutureProviderElement<UserModel> $createElement($ProviderPointer pointer) =>
+  $FutureProviderElement<User> $createElement($ProviderPointer pointer) =>
       $FutureProviderElement(pointer);
 
   @override
-  FutureOr<UserModel> create(Ref ref) {
+  FutureOr<User> create(Ref ref) {
     return getCurrentUser(ref);
   }
 }
 
-String _$getCurrentUserHash() => r'66c241f85b04e6497e9247c9fedf350bdf214189';
+String _$getCurrentUserHash() => r'49cea28c3797e3bc7ceed3e7c3b78dda586ff09d';

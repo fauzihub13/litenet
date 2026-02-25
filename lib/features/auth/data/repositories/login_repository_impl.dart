@@ -25,6 +25,7 @@ class LoginRepositoryImpl extends LoginRepository {
       if (!response.success) {
         return Left(Failure(message: response.message));
       }
+      
       return Right(response);
     } on DioException catch (e) {
       final error = await DioErrorHandler.handleError(e);

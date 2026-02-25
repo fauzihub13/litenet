@@ -30,7 +30,7 @@ Dio dio(Ref ref) {
       onRequest: (options, handler) async {
         try {
           final tokenManager = await ref.read(tokenManagerProvider.future);
-          final authToken = await tokenManager.getToken();
+          final authToken =  tokenManager.getToken();
           options.headers['Authorization'] = 'Bearer $authToken';
 
           // Get the User-Agent
@@ -48,7 +48,7 @@ Dio dio(Ref ref) {
             final tokenManager = await ref.read(tokenManagerProvider.future);
             final userManager = await ref.read(userManagerProvider.future);
 
-            if (await userManager.hasUser()) {
+            if ( userManager.hasUser()) {
               await tokenManager.removeToken();
               await userManager.removeUser();
 
@@ -57,7 +57,7 @@ Dio dio(Ref ref) {
                   .pushReplacementNamed(RouteName.loginPage);
             }
           } catch (e) {
-            print('Error handling 401: $e');
+            // print('Error handling 401: $e');
           }
           return handler.next(error);
         } else {

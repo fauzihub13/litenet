@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/enum.dart';
+import 'package:litenet/core/provider/user_manager_provider.dart';
 import 'package:litenet/features/auth/presentation/views/login_page.dart';
 import 'package:litenet/features/auth/presentation/views/register_page.dart';
 import 'package:litenet/features/device/presentation/views/add_new_device_page.dart';
@@ -30,26 +31,22 @@ part 'app_router.g.dart';
 @riverpod
 GoRouter appRouter(Ref ref) {
   final seenOnboardingAsync = ref.watch(seenOnboardingProvider);
-
-  // sementara tunggu async selesai → splash
-  // if (!seenOnboardingAsync.hasValue) {
-  //   return GoRouter(
-  //     initialLocation: '/splash',
-  //     routes: [
-  //       GoRoute(path: '/splash', builder: (_, __) => const SplashPage()),
-  //     ],
-  //   );
-  // }
-
   final seenOnboarding = seenOnboardingAsync.value ?? false;
+  final userManager = ref.watch(userManagerProvider).requireValue;
+
+  String initialPath;
+
+  if (!seenOnboarding) {
+    initialPath = '/${RouteName.onboardingPage}';
+  } else if (userManager.hasUser()) {
+    initialPath = '/${RouteName.homePage}';
+  } else {
+    initialPath = '/${RouteName.loginPage}';
+  }
 
   return GoRouter(
     debugLogDiagnostics: true,
-
-    initialLocation: seenOnboarding
-        ? '/${RouteName.loginPage}'
-        : '/${RouteName.onboardingPage}',
-
+    initialLocation: initialPath,
     routes: [
       // =====================
       // AUTH & ONBOARDING
@@ -168,8 +165,8 @@ GoRouter appRouter(Ref ref) {
       // MAIN SHELL
       // =====================
       ShellRoute(
-        pageBuilder: (context, state, child) {
-          return NoTransitionPage(child: MainPage(child: child));
+        builder: (context, state, child) {
+          return MainPage(child: child);
         },
 
         routes: [

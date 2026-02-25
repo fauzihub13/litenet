@@ -18,6 +18,8 @@ class MainPage extends ConsumerWidget {
     return Scaffold(
       body: child,
       bottomNavigationBar: BottomNavBar(currentIndex: currentIndex),
+      extendBody: false, 
+      extendBodyBehindAppBar: false,
     );
   }
 
