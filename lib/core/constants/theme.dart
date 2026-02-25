@@ -39,7 +39,7 @@ class DefaultColors {
   static const purple900 = Color(0xff281d6a);
 
   // =========== BASE ===========
-  static const lightGreen = Color(0xff19CF2E);
+  static const lightGreen = Color(0xff28A745);
   static const lightRed = Color(0xffFF383C);
   static const lightYellow = Color(0xffFFCC00);
   static const black = Color(0xff090040);

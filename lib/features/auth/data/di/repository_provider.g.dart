@@ -50,3 +50,51 @@ final class LoginRepositoryProvider
 }
 
 String _$loginRepositoryHash() => r'30ee18c7d48021ba1386f39ece162ccb7f9ebdba';
+
+@ProviderFor(registerRepository)
+const registerRepositoryProvider = RegisterRepositoryProvider._();
+
+final class RegisterRepositoryProvider
+    extends
+        $FunctionalProvider<
+          RegisterRepository,
+          RegisterRepository,
+          RegisterRepository
+        >
+    with $Provider<RegisterRepository> {
+  const RegisterRepositoryProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'registerRepositoryProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$registerRepositoryHash();
+
+  @$internal
+  @override
+  $ProviderElement<RegisterRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  RegisterRepository create(Ref ref) {
+    return registerRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(RegisterRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<RegisterRepository>(value),
+    );
+  }
+}
+
+String _$registerRepositoryHash() =>
+    r'9505d875763b0a39b149872858969f36b7dd52e7';

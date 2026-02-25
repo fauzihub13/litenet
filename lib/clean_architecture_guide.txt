@@ -7,6 +7,8 @@ Domain-Entity
 ↓
 Data-Model
 ↓
+Mapper
+↓
 Domain-Abstract Repository 
 ↓
 Data-Datasource
@@ -14,5 +16,7 @@ Data-Datasource
 Data-Repository Implement
 ↓
 Domain-Usecase
+↓
+Depedency Injection
 ↓
 Presentation-ViewModel

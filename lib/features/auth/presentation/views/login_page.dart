@@ -34,23 +34,10 @@ class LoginPage extends HookConsumerWidget {
       if (next.hasValue) {
         final data = next.value;
         if (data != null) {
-          // ScaffoldMessenger.of(context).clearSnackBars();
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   const SnackBar(
-          //     content: Text('Login berhasil!'),
-          //     backgroundColor: Colors.green,
-          //   ),
-          // );
           context.goNamed(RouteName.homePage);
         }
       }
     });
-
-    // Register listener once using useEffect
-    // useEffect(() {
-
-    //   return null; // no cleanup
-    // }, const []);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),

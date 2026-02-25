@@ -4,9 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/theme.dart';
+import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/core/widgets/button.dart';
+import 'package:litenet/core/widgets/custom_snackbar.dart';
 import 'package:litenet/core/widgets/form_input.dart';
 import 'package:litenet/core/widgets/row_title.dart';
+import 'package:litenet/features/auth/presentation/controllers/register_provider.dart';
 import 'package:litenet/gen/assets.gen.dart';
 import 'package:litenet/routes/route_name.dart';
 
@@ -40,7 +43,28 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    ref.listenManual(registerProvider, (previous, next) {
+      if (next is AsyncError && next != previous) {
+        final error = (next.error) as Failure;
+        context.showError(error.message ?? 'Terjadi kesalahan');
+        return;
+      }
+
+      if (next.hasValue) {
+        final data = next.value;
+        if (data != null) {
+          context.showSuccess(data.message);
+          context.goNamed(RouteName.loginPage);
+        }
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final registerState = ref.watch(registerProvider);
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
       body: SingleChildScrollView(
@@ -217,9 +241,20 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                         // Tombol Daftar
                         Button(
                           text: "Daftar",
+                          isLoading: registerState.isLoading,
+                          isDisabled: registerState.isLoading,
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
-                              // Jalankan logic register Anda di sini
+                              ref
+                                  .read(registerProvider.notifier)
+                                  .register(
+                                    name: _nameController.text,
+                                    email: _emailController.text.trim(),
+                                    password: _passwordController.text,
+                                    passwordConfirmation:
+                                        _confirmPasswordController.text,
+                                    phoneNumber: _phoneController.text,
+                                  );
                             }
                           },
                         ),

@@ -7,6 +7,7 @@ import 'package:litenet/features/auth/domain/entities/login.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'login_provider.g.dart';
+
 @riverpod
 class Login extends _$Login {
   @override
@@ -40,4 +41,3 @@ class Login extends _$Login {
     );
   }
 }
-
