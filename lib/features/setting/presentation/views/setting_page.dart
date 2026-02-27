@@ -3,8 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/theme.dart';
+import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/custom_modal.dart';
+import 'package:litenet/core/widgets/custom_snackbar.dart';
+import 'package:litenet/features/setting/presentation/controllers/logout_provider.dart';
 import 'package:litenet/gen/assets.gen.dart';
 import 'package:litenet/routes/route_name.dart';
 
@@ -18,6 +21,20 @@ class SettingPage extends ConsumerStatefulWidget {
 class _SettingPageState extends ConsumerState<SettingPage> {
   @override
   Widget build(BuildContext context) {
+    ref.listen(logoutProvider, (previous, next) {
+      next.when(
+        data: (data) {
+          if (data != null) {
+            context.goNamed(RouteName.loginPage);
+          }
+        },
+        error: (err, _) {
+          final error = err as Failure;
+          context.showError(error.message ?? 'Terjadi kesalahan');
+        },
+        loading: () {},
+      );
+    });
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
       // Menggunakan CustomAppbar reusable kita
@@ -95,7 +112,12 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         DefaultColors.lightRed, // Warna merah untuk keluar
                     iconColor: DefaultColors.lightRed,
                     onTap: () {
-                      showLogoutModal(context);
+                      showLogoutModal(
+                        context: context,
+                        onTap: () {
+                          ref.read(logoutProvider.notifier).logout();
+                        },
+                      );
                     },
                   ),
                 ],

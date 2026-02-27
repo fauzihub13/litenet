@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/button.dart';
 
-void showLogoutModal(BuildContext context) {
+void showLogoutModal({required BuildContext context, required VoidCallback onTap}) {
   showModalBottomSheet(
     context: context,
     backgroundColor: Colors.transparent,
@@ -62,12 +62,7 @@ void showLogoutModal(BuildContext context) {
                   child: Button(
                     text: "Ya, keluar",
                     buttonType: ButtonType.filled,
-                    onPressed: () {
-                      // Tambahkan logika logout di sini (clear session, dll)
-                      // Contoh: pindah ke halaman login
-                      
-                      context.pop();
-                    },
+                    onPressed: onTap,
                   ),
                 ),
               ],
