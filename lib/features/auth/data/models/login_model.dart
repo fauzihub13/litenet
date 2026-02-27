@@ -17,7 +17,7 @@ abstract class LoginResponseModel with _$LoginResponseModel {
 
 @freezed
 abstract class LoginDataModel with _$LoginDataModel {
-  const factory LoginDataModel({UserModel? user, String? token}) =
+  const factory LoginDataModel({UserModel? user,bool? isVerified,String? token}) =
       _LoginDataModel;
 
   factory LoginDataModel.fromJson(Map<String, dynamic> json) =>

@@ -1,20 +1,21 @@
+import 'package:litenet/features/auth/data/models/login_model.dart';
+import 'package:litenet/features/auth/data/models/otp_model.dart';
 import 'package:litenet/features/auth/domain/entities/login.dart';
+import 'package:litenet/features/auth/domain/entities/otp.dart';
 
-import '../models/login_model.dart';
-
-extension LoginResponseModelMapper on LoginResponseModel {
-  LoginResponse toEntity() {
-    return LoginResponse(
+extension OTPResponseModelMapper on OTPResponseModel {
+  OTPResponse toEntity() {
+    return OTPResponse(
       success: success ?? false,
       message: message ?? '-',
-      data: (data ?? const LoginDataModel()).toEntity(),
+      data: (data ?? const OTPDataModel()).toEntity(),
     );
   }
 }
 
-extension LoginDataModelMapper on LoginDataModel {
-  LoginDataEntity toEntity() {
-    return LoginDataEntity(
+extension OTPDataModelMapper on OTPDataModel {
+  OTPDataEntity toEntity() {
+    return OTPDataEntity(
       user: (user ?? const UserModel()).toEntity(),
       isVerified: isVerified ?? false,
       token: token ?? '-',
@@ -22,7 +23,7 @@ extension LoginDataModelMapper on LoginDataModel {
   }
 }
 
-extension UserModelMapper on UserModel {
+extension OTPModelMapper on UserModel {
   User toEntity() {
     return User(
       id: id ?? '-',

@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/enum.dart';
 import 'package:litenet/core/provider/user_manager_provider.dart';
 import 'package:litenet/features/auth/presentation/views/login_page.dart';
+import 'package:litenet/features/auth/presentation/views/otp_page.dart';
 import 'package:litenet/features/auth/presentation/views/register_page.dart';
 import 'package:litenet/features/device/presentation/views/add_new_device_page.dart';
 import 'package:litenet/features/device/presentation/views/coordinate_device_page.dart';
@@ -67,6 +68,16 @@ GoRouter appRouter(Ref ref) {
         path: '/${RouteName.registerPage}',
         name: RouteName.registerPage,
         builder: (_, __) => const RegisterPage(),
+      ),
+
+      GoRoute(
+        path: '/${RouteName.otpPage}',
+        name: RouteName.otpPage,
+        builder: (context, state) {
+          final extras = state.extra as Map<String, dynamic>?;
+          final email = extras?['email'] as String;
+          return OTPPage(email: email);
+        },
       ),
 
       // -----------------

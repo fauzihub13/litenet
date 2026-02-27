@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'login_provider.dart';
+part of 'otp_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,44 +9,43 @@ part of 'login_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(Login)
-const loginProvider = LoginProvider._();
+@ProviderFor(OTP)
+const oTPProvider = OTPProvider._();
 
-final class LoginProvider
-    extends $AsyncNotifierProvider<Login, LoginResponse?> {
-  const LoginProvider._()
+final class OTPProvider extends $AsyncNotifierProvider<OTP, OTPResponse?> {
+  const OTPProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'loginProvider',
+        name: r'oTPProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$loginHash();
+  String debugGetCreateSourceHash() => _$oTPHash();
 
   @$internal
   @override
-  Login create() => Login();
+  OTP create() => OTP();
 }
 
-String _$loginHash() => r'13edd5d9cbbad05ca21c8caf569637ceb703da92';
+String _$oTPHash() => r'f99600c6e6f2f2e95cb171f0e7045599ae03364e';
 
-abstract class _$Login extends $AsyncNotifier<LoginResponse?> {
-  FutureOr<LoginResponse?> build();
+abstract class _$OTP extends $AsyncNotifier<OTPResponse?> {
+  FutureOr<OTPResponse?> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<AsyncValue<LoginResponse?>, LoginResponse?>;
+    final ref = this.ref as $Ref<AsyncValue<OTPResponse?>, OTPResponse?>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<LoginResponse?>, LoginResponse?>,
-              AsyncValue<LoginResponse?>,
+              AnyNotifier<AsyncValue<OTPResponse?>, OTPResponse?>,
+              AsyncValue<OTPResponse?>,
               Object?,
               Object?
             >;

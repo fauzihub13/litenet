@@ -27,11 +27,16 @@ _LoginDataModel _$LoginDataModelFromJson(Map<String, dynamic> json) =>
       user: json['user'] == null
           ? null
           : UserModel.fromJson(json['user'] as Map<String, dynamic>),
+      isVerified: json['is_verified'] as bool?,
       token: json['token'] as String?,
     );
 
 Map<String, dynamic> _$LoginDataModelToJson(_LoginDataModel instance) =>
-    <String, dynamic>{'user': instance.user, 'token': instance.token};
+    <String, dynamic>{
+      'user': instance.user,
+      'is_verified': instance.isVerified,
+      'token': instance.token,
+    };
 
 _UserModel _$UserModelFromJson(Map<String, dynamic> json) => _UserModel(
   id: json['id'] as String?,

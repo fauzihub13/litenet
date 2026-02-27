@@ -5,36 +5,46 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/errors/failure.dart';
+import 'package:litenet/core/provider/token_manager_provider.dart';
+import 'package:litenet/core/provider/user_manager_provider.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/custom_snackbar.dart';
 import 'package:litenet/core/widgets/form_input.dart';
 import 'package:litenet/core/widgets/row_title.dart';
-import 'package:litenet/features/auth/presentation/controllers/login_provider.dart';
+import 'package:litenet/features/auth/presentation/controllers/otp_provider.dart';
 import 'package:litenet/gen/assets.gen.dart';
 import 'package:litenet/routes/route_name.dart';
 
-class LoginPage extends HookConsumerWidget {
-  const LoginPage({super.key});
+class OTPPage extends HookConsumerWidget {
+  final String email;
+  const OTPPage({super.key, required this.email});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final emailController = useTextEditingController();
-    final passwordController = useTextEditingController();
-    final isObscure = useState(true);
+    final otpController = useTextEditingController();
+    emailController.text = email;
 
-    final loginState = ref.watch(loginProvider);
-    ref.listen(loginProvider, (previous, next) {
+    final otpState = ref.watch(oTPProvider);
+    ref.listen(oTPProvider, (previous, next) {
       next.when(
-        data: (data) {
-          if (data != null && data.data.isVerified) {
-            context.goNamed(RouteName.homePage);
-          } else if (data != null && data.data.isVerified == false) {
-            // context.showError(data.message);
-            context.goNamed(
-              RouteName.otpPage,
-              extra: {'email': data.data.user.email},
-            );
+        data: (data) async {
+          if (data != null) {
+            if (data.data.isVerified) {
+              // simpan token
+              final tokenManager = await ref.read(tokenManagerProvider.future);
+              await tokenManager.saveToken(data.data.token);
+
+              // simpan user
+              final userManager = await ref.read(userManagerProvider.future);
+              await userManager.saveUser(data.data.user);
+              if (!context.mounted) return;
+
+              context.goNamed(RouteName.homePage);
+            } else {
+              context.showSuccess(data.message);
+            }
           }
         },
         error: (err, _) {
@@ -70,7 +80,7 @@ class LoginPage extends HookConsumerWidget {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      "Masuk",
+                      "Verifikasi OTP",
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -80,7 +90,7 @@ class LoginPage extends HookConsumerWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 40),
                       child: Text(
-                        "Masuk ke akun Anda untuk menggunakan aplikasi LiteNet",
+                        "Silahkan masukan kode OTP yang telah dikirim ke email Anda",
                         textAlign: TextAlign.center,
                         style: Theme.of(
                           context,
@@ -129,57 +139,36 @@ class LoginPage extends HookConsumerWidget {
                           const SizedBox(height: 8),
                           FormInput(
                             textController: emailController,
-                            hintText: "user@example.com",
+                            readOnly: true,
                             keyboardType: TextInputType.emailAddress,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Email tidak boleh kosong';
-                              }
-                              final emailRegex = RegExp(
-                                r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-                              );
-                              if (!emailRegex.hasMatch(value)) {
-                                return 'Format email salah';
-                              }
-                              return null;
-                            },
                           ),
                           const SizedBox(height: 20),
 
                           // Field Kata Sandi
-                          const RowTitle(title: "Kata Sandi"),
+                          const RowTitle(title: "Kode OTP"),
                           const SizedBox(height: 8),
                           FormInput(
-                            textController: passwordController,
-                            hintText: "*******",
-                            obscureText: isObscure.value,
-                            suffixIcon: Icon(
-                              isObscure.value
-                                  ? Icons.visibility_off_outlined
-                                  : Icons.visibility_outlined,
-                              size: 22,
-                            ),
-                            onSuffixIconTap: () =>
-                                isObscure.value = !isObscure.value,
+                            textController: otpController,
+                            hintText: "000000",
                             validator: (value) =>
                                 (value == null || value.isEmpty)
-                                ? 'Sandi tidak boleh kosong'
+                                ? 'Kode OTP tidak boleh kosong'
                                 : null,
                           ),
                           const SizedBox(height: 40),
 
                           // Tombol Masuk
                           Button(
-                            text: "Masuk",
-                            isLoading: loginState.isLoading,
-                            isDisabled: loginState.isLoading,
+                            text: "Verifikasi OTP",
+                            isLoading: otpState.isLoading,
+                            isDisabled: otpState.isLoading,
                             onPressed: () {
                               if (formKey.currentState!.validate()) {
                                 ref
-                                    .read(loginProvider.notifier)
-                                    .login(
+                                    .read(oTPProvider.notifier)
+                                    .verifyOtp(
                                       email: emailController.text.trim(),
-                                      password: passwordController.text,
+                                      otp: otpController.text.trim(),
                                     );
                               }
                             },
@@ -192,15 +181,20 @@ class LoginPage extends HookConsumerWidget {
                               crossAxisAlignment: WrapCrossAlignment.center,
                               children: [
                                 Text(
-                                  "Belum punya akun? ",
+                                  "Belum menerima OTP? ",
                                   style: Theme.of(context).textTheme.bodySmall
                                       ?.copyWith(color: DefaultColors.black200),
                                 ),
                                 GestureDetector(
-                                  onTap: () =>
-                                      context.goNamed(RouteName.registerPage),
+                                  onTap: () {
+                                    ref
+                                        .read(oTPProvider.notifier)
+                                        .resendOtp(
+                                          email: emailController.text.trim(),
+                                        );
+                                  },
                                   child: Text(
-                                    "Daftar",
+                                    "Kirim OTP",
                                     style: Theme.of(context).textTheme.bodySmall
                                         ?.copyWith(
                                           color: DefaultColors.purple500,

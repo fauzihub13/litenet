@@ -308,7 +308,7 @@ $LoginDataModelCopyWith<$Res>? get data {
 /// @nodoc
 mixin _$LoginDataModel {
 
- UserModel? get user; String? get token;
+ UserModel? get user; bool? get isVerified; String? get token;
 /// Create a copy of LoginDataModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -321,16 +321,16 @@ $LoginDataModelCopyWith<LoginDataModel> get copyWith => _$LoginDataModelCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginDataModel&&(identical(other.user, user) || other.user == user)&&(identical(other.token, token) || other.token == token));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginDataModel&&(identical(other.user, user) || other.user == user)&&(identical(other.isVerified, isVerified) || other.isVerified == isVerified)&&(identical(other.token, token) || other.token == token));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,user,token);
+int get hashCode => Object.hash(runtimeType,user,isVerified,token);
 
 @override
 String toString() {
-  return 'LoginDataModel(user: $user, token: $token)';
+  return 'LoginDataModel(user: $user, isVerified: $isVerified, token: $token)';
 }
 
 
@@ -341,7 +341,7 @@ abstract mixin class $LoginDataModelCopyWith<$Res>  {
   factory $LoginDataModelCopyWith(LoginDataModel value, $Res Function(LoginDataModel) _then) = _$LoginDataModelCopyWithImpl;
 @useResult
 $Res call({
- UserModel? user, String? token
+ UserModel? user, bool? isVerified, String? token
 });
 
 
@@ -358,10 +358,11 @@ class _$LoginDataModelCopyWithImpl<$Res>
 
 /// Create a copy of LoginDataModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? user = freezed,Object? token = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? user = freezed,Object? isVerified = freezed,Object? token = freezed,}) {
   return _then(_self.copyWith(
 user: freezed == user ? _self.user : user // ignore: cast_nullable_to_non_nullable
-as UserModel?,token: freezed == token ? _self.token : token // ignore: cast_nullable_to_non_nullable
+as UserModel?,isVerified: freezed == isVerified ? _self.isVerified : isVerified // ignore: cast_nullable_to_non_nullable
+as bool?,token: freezed == token ? _self.token : token // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -459,10 +460,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( UserModel? user,  String? token)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( UserModel? user,  bool? isVerified,  String? token)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LoginDataModel() when $default != null:
-return $default(_that.user,_that.token);case _:
+return $default(_that.user,_that.isVerified,_that.token);case _:
   return orElse();
 
 }
@@ -480,10 +481,10 @@ return $default(_that.user,_that.token);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( UserModel? user,  String? token)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( UserModel? user,  bool? isVerified,  String? token)  $default,) {final _that = this;
 switch (_that) {
 case _LoginDataModel():
-return $default(_that.user,_that.token);case _:
+return $default(_that.user,_that.isVerified,_that.token);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -500,10 +501,10 @@ return $default(_that.user,_that.token);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( UserModel? user,  String? token)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( UserModel? user,  bool? isVerified,  String? token)?  $default,) {final _that = this;
 switch (_that) {
 case _LoginDataModel() when $default != null:
-return $default(_that.user,_that.token);case _:
+return $default(_that.user,_that.isVerified,_that.token);case _:
   return null;
 
 }
@@ -515,10 +516,11 @@ return $default(_that.user,_that.token);case _:
 @JsonSerializable()
 
 class _LoginDataModel implements LoginDataModel {
-  const _LoginDataModel({this.user, this.token});
+  const _LoginDataModel({this.user, this.isVerified, this.token});
   factory _LoginDataModel.fromJson(Map<String, dynamic> json) => _$LoginDataModelFromJson(json);
 
 @override final  UserModel? user;
+@override final  bool? isVerified;
 @override final  String? token;
 
 /// Create a copy of LoginDataModel
@@ -534,16 +536,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LoginDataModel&&(identical(other.user, user) || other.user == user)&&(identical(other.token, token) || other.token == token));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LoginDataModel&&(identical(other.user, user) || other.user == user)&&(identical(other.isVerified, isVerified) || other.isVerified == isVerified)&&(identical(other.token, token) || other.token == token));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,user,token);
+int get hashCode => Object.hash(runtimeType,user,isVerified,token);
 
 @override
 String toString() {
-  return 'LoginDataModel(user: $user, token: $token)';
+  return 'LoginDataModel(user: $user, isVerified: $isVerified, token: $token)';
 }
 
 
@@ -554,7 +556,7 @@ abstract mixin class _$LoginDataModelCopyWith<$Res> implements $LoginDataModelCo
   factory _$LoginDataModelCopyWith(_LoginDataModel value, $Res Function(_LoginDataModel) _then) = __$LoginDataModelCopyWithImpl;
 @override @useResult
 $Res call({
- UserModel? user, String? token
+ UserModel? user, bool? isVerified, String? token
 });
 
 
@@ -571,10 +573,11 @@ class __$LoginDataModelCopyWithImpl<$Res>
 
 /// Create a copy of LoginDataModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? user = freezed,Object? token = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? user = freezed,Object? isVerified = freezed,Object? token = freezed,}) {
   return _then(_LoginDataModel(
 user: freezed == user ? _self.user : user // ignore: cast_nullable_to_non_nullable
-as UserModel?,token: freezed == token ? _self.token : token // ignore: cast_nullable_to_non_nullable
+as UserModel?,isVerified: freezed == isVerified ? _self.isVerified : isVerified // ignore: cast_nullable_to_non_nullable
+as bool?,token: freezed == token ? _self.token : token // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

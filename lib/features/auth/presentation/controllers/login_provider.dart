@@ -26,14 +26,15 @@ class Login extends _$Login {
         state = AsyncValue.error(failure, StackTrace.current);
       },
       (data) async {
-        // simpan token
-        final tokenManager = await ref.read(tokenManagerProvider.future);
-        await tokenManager.saveToken(data.data.token);
+        if (data.data.isVerified) {
+          // simpan token
+          final tokenManager = await ref.read(tokenManagerProvider.future);
+          await tokenManager.saveToken(data.data.token);
 
-        // simpan user
-        final userManager = await ref.read(userManagerProvider.future);
-        
-        await userManager.saveUser(data.data.user);
+          // simpan user
+          final userManager = await ref.read(userManagerProvider.future);
+          await userManager.saveUser(data.data.user);
+        }
 
         // update state sukses
         state = AsyncValue.data(data);

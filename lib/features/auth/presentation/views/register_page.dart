@@ -56,7 +56,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         final data = next.value;
         if (data != null) {
           context.showSuccess(data.message);
-          context.goNamed(RouteName.loginPage);
+          context.goNamed(
+            RouteName.otpPage,
+            extra: {'email': _emailController.text},
+          );
         }
       }
     });

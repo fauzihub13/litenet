@@ -98,3 +98,44 @@ final class RegisterDatasourceProvider
 
 String _$registerDatasourceHash() =>
     r'400858431278cf250e6bc6bd17cbd5d8f9bf044a';
+
+@ProviderFor(otpDatasource)
+const otpDatasourceProvider = OtpDatasourceProvider._();
+
+final class OtpDatasourceProvider
+    extends $FunctionalProvider<OTPDatasource, OTPDatasource, OTPDatasource>
+    with $Provider<OTPDatasource> {
+  const OtpDatasourceProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'otpDatasourceProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$otpDatasourceHash();
+
+  @$internal
+  @override
+  $ProviderElement<OTPDatasource> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  OTPDatasource create(Ref ref) {
+    return otpDatasource(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(OTPDatasource value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<OTPDatasource>(value),
+    );
+  }
+}
+
+String _$otpDatasourceHash() => r'c358409364c77f9d49bb9a7f61db240bdc16ecbd';

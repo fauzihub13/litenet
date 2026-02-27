@@ -14,9 +14,10 @@ class LoginResponse {
 // login_data_entity.dart
 class LoginDataEntity {
   final User user;
+  final bool isVerified;
   final String token;
 
-  const LoginDataEntity({required this.user, required this.token});
+  const LoginDataEntity({required this.user,required this.isVerified, required this.token});
 }
 
 // user_entity.dart

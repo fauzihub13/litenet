@@ -25,7 +25,6 @@ class LoginDatasourceImpl extends LoginDatasource {
       url,
       data: {'email': email, 'password': password},
     );
-    // print(response.data);
 
     final data = LoginResponseModel.fromJson(response.data);
     return data.toEntity();

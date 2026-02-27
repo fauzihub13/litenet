@@ -3,6 +3,7 @@ class RouteName {
   static const String mainPage = 'main';
   static const String loginPage = 'login';
   static const String registerPage = 'register';
+  static const String otpPage = 'otp';
   static const String homePage = 'home';
   static const String settingPage = 'settings';
   static const String changeProfilePage = 'change-profile';
