@@ -1,36 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:litenet/core/constants/theme.dart';
+import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
+import 'package:litenet/core/widgets/custom_snackbar.dart';
 import 'package:litenet/core/widgets/form_input.dart';
 import 'package:litenet/core/widgets/row_title.dart';
+import 'package:litenet/features/setting/presentation/controllers/change_password_provider.dart';
 
-class ChangePasswordPage extends StatefulWidget {
+class ChangePasswordPage extends HookConsumerWidget {
   const ChangePasswordPage({super.key});
 
   @override
-  State<ChangePasswordPage> createState() => _ChangePasswordPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final formKey = useMemoized(() => GlobalKey<FormState>());
+    final oldPassswordController = useTextEditingController();
+    final newPasswordController = useTextEditingController();
+    final confirmationNewController = useTextEditingController();
 
-class _ChangePasswordPageState extends State<ChangePasswordPage> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _oldPassswordController = TextEditingController();
-  final TextEditingController _newPasswordController = TextEditingController();
-  final TextEditingController _confirNewPasswordController =
-      TextEditingController();
+    final isObscureOldPassword = useState(true);
+    final isObscureNewpassword = useState(true);
+    final isObscureConfirmNewpassword = useState(true);
+    final asyncChangePassword = ref.watch(changePasswordProvider);
 
-  bool _isObscureOldPassword = true;
-  bool _isObscureNewpassword = true;
-  bool _isObscureConfirmNewpassword = true;
+    ref.listen(changePasswordProvider, (previous, next) {
+      next.when(
+        data: (data) async {
+          if (data != null) {
+            oldPassswordController.clear();
+            newPasswordController.clear();
+            confirmationNewController.clear();
+            context.showSuccess(data.message);
+          }
+        },
+        error: (err, _) {
+          final error = err as Failure;
+          context.showError(error.message ?? 'Terjadi kesalahan');
+        },
+        loading: () {},
+      );
+    });
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppbar(title: 'Ubah Kata Sandi'),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: PaddingSize.horizontal),
         child: Form(
-          key: _formKey,
+          key: formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -40,19 +58,17 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               RowTitle(title: "Kata Sandi Lama"),
               const SizedBox(height: 8),
               FormInput(
-                textController: _oldPassswordController,
+                textController: oldPassswordController,
                 hintText: "********",
-                obscureText: _isObscureOldPassword,
+                obscureText: isObscureOldPassword.value,
                 suffixIcon: Icon(
-                  _isObscureOldPassword
+                  isObscureOldPassword.value
                       ? Icons.visibility_off_outlined
                       : Icons.visibility_outlined,
                   size: 22,
                 ),
                 onSuffixIconTap: () {
-                  setState(() {
-                    _isObscureOldPassword = !_isObscureOldPassword;
-                  });
+                  isObscureOldPassword.value = !isObscureOldPassword.value;
                 },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -67,20 +83,18 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               RowTitle(title: "Kata Sandi Baru"),
               const SizedBox(height: 8),
               FormInput(
-                textController: _newPasswordController,
+                textController: newPasswordController,
                 keyboardType: TextInputType.number,
                 hintText: "*******",
-                obscureText: _isObscureNewpassword,
+                obscureText: isObscureNewpassword.value,
                 suffixIcon: Icon(
-                  _isObscureNewpassword
+                  isObscureNewpassword.value
                       ? Icons.visibility_off_outlined
                       : Icons.visibility_outlined,
                   size: 22,
                 ),
                 onSuffixIconTap: () {
-                  setState(() {
-                    _isObscureNewpassword = !_isObscureNewpassword;
-                  });
+                  isObscureNewpassword.value = !isObscureNewpassword.value;
                 },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -96,27 +110,25 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               RowTitle(title: "Ulangi Kata Sandi Baru"),
               const SizedBox(height: 8),
               FormInput(
-                textController: _confirNewPasswordController,
+                textController: confirmationNewController,
                 keyboardType: TextInputType.number,
                 hintText: "*******",
-                obscureText: _isObscureConfirmNewpassword,
+                obscureText: isObscureConfirmNewpassword.value,
                 suffixIcon: Icon(
-                  _isObscureConfirmNewpassword
+                  isObscureConfirmNewpassword.value
                       ? Icons.visibility_off_outlined
                       : Icons.visibility_outlined,
                   size: 22,
                 ),
                 onSuffixIconTap: () {
-                  setState(() {
-                    _isObscureConfirmNewpassword =
-                        !_isObscureConfirmNewpassword;
-                  });
+                  isObscureConfirmNewpassword.value =
+                      !isObscureConfirmNewpassword.value;
                 },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Kata sandi tidak boleh kosong';
                   }
-                  if (value != _newPasswordController.text) {
+                  if (value != newPasswordController.text) {
                     return 'Kata Sandi tidak cocok';
                   }
                   return null;
@@ -128,9 +140,17 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               // Tombol Masuk Reusable
               Button(
                 text: "Simpan",
+                isDisabled: asyncChangePassword.isLoading,
+                isLoading: asyncChangePassword.isLoading,
                 onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    // Logika Register
+                  if (formKey.currentState!.validate()) {
+                    ref
+                        .read(changePasswordProvider.notifier)
+                        .changePassword(
+                          oldPassword: oldPassswordController.text,
+                          newPassword: newPasswordController.text,
+                          confirmNewPassword: confirmationNewController.text,
+                        );
                   }
                 },
               ),
@@ -141,3 +161,16 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     );
   }
 }
+
+// class _ChangePasswordPageState extends State<ChangePasswordPage> {
+//   final _formKey = GlobalKey<FormState>();
+//   final TextEditingController _oldPassswordController = TextEditingController();
+//   final TextEditingController _newPasswordController = TextEditingController();
+//   final TextEditingController _confirNewPasswordController =
+//       TextEditingController();
+
+//   bool _isObscureOldPassword = true;
+//   bool _isObscureNewpassword = true;
+//   bool _isObscureConfirmNewpassword = true;
+
+// }
