@@ -23,6 +23,12 @@ class FAQPage extends ConsumerWidget {
         child: asyncFAQ.when(
           data: (data) {
             List<FAQDataEntity> faqData = data.data;
+            if (faqData.isEmpty) {
+              return EmptyState(
+                message: 'Tidak ditemukan data',
+                isRefreshable: true,
+              );
+            }
             return ListView.separated(
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),

@@ -16,14 +16,20 @@ class TermsAndConditionsPage extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const CustomAppbar(title: 'Syarat dan Ketentuan'),
-      body: asyncPrivacyAndPolicy.when(
-        data: (data) {
-          List<PrivacyAndPolicyDataEntity> privacyAndPolicyData = data.data;
-          return RefreshIndicator(
-            onRefresh: () async {
-              ref.invalidate(getPrivacyAndPolicyProvider);
-            },
-            child: ListView.builder(
+      body: RefreshIndicator(
+        onRefresh: () async {
+          ref.invalidate(getPrivacyAndPolicyProvider);
+        },
+        child: asyncPrivacyAndPolicy.when(
+          data: (data) {
+            List<PrivacyAndPolicyDataEntity> privacyAndPolicyData = data.data;
+            if (privacyAndPolicyData.isEmpty) {
+              return EmptyState(
+                message: 'Tidak ditemukan data',
+                isRefreshable: true,
+              );
+            }
+            return ListView.builder(
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
               itemCount: privacyAndPolicyData.length,
@@ -36,17 +42,17 @@ class TermsAndConditionsPage extends ConsumerWidget {
                   content: privacyAndPolicy.description,
                 );
               },
-            ),
-          );
-        },
-        error: (error, _) {
-          String errorMessage =
-              (error as Failure).message ?? 'Terjadi kesalahan';
-          return EmptyState(message: errorMessage, isRefreshable: true);
-        },
-        loading: () {
-          return Center(child: const CircularProgressIndicator());
-        },
+            );
+          },
+          error: (error, _) {
+            String errorMessage =
+                (error as Failure).message ?? 'Terjadi kesalahan';
+            return EmptyState(message: errorMessage, isRefreshable: true);
+          },
+          loading: () {
+            return Center(child: const CircularProgressIndicator());
+          },
+        ),
       ),
     );
   }
