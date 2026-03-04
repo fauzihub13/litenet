@@ -148,13 +148,43 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: '/${RouteName.addNewDevicePage}',
         name: RouteName.addNewDevicePage,
-        builder: (_, __) => const AddNewDevicePage(),
+        builder: (context, state) {
+          final extras = state.extra as Map<String, dynamic>?;
+          final latitude = extras?['latitude'] as double?;
+          final longitude = extras?['longitude'] as double?;
+          final reqName = extras?['reqName'] as String?;
+          final redNodelink = extras?['redNodelink'] as String?;
+          final reqKitSerialNumber = extras?['reqKitSerialNumber'] as String?;
+          final reqAddress = extras?['reqAddress'] as String?;
+
+          return AddNewDevicePage(
+            latitude,
+            longitude,
+            reqName,
+            redNodelink,
+            reqKitSerialNumber,
+            reqAddress,
+          );
+        },
       ),
 
       GoRoute(
         path: '/${RouteName.deviceCoordinatePage}',
         name: RouteName.deviceCoordinatePage,
-        builder: (_, __) => const CoordinateDevicePage(),
+        builder: (context, state) {
+          final extras = state.extra as Map<String, dynamic>?;
+
+          final reqName = extras?['reqName'] as String?;
+          final redNodelink = extras?['redNodelink'] as String?;
+          final reqKitSerialNumber = extras?['reqKitSerialNumber'] as String?;
+          final reqAddress = extras?['reqAddress'] as String?;
+          return CoordinateDevicePage(
+            reqName: reqName,
+            redNodelink: redNodelink,
+            reqKitSerialNumber: reqKitSerialNumber,
+            reqAddress: reqAddress,
+          );
+        },
       ),
 
       GoRoute(

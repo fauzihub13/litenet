@@ -1,32 +1,76 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:litenet/core/constants/theme.dart';
+import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
+import 'package:litenet/core/widgets/custom_snackbar.dart';
 import 'package:litenet/core/widgets/form_input.dart';
 import 'package:litenet/core/widgets/row_title.dart';
+import 'package:litenet/features/device/presentation/controllers/claim_device_provider.dart';
 import 'package:litenet/routes/route_name.dart';
 
-class AddNewDevicePage extends ConsumerStatefulWidget {
-  const AddNewDevicePage({super.key});
+class AddNewDevicePage extends HookConsumerWidget {
+  final double? latitude;
+  final double? longitude;
+  final String? reqName;
+  final String? redNodelink;
+  final String? reqKitSerialNumber;
+  final String? reqAddress;
+
+  const AddNewDevicePage(
+    this.latitude,
+    this.longitude,
+    this.reqName,
+    this.redNodelink,
+    this.reqKitSerialNumber,
+    this.reqAddress, {
+    super.key,
+  });
 
   @override
-  ConsumerState<AddNewDevicePage> createState() => _AddNewDevicePageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final formKey = useMemoized(() => GlobalKey<FormState>());
+    final nameController = useTextEditingController();
+    final nodelinkController = useTextEditingController();
+    final kitSerialNumberController = useTextEditingController();
+    final locationController = useTextEditingController();
+    final addressController = useTextEditingController();
+    final mapController = useMemoized(() => MapController());
+    LatLng currentLatLng = const LatLng(-6.5971, 106.8060);
 
-class _AddNewDevicePageState extends ConsumerState<AddNewDevicePage> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneNumberController = TextEditingController();
-  final MapController _mapController = MapController();
-  LatLng _currentLatLng = const LatLng(-6.5971, 106.8060);
+    if (latitude != null && longitude != null) {
+      currentLatLng = LatLng(latitude!, longitude!);
+      locationController.text = "$latitude, $longitude";
+      print(reqName);
+      nameController.text = reqName ?? '';
+      nodelinkController.text = redNodelink ?? '';
+      kitSerialNumberController.text = reqKitSerialNumber ?? '';
+      addressController.text = reqAddress ?? '';
+    }
 
-  @override
-  Widget build(BuildContext context) {
+    final asyncClaimDevice = ref.watch(claimDeviceProvider);
+
+    ref.listen(claimDeviceProvider, (previous, next) {
+      next.when(
+        data: (data) async {
+          if (data != null) {
+            context.showSuccess(data.message);
+            context.goNamed(RouteName.monitoringPage);
+          }
+        },
+        error: (err, _) {
+          final error = err as Failure;
+          context.showError(error.message ?? 'Terjadi kesalahan');
+        },
+        loading: () {},
+      );
+    });
+
     return Scaffold(
       appBar: CustomAppbar(title: 'Tambah Perangkat'),
       body: Padding(
@@ -35,16 +79,31 @@ class _AddNewDevicePageState extends ConsumerState<AddNewDevicePage> {
           vertical: PaddingSize.vertical,
         ),
         child: Form(
-          key: _formKey,
+          key: formKey,
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Name
+                RowTitle(title: "Nama Perangkat"),
+                const SizedBox(height: 8),
+                FormInput(
+                  textController: nameController,
+                  hintText: "Masukan nama perangkat",
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Nama tidak boleh kosong';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
                 // Nodelink
                 RowTitle(title: "Nodelink"),
                 const SizedBox(height: 8),
                 FormInput(
-                  textController: _nameController,
+                  textController: nodelinkController,
                   hintText: "Masukan nodelink perangkat",
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -56,10 +115,10 @@ class _AddNewDevicePageState extends ConsumerState<AddNewDevicePage> {
                 const SizedBox(height: 16),
 
                 // Serial Number Model
-                RowTitle(title: "Serial Number Modem"),
+                RowTitle(title: "Kit Serial Number Modem"),
                 const SizedBox(height: 8),
                 FormInput(
-                  textController: _emailController,
+                  textController: kitSerialNumberController,
                   hintText: "Masukan serial number modem",
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -74,7 +133,7 @@ class _AddNewDevicePageState extends ConsumerState<AddNewDevicePage> {
                 RowTitle(title: "Alamat"),
                 const SizedBox(height: 8),
                 FormInput(
-                  textController: _phoneNumberController,
+                  textController: addressController,
                   keyboardType: TextInputType.number,
                   hintText: "Masukan alamat perangkat",
                   validator: (value) {
@@ -91,7 +150,8 @@ class _AddNewDevicePageState extends ConsumerState<AddNewDevicePage> {
                 RowTitle(title: "Koordinat Lokasi"),
                 const SizedBox(height: 8),
                 FormInput(
-                  textController: _phoneNumberController,
+                  textController: locationController,
+                  readOnly: true,
                   keyboardType: TextInputType.number,
                   hintText: "Masukan koordinat perangkat",
                   validator: (value) {
@@ -111,9 +171,9 @@ class _AddNewDevicePageState extends ConsumerState<AddNewDevicePage> {
                     color: Colors.amber,
                   ),
                   child: FlutterMap(
-                    mapController: _mapController,
+                    mapController: mapController,
                     options: MapOptions(
-                      initialCenter: _currentLatLng,
+                      initialCenter: currentLatLng,
                       initialZoom: 15.0,
                       onTap: (tapPosition, point) {},
                     ),
@@ -126,7 +186,7 @@ class _AddNewDevicePageState extends ConsumerState<AddNewDevicePage> {
                       MarkerLayer(
                         markers: [
                           Marker(
-                            point: _currentLatLng,
+                            point: currentLatLng,
                             width: 80,
                             height: 80,
                             child: const Icon(
@@ -148,7 +208,15 @@ class _AddNewDevicePageState extends ConsumerState<AddNewDevicePage> {
                     height: 44,
                     width: MediaQuery.of(context).size.width * 0.5,
                     onPressed: () {
-                      context.pushNamed(RouteName.deviceCoordinatePage);
+                      context.pushNamed(
+                        RouteName.deviceCoordinatePage,
+                        extra: {
+                          'reqName': nameController.text,
+                          'redNodelink': nodelinkController.text,
+                          'reqKitSerialNumber': kitSerialNumberController.text,
+                          'reqAddress': addressController.text,
+                        },
+                      );
                     },
                   ),
                 ),
@@ -161,9 +229,20 @@ class _AddNewDevicePageState extends ConsumerState<AddNewDevicePage> {
         padding: const EdgeInsets.all(PaddingSize.horizontal),
         child: Button(
           text: "Simpan",
+          isDisabled: asyncClaimDevice.isLoading,
+          isLoading: asyncClaimDevice.isLoading,
           onPressed: () {
-            if (_formKey.currentState!.validate()) {
-              // context.pushNamed(RouteName.);
+            if (formKey.currentState!.validate()) {
+              ref
+                  .read(claimDeviceProvider.notifier)
+                  .claimDevice(
+                    name: nameController.text,
+                    address: addressController.text,
+                    kitSerialNumber: kitSerialNumberController.text,
+                    nodelink: nodelinkController.text,
+                    latitude: latitude!,
+                    longitude: longitude!,
+                  );
             }
           },
         ),

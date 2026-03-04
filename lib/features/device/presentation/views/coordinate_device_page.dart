@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:litenet/core/constants/theme.dart';
@@ -10,9 +11,20 @@ import 'package:litenet/core/helper/permission.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/form_input.dart';
+import 'package:litenet/routes/route_name.dart';
 
 class CoordinateDevicePage extends StatefulWidget {
-  const CoordinateDevicePage({super.key});
+  final String? reqName;
+  final String? redNodelink;
+  final String? reqKitSerialNumber;
+  final String? reqAddress;
+  const CoordinateDevicePage({
+    super.key,
+    this.reqName,
+    this.redNodelink,
+    this.reqKitSerialNumber,
+    this.reqAddress,
+  });
 
   @override
   State<CoordinateDevicePage> createState() => _CoordinateDevicePageState();
@@ -343,7 +355,17 @@ class _CoordinateDevicePageState extends State<CoordinateDevicePage>
                     text: "Simpan Lokasi",
                     onPressed: () {
                       if (_coordinatController.text.isNotEmpty) {
-                        // Aksi Simpan
+                        context.pushNamed(
+                          RouteName.addNewDevicePage,
+                          extra: {
+                            'latitude': _currentLatLng!.latitude,
+                            'longitude': _currentLatLng!.longitude,
+                            'reqName': widget.reqName,
+                            'redNodelink': widget.redNodelink,
+                            'reqKitSerialNumber': widget.reqKitSerialNumber,
+                            'reqAddress': widget.reqAddress,
+                          },
+                        );
                       }
                     },
                   ),
