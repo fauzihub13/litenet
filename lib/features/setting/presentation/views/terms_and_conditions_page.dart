@@ -1,72 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:litenet/core/constants/theme.dart';
+import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
+import 'package:litenet/core/widgets/empty_state.dart';
+import 'package:litenet/features/setting/domain/entities/privacy_and_policy.dart';
+import 'package:litenet/features/setting/presentation/controllers/get_privacy_and_policy_provider.dart';
 
 class TermsAndConditionsPage extends ConsumerWidget {
   const TermsAndConditionsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final asyncPrivacyAndPolicy = ref.watch(getPrivacyAndPolicyProvider);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const CustomAppbar(title: 'Syarat dan Ketentuan'),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(PaddingSize.horizontal),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildSection(
-              context,
-              title: 'Selamat Datang di LiteNet',
-              content:
-                  'Dengan menggunakan aplikasi kami, Anda setuju untuk terikat dengan syarat dan ketentuan ini. Mohon baca dengan seksama.',
+      body: asyncPrivacyAndPolicy.when(
+        data: (data) {
+          List<PrivacyAndPolicyDataEntity> privacyAndPolicyData = data.data;
+          return RefreshIndicator(
+            onRefresh: () async {
+              ref.invalidate(getPrivacyAndPolicyProvider);
+            },
+            child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
+              itemCount: privacyAndPolicyData.length,
+              itemBuilder: (context, index) {
+                PrivacyAndPolicyDataEntity privacyAndPolicy =
+                    privacyAndPolicyData[index];
+                return _buildSection(
+                  context,
+                  title: "${index + 1}. ${privacyAndPolicy.title}",
+                  content: privacyAndPolicy.description,
+                );
+              },
             ),
-            _buildSection(
-              context,
-              title: '1. Penggunaan Layanan',
-              content:
-                  'Anda setuju untuk menggunakan layanan kami hanya untuk tujuan yang sah dan sesuai dengan semua hukum dan peraturan yang berlaku. Anda tidak diizinkan menggunakan layanan kami untuk aktivitas ilegal atau yang melanggar hak orang lain.',
-            ),
-            _buildSection(
-              context,
-              title: '2. Akun Pengguna',
-              content:
-                  'Anda bertanggung jawab untuk menjaga kerahasiaan informasi akun Anda, termasuk kata sandi Anda. Anda setuju untuk segera memberitahu kami jika ada penggunaan akun Anda yang tidak sah.',
-            ),
-            _buildSection(
-              context,
-              title: '3. Kekayaan Intelektual',
-              content:
-                  'Semua konten dan materi yang tersedia di aplikasi ini, termasuk namun tidak terbatas pada teks, grafik, logo, dan perangkat lunak, adalah milik LiteNet atau pemberi lisensinya dan dilindungi oleh undang-undang hak cipta.',
-            ),
-            _buildSection(
-              context,
-              title: '4. Pembatasan Tanggung Jawab',
-              content:
-                  'Layanan kami disediakan "sebagaimana adanya" tanpa jaminan apa pun. LiteNet tidak akan bertanggung jawab atas kerusakan tidak langsung, insidental, atau konsekuensial yang timbul dari penggunaan atau ketidakmampuan untuk menggunakan layanan kami.',
-            ),
-            _buildSection(
-              context,
-              title: '5. Perubahan Ketentuan',
-              content:
-                  'Kami berhak untuk mengubah syarat dan ketentuan ini dari waktu ke waktu. Perubahan akan berlaku setelah diposting di halaman ini. Kami menyarankan Anda untuk meninjau halaman ini secara berkala.',
-            ),
-            _buildSection(
-              context,
-              title: '6. Hukum yang Mengatur',
-              content:
-                  'Syarat dan ketentuan ini diatur oleh dan ditafsirkan sesuai dengan hukum yang berlaku di Indonesia.',
-            ),
-            _buildSection(
-              context,
-              title: '7. Hubungi Kami',
-              content:
-                  'Jika Anda memiliki pertanyaan tentang Syarat dan Ketentuan ini, silakan hubungi kami di support@litenet.com.',
-            ),
-            const SizedBox(height: 20),
-          ],
-        ),
+          );
+        },
+        error: (error, _) {
+          String errorMessage =
+              (error as Failure).message ?? 'Terjadi kesalahan';
+          return EmptyState(message: errorMessage, isRefreshable: true);
+        },
+        loading: () {
+          return Center(child: const CircularProgressIndicator());
+        },
       ),
     );
   }

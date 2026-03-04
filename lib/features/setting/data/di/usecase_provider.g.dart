@@ -192,3 +192,93 @@ final class ChangePasswordUsecaseProvider
 
 String _$changePasswordUsecaseHash() =>
     r'301dad1eb572bb0e126559a10e24fcfee5fcbbdf';
+
+@ProviderFor(getFAQUsecase)
+const getFAQUsecaseProvider = GetFAQUsecaseProvider._();
+
+final class GetFAQUsecaseProvider
+    extends $FunctionalProvider<GetFAQUsecase, GetFAQUsecase, GetFAQUsecase>
+    with $Provider<GetFAQUsecase> {
+  const GetFAQUsecaseProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'getFAQUsecaseProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$getFAQUsecaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<GetFAQUsecase> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  GetFAQUsecase create(Ref ref) {
+    return getFAQUsecase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(GetFAQUsecase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<GetFAQUsecase>(value),
+    );
+  }
+}
+
+String _$getFAQUsecaseHash() => r'b50d8bf81dcfde6cfa4120f5dd67a1204bac6eff';
+
+@ProviderFor(getPrivacyAndPolicyUsecase)
+const getPrivacyAndPolicyUsecaseProvider =
+    GetPrivacyAndPolicyUsecaseProvider._();
+
+final class GetPrivacyAndPolicyUsecaseProvider
+    extends
+        $FunctionalProvider<
+          GetPrivacyAndPolicyUsecase,
+          GetPrivacyAndPolicyUsecase,
+          GetPrivacyAndPolicyUsecase
+        >
+    with $Provider<GetPrivacyAndPolicyUsecase> {
+  const GetPrivacyAndPolicyUsecaseProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'getPrivacyAndPolicyUsecaseProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$getPrivacyAndPolicyUsecaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<GetPrivacyAndPolicyUsecase> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  GetPrivacyAndPolicyUsecase create(Ref ref) {
+    return getPrivacyAndPolicyUsecase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(GetPrivacyAndPolicyUsecase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<GetPrivacyAndPolicyUsecase>(value),
+    );
+  }
+}
+
+String _$getPrivacyAndPolicyUsecaseHash() =>
+    r'b65328dfd849661a68fa21116b7b24dcccd2734a';

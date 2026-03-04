@@ -1,7 +1,9 @@
 import 'package:dartz/dartz.dart';
 import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/features/setting/domain/entities/change_password.dart';
+import 'package:litenet/features/setting/domain/entities/faq.dart';
 import 'package:litenet/features/setting/domain/entities/logout.dart';
+import 'package:litenet/features/setting/domain/entities/privacy_and_policy.dart';
 import 'package:litenet/features/setting/domain/entities/profile.dart';
 
 abstract class SettingRepository {
@@ -17,4 +19,8 @@ abstract class SettingRepository {
     required String newPassword,
     required String confirmNewPassword,
   });
+  Future<Either<Failure, FAQResponse>> getFAQ();
+  Future<Either<Failure, PrivacyAndPolicyResponse>> getPrivacyAndPolicy();
 }
+
+
