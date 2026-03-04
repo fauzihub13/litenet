@@ -3,11 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/theme.dart';
+import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/core/helper/permission.dart';
 import 'package:litenet/core/provider/user_manager_provider.dart';
 import 'package:litenet/core/widgets/custom_snackbar.dart';
+import 'package:litenet/core/widgets/empty_state.dart';
 import 'package:litenet/core/widgets/promo_card.dart';
 import 'package:litenet/core/widgets/quota_card.dart';
+import 'package:litenet/features/promo/domain/entities/promo.dart';
+import 'package:litenet/features/promo/presentation/controllers/get_promo_provider.dart';
 import 'package:litenet/gen/assets.gen.dart';
 import 'package:litenet/routes/route_name.dart';
 
@@ -263,14 +267,33 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   // Build Promo Slider
   Widget _buildPromoSlider() {
+    final asyncPromo = ref.watch(getPromoProvider);
+
     return SizedBox(
       height: 130,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.only(left: PaddingSize.horizontal),
-        itemCount: 4,
-        itemBuilder: (context, index) {
-          return PromoCard(onTap: () {});
+      child: asyncPromo.when(
+        data: (data) {
+          List<PromoDataEntity> promoData = data.data;
+          return ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.only(left: PaddingSize.horizontal),
+            itemCount: promoData.length > 3 ? 3 : promoData.length,
+            itemBuilder: (context, index) {
+              PromoDataEntity promo = promoData[index];
+              return Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: PromoCard(promo: promo, onTap: () {}),
+              );
+            },
+          );
+        },
+        error: (error, _) {
+          String errorMessage =
+              (error as Failure).message ?? 'Terjadi kesalahan';
+          return EmptyState(message: errorMessage, isRefreshable: true);
+        },
+        loading: () {
+          return Center(child: const CircularProgressIndicator());
         },
       ),
     );

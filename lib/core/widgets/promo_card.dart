@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:litenet/core/constants/theme.dart';
+import 'package:litenet/core/extensions/datetime_context.ext.dart';
+import 'package:litenet/core/extensions/num_context.ext.dart';
+import 'package:litenet/features/promo/domain/entities/promo.dart';
 import 'package:litenet/gen/assets.gen.dart';
 
 class PromoCard extends StatelessWidget {
+  final PromoDataEntity promo;
   final VoidCallback onTap;
-  const PromoCard({super.key, required this.onTap});
+  const PromoCard({super.key, required this.promo, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 300,
-        margin: const EdgeInsets.only(right: 16),
+        width: 330,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -44,13 +47,15 @@ class PromoCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "20% sampai 750k",
+                        "Potongan sampai ${promo.maxDiscount.toRupiah()}",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       Text(
-                        "Min. transaksi 100k",
+                        "Min. transaksi ${promo.minimumTransaction.toRupiah()}",
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: DefaultColors.black200,
                           fontSize: 12,
@@ -72,7 +77,7 @@ class PromoCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                "Sampai 12 Desember 2025",
+                "Sampai ${promo.endAt.toIndonesianDateString()}",
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: DefaultColors.purple500,
                   fontSize: 10,

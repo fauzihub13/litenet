@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/theme.dart';
+import 'package:litenet/core/extensions/datetime_context.ext.dart';
+import 'package:litenet/core/extensions/num_context.ext.dart';
 import 'package:litenet/core/widgets/button.dart';
+import 'package:litenet/core/widgets/custom_snackbar.dart';
+import 'package:litenet/features/promo/domain/entities/promo.dart';
 import 'package:litenet/gen/assets.gen.dart';
 
-void showPromoModal(BuildContext context) {
+void showPromoModal({
+  required PromoDataEntity promo,
+  required BuildContext context,
+}) {
   showModalBottomSheet(
     context: context,
     backgroundColor: Colors.transparent,
@@ -38,7 +46,7 @@ void showPromoModal(BuildContext context) {
             Align(
               alignment: AlignmentGeometry.centerLeft,
               child: Text(
-                "Potongan 50% sampai 20K",
+                promo.title,
                 textAlign: TextAlign.left,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.w600,
@@ -62,17 +70,19 @@ void showPromoModal(BuildContext context) {
                   _promoDetail(
                     context: context,
                     asset: Assets.icons.money,
-                    text: 'Transaksi minimal 100k',
+                    text:
+                        "Min. transaksi ${promo.minimumTransaction.toRupiah()}",
                   ),
                   _promoDetail(
                     context: context,
                     asset: Assets.icons.discount2,
-                    text: 'Potongan maksimal 200k',
+                    text: "Potongan maksimal ${promo.maxDiscount.toRupiah()}",
                   ),
                   _promoDetail(
                     context: context,
                     asset: Assets.icons.calendar,
-                    text: 'Berlaku sampai 12 Desember 2025',
+                    text:
+                        'Berlaku sampai ${promo.endAt.toIndonesianDateString()}',
                   ),
                 ],
               ),
@@ -82,10 +92,14 @@ void showPromoModal(BuildContext context) {
               text: "Salin Kode Promo",
               buttonType: ButtonType.filled,
               onPressed: () {
+                Clipboard.setData(ClipboardData(text: promo.promoCode));
+                context.showSuccess(
+                  "Kode promo ${promo.promoCode} berhasil disalin",
+                );
                 context.pop();
               },
             ),
-            const SizedBox(height: 20), // Memberikan padding bawah agar aman
+            const SizedBox(height: 20),
           ],
         ),
       );
