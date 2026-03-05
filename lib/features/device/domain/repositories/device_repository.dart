@@ -1,6 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/features/device/domain/entities/claim_device.dart';
+import 'package:litenet/features/device/domain/entities/detail_device.dart';
+import 'package:litenet/features/device/domain/entities/device.dart';
 
 abstract class DeviceRepository {
   Future<Either<Failure, ClaimDeviceResponse>> claimDevice({
@@ -10,5 +12,9 @@ abstract class DeviceRepository {
     required String nodelink,
     required double latitude,
     required double longitude,
+  });
+  Future<Either<Failure, DeviceResponse>> getAllDevice();
+  Future<Either<Failure, DetailDeviceResponse>> getDetailDevice({
+    required String deviceId,
   });
 }

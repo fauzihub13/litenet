@@ -46,7 +46,6 @@ class AddNewDevicePage extends HookConsumerWidget {
     if (latitude != null && longitude != null) {
       currentLatLng = LatLng(latitude!, longitude!);
       locationController.text = "$latitude, $longitude";
-      print(reqName);
       nameController.text = reqName ?? '';
       nodelinkController.text = redNodelink ?? '';
       kitSerialNumberController.text = reqKitSerialNumber ?? '';

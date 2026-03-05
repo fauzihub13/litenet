@@ -7,6 +7,11 @@ extension Stringext on String {
     String formattedDate = format.format(date);
     return formattedDate;
   }
+
+  String firstWordCapitalize() {
+    if (isEmpty) return this;
+    return this[0].toUpperCase() + substring(1);
+  }
 }
 
 extension FormattedDateString on String? {

@@ -173,7 +173,6 @@ GoRouter appRouter(Ref ref) {
         name: RouteName.deviceCoordinatePage,
         builder: (context, state) {
           final extras = state.extra as Map<String, dynamic>?;
-
           final reqName = extras?['reqName'] as String?;
           final redNodelink = extras?['redNodelink'] as String?;
           final reqKitSerialNumber = extras?['reqKitSerialNumber'] as String?;
@@ -190,7 +189,11 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: "/${RouteName.detailMonitoringPage}",
         name: RouteName.detailMonitoringPage,
-        builder: (_, __) => const DetailDevicePage(),
+        builder: (context, state) {
+          final extras = state.extra as Map<String, dynamic>?;
+          final deviceId = extras?['deviceId'] as String?;
+          return DetailDevicePage(deviceId: deviceId ?? '');
+        },
       ),
 
       GoRoute(

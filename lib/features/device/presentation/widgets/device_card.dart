@@ -3,17 +3,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/theme.dart';
+import 'package:litenet/core/extensions/datetime_context.ext.dart';
+import 'package:litenet/core/extensions/string_context.ext.dart';
+import 'package:litenet/features/device/domain/entities/device.dart';
 import 'package:litenet/gen/assets.gen.dart';
 import 'package:litenet/routes/route_name.dart';
 
 class DeviceCard extends ConsumerWidget {
-  const DeviceCard({super.key});
+  final DeviceDataEntity device;
+  const DeviceCard({super.key, required this.device});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap: () {
-        context.pushNamed(RouteName.detailProductPage);
+        context.pushNamed(
+          RouteName.detailMonitoringPage,
+          extra: {'deviceId': device.deviceId},
+        );
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
@@ -43,7 +50,7 @@ class DeviceCard extends ConsumerWidget {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'Perangkat 1',
+                            device.name,
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(
                                   fontWeight: FontWeight.w600,
@@ -54,7 +61,7 @@ class DeviceCard extends ConsumerWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        "Jl. Sholeh Iskandar No 5, Kota Bogor, Jawa Barat",
+                        device.address,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: DefaultColors.black200,
                           fontSize: 12,
@@ -96,7 +103,7 @@ class DeviceCard extends ConsumerWidget {
                                 ),
                           ),
                           Text(
-                            "24 GB/30 GB",
+                            "${device.quotaLeft / 1000} GB/${device.quotaTotal / 1000} GB",
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(
                                   fontWeight: FontWeight.w700,
@@ -110,7 +117,9 @@ class DeviceCard extends ConsumerWidget {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: LinearProgressIndicator(
-                          value: 0.65,
+                          value: device.quotaTotal == 0
+                              ? 0
+                              : device.quotaLeft / device.quotaTotal,
                           minHeight: 8,
                           backgroundColor: DefaultColors.purple50,
                           valueColor: const AlwaysStoppedAnimation<Color>(
@@ -138,7 +147,7 @@ class DeviceCard extends ConsumerWidget {
                       ),
                     ),
                     child: Text(
-                      "Online",
+                      device.status.firstWordCapitalize(),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.w500,
                         color: DefaultColors.white,
@@ -160,7 +169,7 @@ class DeviceCard extends ConsumerWidget {
                 ),
               ),
               child: Text(
-                "Aktif sejak 31 December 2024",
+                "Aktif sejak ${device.activeSince.toIndonesianDateString()}",
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: DefaultColors.purple50,
                   fontSize: 12,

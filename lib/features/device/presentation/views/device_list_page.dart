@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:litenet/core/constants/theme.dart';
+import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/custom_search_bar.dart';
+import 'package:litenet/core/widgets/empty_state.dart';
+import 'package:litenet/features/device/domain/entities/device.dart';
+import 'package:litenet/features/device/presentation/controllers/get_all_device_provider.dart';
 import 'package:litenet/features/device/presentation/widgets/device_card.dart';
 import 'package:litenet/routes/route_name.dart';
 
-class DeviceListPage extends ConsumerStatefulWidget {
+class DeviceListPage extends HookConsumerWidget {
   const DeviceListPage({super.key});
 
   @override
-  ConsumerState<DeviceListPage> createState() => _DeviceListPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncAllDevice = ref.watch(getAllDeviceProvider);
 
-class _DeviceListPageState extends ConsumerState<DeviceListPage> {
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppbar(title: 'Daftar Perangkat', isLeading: false),
       body: Column(
@@ -24,14 +25,39 @@ class _DeviceListPageState extends ConsumerState<DeviceListPage> {
           // 1. Search Bar (Reusable CustomSearchBar yang kita buat tadi)
           CustomSearchBar(title: "Top up"),
 
-          // 2. List Perangkat
+          // 2. List Perangkatx
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 18),
-              itemCount: 4,
-              itemBuilder: (context, index) {
-                return DeviceCard();
+            child: RefreshIndicator(
+              onRefresh: () async {
+                ref.invalidate(getAllDeviceProvider);
               },
+              child: asyncAllDevice.when(
+                data: (data) {
+                  List<DeviceDataEntity> deviceData = data.data;
+                  if (deviceData.isEmpty) {
+                    return EmptyState(
+                      message: 'Tidak ditemukan data',
+                      isRefreshable: true,
+                    );
+                  }
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 18),
+                    itemCount: deviceData.length,
+                    itemBuilder: (context, index) {
+                      DeviceDataEntity device = deviceData[index];
+                      return DeviceCard(device:device);
+                    },
+                  );
+                },
+                error: (error, _) {
+                  String errorMessage =
+                      (error as Failure).message ?? 'Terjadi kesalahan';
+                  return EmptyState(message: errorMessage, isRefreshable: true);
+                },
+                loading: () {
+                  return Center(child: const CircularProgressIndicator());
+                },
+              ),
             ),
           ),
         ],

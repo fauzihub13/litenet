@@ -1,147 +1,194 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:litenet/core/constants/theme.dart';
+import 'package:litenet/core/errors/failure.dart';
+import 'package:litenet/core/extensions/datetime_context.ext.dart';
+import 'package:litenet/core/extensions/string_context.ext.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/custom_badge.dart';
+import 'package:litenet/core/widgets/empty_state.dart';
+import 'package:litenet/features/device/domain/entities/device.dart';
+import 'package:litenet/features/device/presentation/controllers/get_detail_device_provider.dart';
 import 'package:litenet/gen/assets.gen.dart';
 
-class DetailDevicePage extends StatefulWidget {
-  const DetailDevicePage({super.key});
+class DetailDevicePage extends HookConsumerWidget {
+  final String deviceId;
+  const DetailDevicePage({super.key, required this.deviceId});
 
   @override
-  State<DetailDevicePage> createState() => _DetailDevicePageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final mapController = useMemoized(() => MapController());
+    final currentLatLng = useState(const LatLng(0, 0));
+    final asyncDetailDevice = ref.watch(
+      getDetailDeviceProvider(deviceId: deviceId),
+    );
 
-class _DetailDevicePageState extends State<DetailDevicePage> {
-  final MapController _mapController = MapController();
-  LatLng _currentLatLng = const LatLng(-6.5971, 106.8060);
+    ref.listen(getDetailDeviceProvider(deviceId: deviceId), (previous, next) {
+      next.when(
+        data: (data) {
+          currentLatLng.value = LatLng(data.data.latitude, data.data.longitude);
+        },
+        error: (_, __) {},
+        loading: () {},
+      );
+    });
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppbar(title: 'Detail Perangkat', isLeading: true),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: PaddingSize.horizontal),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              CustomBadge(
-                text: 'Online',
-                backgroundColor: DefaultColors.purple500,
-                textColor: DefaultColors.purple50,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                paddingHorizontal: 10,
-                paddingVertical: 4,
-                borderRadius: 10,
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  SvgPicture.asset(
-                    Assets.icons.device,
-                    colorFilter: const ColorFilter.mode(
-                      DefaultColors.purple500,
-                      BlendMode.srcIn,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Perangkat 1',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: DefaultColors.purple700,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Text(
-                "Jl. Sholeh Iskandar No 5, Kota Bogor, Jawa Barat",
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: DefaultColors.black200,
-                  fontSize: 12,
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Detail Device
-              _buildQuotaMonitorCard(context),
-              const SizedBox(height: 16),
-              Text(
-                "Detail Perangkat",
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: DefaultColors.purple500,
-                  fontSize: 20,
-                ),
-              ),
-              const SizedBox(height: 10),
-              _buildTechnicalDetail(context, 'Pemilik', 'Tonal Drump'),
-              _buildTechnicalDetail(context, 'Nodelink', '5678998'),
-              _buildTechnicalDetail(
-                context,
-                'Serial Number Modem',
-                'KIT02984735',
-              ),
-              _buildTechnicalDetail(context, 'Aktif Sejak', '20 Agustus 2025'),
-              _buildTechnicalDetail(context, 'Latitude', '-6.572596310698561'),
-              _buildTechnicalDetail(context, 'Longitude', '106.80774260648441'),
-
-              // TODO: GOOGLE MAPS PREVIEW
-              Text(
-                'Preview Lokasi',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: DefaultColors.purple500,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Container(
-                width: double.infinity,
-                height: 200,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  color: Colors.amber,
-                ),
-                child: FlutterMap(
-                  mapController: _mapController,
-                  options: MapOptions(
-                    initialCenter: _currentLatLng,
-                    initialZoom: 15.0,
-                    onTap: (tapPosition, point) {},
-                  ),
+        child: RefreshIndicator(
+          onRefresh: () async {
+            ref.invalidate(getDetailDeviceProvider(deviceId: deviceId));
+          },
+          child: SingleChildScrollView(
+            child: asyncDetailDevice.when(
+              data: (data) {
+                DeviceDataEntity device = data.data;
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    TileLayer(
-                      urlTemplate:
-                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      userAgentPackageName: 'com.litenet.app',
+                    const SizedBox(height: 16),
+                    CustomBadge(
+                      text: device.status.firstWordCapitalize(),
+                      backgroundColor: DefaultColors.purple500,
+                      textColor: DefaultColors.purple50,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      paddingHorizontal: 10,
+                      paddingVertical: 4,
+                      borderRadius: 10,
                     ),
-                    MarkerLayer(
-                      markers: [
-                        Marker(
-                          point: _currentLatLng,
-                          width: 80,
-                          height: 80,
-                          child: const Icon(
-                            Icons.location_on,
-                            color: DefaultColors.purple500,
-                            size: 40,
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        SvgPicture.asset(
+                          Assets.icons.device,
+                          colorFilter: const ColorFilter.mode(
+                            DefaultColors.purple500,
+                            BlendMode.srcIn,
                           ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          device.name,
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: DefaultColors.purple700,
+                              ),
                         ),
                       ],
                     ),
+                    const SizedBox(height: 4),
+                    Text(
+                      device.address,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: DefaultColors.black200,
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Detail Device
+                    _buildQuotaMonitorCard(context: context, device: device),
+                    const SizedBox(height: 16),
+                    Text(
+                      "Detail Perangkat",
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: DefaultColors.purple500,
+                        fontSize: 20,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildTechnicalDetail(context, 'Pemilik', device.userName),
+                    _buildTechnicalDetail(context, 'Nodelink', device.nodelink),
+                    _buildTechnicalDetail(
+                      context,
+                      'Serial Number Modem',
+                      device.kitSerialNumber,
+                    ),
+                    _buildTechnicalDetail(
+                      context,
+                      'Aktif Sejak',
+                      device.activeSince.toIndonesianDateString(),
+                    ),
+                    _buildTechnicalDetail(
+                      context,
+                      'Latitude',
+                      device.latitude.toString(),
+                    ),
+                    _buildTechnicalDetail(
+                      context,
+                      'Longitude',
+                      device.longitude.toString(),
+                    ),
+
+                    Text(
+                      'Preview Lokasi',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: DefaultColors.purple500,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      width: double.infinity,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        color: Colors.amber,
+                      ),
+                      child: FlutterMap(
+                        mapController: mapController,
+                        options: MapOptions(
+                          initialCenter: currentLatLng.value,
+                          initialZoom: 15.0,
+                          onTap: (tapPosition, point) {},
+                        ),
+                        children: [
+                          TileLayer(
+                            urlTemplate:
+                                'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                            userAgentPackageName: 'com.litenet.app',
+                          ),
+                          MarkerLayer(
+                            markers: [
+                              Marker(
+                                point: currentLatLng.value,
+                                width: 80,
+                                height: 80,
+                                child: const Icon(
+                                  Icons.location_on,
+                                  color: DefaultColors.purple500,
+                                  size: 40,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
-                ),
-              ),
-            ],
+                );
+              },
+              error: (error, _) {
+                String errorMessage =
+                    (error as Failure).message ?? 'Terjadi kesalahan';
+                return EmptyState(message: errorMessage, isRefreshable: true);
+              },
+              loading: () {
+                return Center(child: const CircularProgressIndicator());
+              },
+            ),
           ),
         ),
       ),
@@ -161,7 +208,10 @@ class _DetailDevicePageState extends State<DetailDevicePage> {
   }
 }
 
-Widget _buildQuotaMonitorCard(BuildContext context) {
+Widget _buildQuotaMonitorCard({
+  required BuildContext context,
+  required DeviceDataEntity device,
+}) {
   return Container(
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
@@ -208,8 +258,10 @@ Widget _buildQuotaMonitorCard(BuildContext context) {
               const SizedBox(height: 8),
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: const LinearProgressIndicator(
-                  value: 0.8, // 28/30
+                child: LinearProgressIndicator(
+                  value: device.quotaTotal == 0
+                      ? 0
+                      : device.quotaLeft / device.quotaTotal,
                   minHeight: 10,
                   backgroundColor: DefaultColors.purple50,
                   valueColor: AlwaysStoppedAnimation<Color>(
@@ -226,9 +278,9 @@ Widget _buildQuotaMonitorCard(BuildContext context) {
                     fontWeight: FontWeight.w600,
                   ),
                   children: [
-                    TextSpan(text: "28 GB"),
+                    TextSpan(text: "${device.quotaLeft / 1000} GB"),
                     TextSpan(
-                      text: "/30 GB",
+                      text: "/${device.quotaTotal / 1000} GB",
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: DefaultColors.black200,
                         fontSize: 14,
