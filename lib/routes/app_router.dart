@@ -92,7 +92,11 @@ GoRouter appRouter(Ref ref) {
           GoRoute(
             path: RouteName.detailProductPage,
             name: RouteName.detailProductPage,
-            builder: (_, __) => const DetailQuotaPage(),
+            builder: (context, state) {
+              final extras = state.extra as Map<String, dynamic>?;
+              final id = extras?['id'] as String;
+              return DetailQuotaPage(id: id);
+            },
           ),
 
           GoRoute(

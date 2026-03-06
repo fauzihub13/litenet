@@ -12,6 +12,8 @@ import 'package:litenet/core/widgets/promo_card.dart';
 import 'package:litenet/core/widgets/quota_card.dart';
 import 'package:litenet/features/promo/domain/entities/promo.dart';
 import 'package:litenet/features/promo/presentation/controllers/get_promo_provider.dart';
+import 'package:litenet/features/quota/domain/entities/quota.dart';
+import 'package:litenet/features/quota/presentation/controllers/get_all_quota_provider.dart';
 import 'package:litenet/gen/assets.gen.dart';
 import 'package:litenet/routes/route_name.dart';
 
@@ -301,17 +303,32 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   // Build Promo Slider
   Widget _buildQuotaList() {
-    return ListView.builder(
-      scrollDirection: Axis.vertical,
-      itemCount: 3,
-      padding: EdgeInsets.zero,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 10.0),
-          child: QuotaCard(),
+    final asyncQuota = ref.watch(getAllQuotaProvider);
+
+    return asyncQuota.when(
+      data: (data) {
+        List<QuotaDataEntity> quotaData = data.data;
+        return ListView.builder(
+          scrollDirection: Axis.vertical,
+          itemCount: quotaData.length > 3 ? 3 : quotaData.length,
+          padding: EdgeInsets.zero,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) {
+            QuotaDataEntity quota = quotaData[index];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 10.0),
+              child: QuotaCard(quota: quota),
+            );
+          },
         );
+      },
+      error: (error, _) {
+        String errorMessage = (error as Failure).message ?? 'Terjadi kesalahan';
+        return EmptyState(message: errorMessage, isRefreshable: true);
+      },
+      loading: () {
+        return Center(child: const CircularProgressIndicator());
       },
     );
   }

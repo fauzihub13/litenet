@@ -2,18 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/theme.dart';
+import 'package:litenet/core/extensions/num_context.ext.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/custom_badge.dart';
+import 'package:litenet/features/quota/domain/entities/quota.dart';
 import 'package:litenet/routes/route_name.dart';
 
 class QuotaCard extends ConsumerWidget {
-  const QuotaCard({super.key});
+  final QuotaDataEntity quota;
+  const QuotaCard({super.key, required this.quota});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap: () {
-        context.pushNamed(RouteName.detailProductPage);
+        context.pushNamed(RouteName.detailProductPage, extra: {'id': quota.id});
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: PaddingSize.horizontal),
@@ -39,7 +42,7 @@ class QuotaCard extends ConsumerWidget {
                     ),
                     SizedBox(width: 8),
                     Text(
-                      "Combo Super",
+                      quota.name,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
@@ -47,7 +50,7 @@ class QuotaCard extends ConsumerWidget {
                   ],
                 ),
                 Text(
-                  "1 BULAN",
+                  "${quota.monthDuration} BULAN",
                   style: Theme.of(
                     context,
                   ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
@@ -56,7 +59,7 @@ class QuotaCard extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              "30 GB",
+              quota.capacity,
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
@@ -67,10 +70,14 @@ class QuotaCard extends ConsumerWidget {
               children: [
                 Row(
                   children: [
-                    CustomBadge(text: "25%", fontSize: 14),
+                    CustomBadge(
+                      text:
+                          "${(quota.discount / quota.basePrice * 100).toInt()}%",
+                      fontSize: 14,
+                    ),
                     const SizedBox(width: 8),
                     Text(
-                      "Rp420.000",
+                      quota.basePrice.toRupiah(),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         decoration: TextDecoration.lineThrough,
                         color: DefaultColors.black200,
@@ -79,7 +86,7 @@ class QuotaCard extends ConsumerWidget {
                   ],
                 ),
                 Text(
-                  "Rp320.000",
+                  quota.promoPrice.toRupiah(),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: DefaultColors.purple900,
                     fontWeight: FontWeight.w600,

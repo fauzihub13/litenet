@@ -2,14 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/theme.dart';
+import 'package:litenet/core/errors/failure.dart';
+import 'package:litenet/core/extensions/num_context.ext.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
+import 'package:litenet/core/widgets/custom_snackbar.dart';
+import 'package:litenet/core/widgets/empty_state.dart';
 import 'package:litenet/core/widgets/form_input.dart';
 import 'package:litenet/core/widgets/row_title.dart';
+import 'package:litenet/features/quota/domain/entities/detail_quota.dart';
+import 'package:litenet/features/quota/presentation/controllers/check_promo_provider.dart';
+import 'package:litenet/features/quota/presentation/controllers/get_detail_quota_provider.dart';
 import 'package:litenet/routes/route_name.dart';
 
 class DetailQuotaPage extends ConsumerStatefulWidget {
-  const DetailQuotaPage({super.key});
+  final String id;
+  const DetailQuotaPage({super.key, required this.id});
 
   @override
   ConsumerState<DetailQuotaPage> createState() => _DetailQuotaPageState();
@@ -22,6 +30,7 @@ class _DetailQuotaPageState extends ConsumerState<DetailQuotaPage>
   String? _selectedDevice;
   final TextEditingController _promoCodeController = TextEditingController();
   bool _isExpanded = false;
+  int discountPrice = 0;
 
   @override
   void initState() {
@@ -40,81 +49,97 @@ class _DetailQuotaPageState extends ConsumerState<DetailQuotaPage>
 
   @override
   Widget build(BuildContext context) {
+    final asyncDetailQuota = ref.watch(getDetailQuotaProvider(id: widget.id));
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const CustomAppbar(title: 'Detail Kuota', isRounded: false),
       body: Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
-              // padding: const EdgeInsets.all(PaddingSize.horizontal),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 1. Header Banner
-                  _buildHeaderBanner(context),
-                  const SizedBox(height: 30),
-
-                  _paddingColumn([
-                    // 2. Dropdown Pilih Perangkat
-                    RowTitle(title: "Perangkat"),
-                    const SizedBox(height: 8),
-                    _buildDeviceDropdown(),
-                    const SizedBox(height: 20),
-
-                    // 3. Input Kode Promo
-                    RowTitle(title: "Kode Promo"),
-                    const SizedBox(height: 8),
-                    _buildPromoInput(),
-                    const SizedBox(height: 30),
-
-                    // 4. Tab Deskripsi & Syarat
-                    TabBar(
-                      controller: _tabController,
-                      labelColor: DefaultColors.purple500,
-                      unselectedLabelColor: DefaultColors.black100,
-                      indicatorColor: DefaultColors.purple500,
-                      indicatorWeight: 3,
-                      indicatorSize: TabBarIndicatorSize.tab,
-                      overlayColor: WidgetStateProperty.all(Colors.transparent),
-                      labelStyle: Theme.of(context).textTheme.titleLarge
-                          ?.copyWith(fontWeight: FontWeight.w500, fontSize: 14),
-
-                      tabs: const [
-                        Tab(text: "Deskripsi"),
-                        Tab(text: "Syarat dan Ketentuan"),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-
-                    // SizedBox(
-                    //   height: 300,
-                    //   child: TabBarView(
-                    //     controller: _tabController,
-                    //     children: [
-                    //       _buildDescriptionText(
-                    //         "Paket Kuota Satelit 10 GB adalah solusi terbaik bagi pengguna yang membutuhkan koneksi internet stabil di wilayah tanpa jangkauan seluler. Dengan jaringan satelit MyLinkSat, paket ini memungkinkan aktivitas komunikasi data, pemantauan perangkat, hingga akses layanan berbasis cloud.\n\nPaket ini memiliki masa aktif 30 hari sejak aktivasi dan dapat digunakan untuk berbagai kebutuhan seperti sistem monitoring lapangan, kapal laut, area tambang, serta lokasi terpencil lainnya.",
-                    //       ),
-                    //       _buildDescriptionText(
-                    //         "Syarat dan ketentuan Paket Kuota Satelit 10 GB adalah solusi terbaik bagi pengguna yang membutuhkan koneksi internet stabil di wilayah tanpa jangkauan seluler. Dengan jaringan satelit MyLinkSat, paket ini memungkinkan aktivitas komunikasi data, pemantauan perangkat, hingga akses layanan berbasis cloud.\n\nPaket ini memiliki masa aktif 30 hari sejak aktivasi dan dapat digunakan untuk berbagai kebutuhan seperti sistem monitoring lapangan, kapal laut, area tambang, serta lokasi terpencil lainnya.",
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-                    IndexedStack(
-                      index: _currentIndex,
+            child: RefreshIndicator(
+              onRefresh: () async {
+                ref.invalidate(getDetailQuotaProvider(id: widget.id));
+              },
+              child: asyncDetailQuota.when(
+                data: (data) {
+                  final quota = data.data;
+                  return SingleChildScrollView(
+                    // padding: const EdgeInsets.all(PaddingSize.horizontal),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildDescriptionText(
-                          "AAA Paket Kuota Satelit 10 GB adalah solusi terbaik bagi pengguna yang membutuhkan koneksi internet stabil di wilayah tanpa jangkauan seluler. Dengan jaringan satelit MyLidigunakan untuk berbagai kebutuhan seperti sistem monitoring lapangan, kapal laut, area tambang, serta lokasi terpencil lainnya.",
-                        ),
-                        _buildDescriptionText(
-                          "Syarat dan ketntuan Paket Kuota Satelit 10 GB adalah solusi terbaik bagi pengguna yang membutuhkan koneksi internet stabil di wilayah tanpa jangkauan seluler. Dengan jaringan satelit MyLinkSat, paket ini memungkinkan aktivitas komunikasi data, pemantauan perangkat, hingga akses layanan berbasis cloud.\n\nPaket ini memiliki masa aktif 30 hari sejak aktivasi dan dapat digunakan untuk berbagai kebutuhan seperti sistem monitoring lapangan, kapal laut, area tambang, serta lokasi terpencil lainnya.",
-                        ),
+                        // 1. Header Banner
+                        _buildHeaderBanner(context: context, quota: quota),
+                        const SizedBox(height: 30),
+
+                        _paddingColumn([
+                          // 2. Dropdown Pilih Perangkat
+                          RowTitle(title: "Perangkat"),
+                          const SizedBox(height: 8),
+                          _buildDeviceDropdown(quota: quota),
+                          const SizedBox(height: 20),
+
+                          // 3. Input Kode Promo
+                          RowTitle(title: "Kode Promo"),
+                          const SizedBox(height: 8),
+                          _buildPromoInput(quota: quota),
+                          const SizedBox(height: 30),
+
+                          // 4. Tab Deskripsi & Syarat
+                          TabBar(
+                            controller: _tabController,
+                            labelColor: DefaultColors.purple500,
+                            unselectedLabelColor: DefaultColors.black100,
+                            indicatorColor: DefaultColors.purple500,
+                            indicatorWeight: 3,
+                            indicatorSize: TabBarIndicatorSize.tab,
+                            overlayColor: WidgetStateProperty.all(
+                              Colors.transparent,
+                            ),
+                            labelStyle: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14,
+                                ),
+
+                            tabs: const [
+                              Tab(text: "Deskripsi"),
+                              Tab(text: "Syarat dan Ketentuan"),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+
+                          IndexedStack(
+                            index: _currentIndex,
+                            children: [
+                              _buildDescriptionText(quota.description),
+                              _buildDescriptionText(
+                                quota.terms
+                                    .asMap()
+                                    .entries
+                                    .map(
+                                      (entry) =>
+                                          "${entry.key + 1}. ${entry.value}",
+                                    )
+                                    .join("\n\n"),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                        ]),
                       ],
                     ),
-                    const SizedBox(height: 10),
-                  ]),
-                ],
+                  );
+                },
+                error: (error, _) {
+                  String errorMessage =
+                      (error as Failure).message ?? 'Terjadi kesalahan';
+                  return EmptyState(message: errorMessage, isRefreshable: true);
+                },
+                loading: () {
+                  return Center(child: const CircularProgressIndicator());
+                },
               ),
             ),
           ),
@@ -123,11 +148,24 @@ class _DetailQuotaPageState extends ConsumerState<DetailQuotaPage>
           // _buildBottomSummary(context),
         ],
       ),
-      bottomNavigationBar: _buildBottomSummary(context),
+      bottomNavigationBar: asyncDetailQuota.when(
+        data: (data) {
+          return _buildBottomSummary(context: context, quota: data.data);
+        },
+        error: (_, __) {
+          return SizedBox();
+        },
+        loading: () {
+          return SizedBox();
+        },
+      ),
     );
   }
 
-  Widget _buildHeaderBanner(BuildContext context) {
+  Widget _buildHeaderBanner({
+    required BuildContext context,
+    required DetailQuotaDataEntity quota,
+  }) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.only(top: 0, bottom: 40),
@@ -141,7 +179,7 @@ class _DetailQuotaPageState extends ConsumerState<DetailQuotaPage>
       child: Column(
         children: [
           Text(
-            "12GB ( 1 Bulan )",
+            "${quota.capacity} ( ${quota.monthDuration} Bulan )",
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -169,7 +207,9 @@ class _DetailQuotaPageState extends ConsumerState<DetailQuotaPage>
     );
   }
 
-  Widget _buildDeviceDropdown() {
+  Widget _buildDeviceDropdown({required DetailQuotaDataEntity quota}) {
+    List<String> devices = quota.devices.map((e) => e.name).toList();
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
@@ -189,7 +229,7 @@ class _DetailQuotaPageState extends ConsumerState<DetailQuotaPage>
           ),
           isExpanded: true,
           value: _selectedDevice,
-          items: ["Perangkat 1X", "Perangkat 2Y"].map((String value) {
+          items: devices.map((String value) {
             return DropdownMenuItem<String>(
               value: value,
               child: Text(
@@ -208,7 +248,26 @@ class _DetailQuotaPageState extends ConsumerState<DetailQuotaPage>
     );
   }
 
-  Widget _buildPromoInput() {
+  Widget _buildPromoInput({required DetailQuotaDataEntity quota}) {
+    final asyncCheckPromo = ref.watch(checkPromoProvider);
+    ref.listen(checkPromoProvider, (previous, next) {
+      asyncCheckPromo.when(
+        data: (data) {
+          if (data != null) {
+            context.showSuccess(data.message);
+            setState(() {
+              discountPrice = data.data.maxDiscount;
+            });
+          }
+        },
+        error: (error, stack) {
+          String errorMessage =
+              (error as Failure).message ?? 'Terjadi kesalahan';
+          context.showError(errorMessage);
+        },
+        loading: () {},
+      );
+    });
     return Row(
       children: [
         Expanded(
@@ -227,7 +286,24 @@ class _DetailQuotaPageState extends ConsumerState<DetailQuotaPage>
         const SizedBox(width: 12),
         Expanded(
           flex: 1,
-          child: Button(text: "Pakai", onPressed: () {}, height: 52),
+          child: Button(
+            text: "Pakai",
+            isDisabled: asyncCheckPromo.isLoading,
+            isLoading: asyncCheckPromo.isLoading,
+            onPressed: () async {
+              if (_promoCodeController.text.isNotEmpty) {
+                ref
+                    .read(checkPromoProvider.notifier)
+                    .checkPromoCode(
+                      dataPlanId: quota.id,
+                      promoCode: _promoCodeController.text.trim(),
+                    );
+              } else {
+                context.showError("Kode tidak boleh kosong");
+              }
+            },
+            height: 52,
+          ),
         ),
       ],
     );
@@ -241,7 +317,10 @@ class _DetailQuotaPageState extends ConsumerState<DetailQuotaPage>
     );
   }
 
-  Widget _buildBottomSummary(BuildContext context) {
+  Widget _buildBottomSummary({
+    required BuildContext context,
+    required DetailQuotaDataEntity quota,
+  }) {
     return Container(
       padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
       decoration: BoxDecoration(
@@ -287,7 +366,7 @@ class _DetailQuotaPageState extends ConsumerState<DetailQuotaPage>
                       ),
                     ),
                     Text(
-                      "Rp 300.000",
+                      (quota.promoPrice - discountPrice).toRupiah(),
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 18,
@@ -308,8 +387,8 @@ class _DetailQuotaPageState extends ConsumerState<DetailQuotaPage>
                 const SizedBox(height: 8),
                 const Divider(color: DefaultColors.purple50),
                 const SizedBox(height: 8),
-                _buildPriceRow("Harga", "Rp 350.000"),
-                _buildPriceRow("Potongan", "-Rp 50.000"),
+                _buildPriceRow("Harga", quota.promoPrice.toRupiah()),
+                _buildPriceRow("Potongan", discountPrice.toRupiah()),
               ],
             ),
             crossFadeState: _isExpanded
