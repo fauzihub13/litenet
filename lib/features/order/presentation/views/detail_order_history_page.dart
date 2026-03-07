@@ -9,8 +9,8 @@ import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/gen/assets.gen.dart';
 
 class DetailOrderHistoryPage extends ConsumerWidget {
-  final TransactionStatus status;
-  const DetailOrderHistoryPage({super.key, required this.status});
+  final String orderId;
+  const DetailOrderHistoryPage({super.key, required this.orderId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -56,7 +56,7 @@ class DetailOrderHistoryPage extends ConsumerWidget {
                   child: Column(
                     children: [
                       // Icon
-                      _buildIcon(status: status),
+                      _buildIcon(status: TransactionStatus.selesai),
                       const SizedBox(height: 24),
                       Text(
                         "Transaksi Berhasil",

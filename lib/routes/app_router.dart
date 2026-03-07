@@ -1,5 +1,4 @@
 import 'package:go_router/go_router.dart';
-import 'package:litenet/core/constants/enum.dart';
 import 'package:litenet/core/provider/user_manager_provider.dart';
 import 'package:litenet/features/auth/presentation/views/login_page.dart';
 import 'package:litenet/features/auth/presentation/views/otp_page.dart';
@@ -15,10 +14,10 @@ import 'package:litenet/features/onboarding/presentation/views/onboarding_page.d
 import 'package:litenet/features/order/domain/entities/create_transaction.dart';
 import 'package:litenet/features/order/presentation/views/detail_order_history_page.dart';
 import 'package:litenet/features/order/presentation/views/order_history_page.dart';
+import 'package:litenet/features/order/presentation/views/payment_method.page.dart';
+import 'package:litenet/features/order/presentation/views/payment_order_page.dart';
 import 'package:litenet/features/promo/presentation/views/promo_page.dart';
 import 'package:litenet/features/quota/presentation/views/detail_quota_page.dart';
-import 'package:litenet/features/quota/presentation/views/payment_method.page.dart';
-import 'package:litenet/features/quota/presentation/views/payment_order_page.dart';
 import 'package:litenet/features/quota/presentation/views/quota_page.dart';
 import 'package:litenet/features/setting/presentation/views/change_password_page.dart';
 import 'package:litenet/features/setting/presentation/views/change_profile_page.dart';
@@ -223,8 +222,9 @@ GoRouter appRouter(Ref ref) {
         path: "/${RouteName.detailOrderHistoryPage}",
         name: RouteName.detailOrderHistoryPage,
         builder: (_, state) {
-          final status = state.extra as TransactionStatus;
-          return DetailOrderHistoryPage(status: status);
+          final extras = state.extra as Map<String, dynamic>?;
+          final orderId = extras?['orderId'] as String?;
+          return DetailOrderHistoryPage(orderId: orderId ?? '');
         },
       ),
 

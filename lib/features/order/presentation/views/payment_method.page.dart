@@ -214,15 +214,3 @@ class PaymentMethodPage extends HookConsumerWidget {
     );
   }
 }
-
-// class PaymentMethod {
-//   final String name;
-//   final String logoAsset;
-//   final String id;
-
-//   PaymentMethod({
-//     required this.name,
-//     required this.logoAsset,
-//     required this.id,
-//   });
-// }

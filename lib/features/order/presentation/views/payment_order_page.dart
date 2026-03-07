@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:litenet/core/constants/theme.dart';
+import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/core/extensions/datetime_context.ext.dart';
 import 'package:litenet/core/extensions/num_context.ext.dart';
 import 'package:litenet/core/extensions/string_context.ext.dart';
@@ -12,6 +14,8 @@ import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/custom_snackbar.dart';
 import 'package:litenet/features/order/domain/entities/create_transaction.dart';
+import 'package:litenet/features/order/presentation/controllers/check_payment_status_provider.dart';
+import 'package:litenet/routes/route_name.dart';
 
 class PaymentOrderPage extends HookConsumerWidget {
   final CreateTransactionDataEntity? createTransactionResponse;
@@ -19,25 +23,73 @@ class PaymentOrderPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final expiredAt = createTransactionResponse!.expiredAt;
+    // final asyncCheckPaymentStatus = ref.watch(checkPaymentStatusProvider);
+    final pollTimer = useRef<Timer?>(null);
 
-    // state awal
+    ref.listen(checkPaymentStatusProvider, (previous, next) {
+      next.when(
+        data: (data) {
+          if (data != null) {
+            final status = data.data.transactionStatus;
+            if (status == 'settlement' || status == 'capture') {
+              // Hentikan timer SEGERA
+              pollTimer.value?.cancel();
+
+              context.pushReplacementNamed(
+                RouteName.detailOrderHistoryPage,
+                extra: {'orderId': data.data.id},
+              );
+            } else if (status == 'expired' || status == 'failure') {
+              pollTimer.value?.cancel();
+              context.showError('Pembayaran Anda telah expired atau gagal');
+            }
+          }
+        },
+        error: (error, _) {
+          String errorMessage =
+              (error as Failure).message ?? 'Terjadi kesalahan';
+          context.showError(errorMessage);
+        },
+        loading: () {},
+      );
+    });
+
+    final expiredAt = createTransactionResponse!.expiredAt;
     final remaining = useState(
       expiredAt.difference(DateTime.now().toUtc().add(Duration(hours: 7))),
     );
 
-    // timer update
     useEffect(() {
-      final timer = Timer.periodic(const Duration(seconds: 1), (_) {
-        final diff = expiredAt.difference(
-          DateTime.now().toUtc().add(Duration(hours: 7)),
-        );
-        remaining.value = diff.isNegative ? Duration.zero : diff;
+      // inisialisasi polling timer
+      pollTimer.value = Timer.periodic(const Duration(seconds: 5), (t) {
+        ref
+            .read(checkPaymentStatusProvider.notifier)
+            .checkPaymentStatus(
+              orderId: createTransactionResponse?.orderId ?? '',
+            );
       });
-      return timer.cancel;
+
+      // ini akan jalan saat widget dibuang dari widget tree
+      return () {
+        pollTimer.value?.cancel();
+      };
     }, []);
 
-    // format jam:menit:detik
+    useEffect(() {
+      final countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+        final now = DateTime.now().toUtc().add(const Duration(hours: 7));
+        final diff = expiredAt.difference(now);
+
+        if (diff.isNegative) {
+          remaining.value = Duration.zero;
+          pollTimer.value?.cancel(); // Hentikan polling jika waktu habis
+        } else {
+          remaining.value = diff;
+        }
+      });
+      return () => countdownTimer.cancel();
+    }, [expiredAt]);
+
     String formatDuration(Duration d) {
       final hours = d.inHours.toString().padLeft(2, '0');
       final minutes = (d.inMinutes % 60).toString().padLeft(2, '0');
@@ -240,10 +292,20 @@ class PaymentOrderPage extends HookConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           spacing: 10,
           children: [
-            Button(text: "Periksa Status", onPressed: () {}),
+            Button(
+              text: "Periksa Status",
+              onPressed: () async {
+                ref
+                    .read(checkPaymentStatusProvider.notifier)
+                    .checkPaymentStatus(
+                      orderId: createTransactionResponse?.orderId ?? '',
+                    );
+              },
+            ),
             Button(
               text: "Kembali",
-              onPressed: () {},
+
+              onPressed: () async {},
               backgroundColor: DefaultColors.purple50,
               textColor: DefaultColors.purple500,
             ),

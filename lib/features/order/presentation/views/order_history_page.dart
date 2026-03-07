@@ -75,7 +75,9 @@ class _OrderHistoryPageState extends ConsumerState<OrderHistoryPage> {
                   onTap: () {
                     context.pushNamed(
                       RouteName.detailOrderHistoryPage,
-                      extra: _orders[index].status,
+                      extra: {
+                        'orderId': _orders[index].trxId,
+                      },
                     );
                   },
                 );
