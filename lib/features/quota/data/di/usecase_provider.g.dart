@@ -151,3 +151,100 @@ final class CheckPromoUsecaseProvider
 }
 
 String _$checkPromoUsecaseHash() => r'fb1e718fac5674129bdce6fb2626ab59cf5883d5';
+
+@ProviderFor(getAllPaymentMethodUsecase)
+const getAllPaymentMethodUsecaseProvider =
+    GetAllPaymentMethodUsecaseProvider._();
+
+final class GetAllPaymentMethodUsecaseProvider
+    extends
+        $FunctionalProvider<
+          GetAllPaymentMethodUsecase,
+          GetAllPaymentMethodUsecase,
+          GetAllPaymentMethodUsecase
+        >
+    with $Provider<GetAllPaymentMethodUsecase> {
+  const GetAllPaymentMethodUsecaseProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'getAllPaymentMethodUsecaseProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$getAllPaymentMethodUsecaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<GetAllPaymentMethodUsecase> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  GetAllPaymentMethodUsecase create(Ref ref) {
+    return getAllPaymentMethodUsecase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(GetAllPaymentMethodUsecase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<GetAllPaymentMethodUsecase>(value),
+    );
+  }
+}
+
+String _$getAllPaymentMethodUsecaseHash() =>
+    r'155877eddac7de4517acda6af59b02c28d5905bd';
+
+@ProviderFor(createTransactionUsecase)
+const createTransactionUsecaseProvider = CreateTransactionUsecaseProvider._();
+
+final class CreateTransactionUsecaseProvider
+    extends
+        $FunctionalProvider<
+          CreateTransactionUsecase,
+          CreateTransactionUsecase,
+          CreateTransactionUsecase
+        >
+    with $Provider<CreateTransactionUsecase> {
+  const CreateTransactionUsecaseProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'createTransactionUsecaseProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$createTransactionUsecaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<CreateTransactionUsecase> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  CreateTransactionUsecase create(Ref ref) {
+    return createTransactionUsecase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(CreateTransactionUsecase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<CreateTransactionUsecase>(value),
+    );
+  }
+}
+
+String _$createTransactionUsecaseHash() =>
+    r'7e88c8c8c618e12d1ea0f1abe8d2232fe5eba3a1';

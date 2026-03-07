@@ -15,6 +15,7 @@ import 'package:litenet/features/onboarding/presentation/views/onboarding_page.d
 import 'package:litenet/features/order/presentation/views/detail_order_history_page.dart';
 import 'package:litenet/features/order/presentation/views/order_history_page.dart';
 import 'package:litenet/features/promo/presentation/views/promo_page.dart';
+import 'package:litenet/features/quota/domain/entities/create_transaction.dart';
 import 'package:litenet/features/quota/presentation/views/detail_quota_page.dart';
 import 'package:litenet/features/quota/presentation/views/payment_method.page.dart';
 import 'package:litenet/features/quota/presentation/views/payment_order_page.dart';
@@ -102,13 +103,31 @@ GoRouter appRouter(Ref ref) {
           GoRoute(
             path: RouteName.paymentMethodPage,
             name: RouteName.paymentMethodPage,
-            builder: (_, __) => const PaymentMethodPage(),
+            builder: (context, state) {
+              final extras = state.extra as Map<String, dynamic>?;
+              final deviceId = extras?['deviceId'] as String;
+              final dataPlanId = extras?['dataPlanId'] as String;
+              final promoCode = extras?['promoCode'] as String?;
+              return PaymentMethodPage(
+                deviceId: deviceId,
+                dataPlanId: dataPlanId,
+                promoCode: promoCode ?? '',
+              );
+            },
           ),
 
           GoRoute(
             path: RouteName.paymentPage,
             name: RouteName.paymentPage,
-            builder: (_, __) => const PaymentOrderPage(),
+            builder: (context, state) {
+              final extras = state.extra as Map<String, dynamic>?;
+              final createTransactionResponse =
+                  extras?['createTransactionResponse']
+                      as CreateTransactionDataEntity?;
+              return PaymentOrderPage(
+                createTransactionResponse: createTransactionResponse,
+              );
+            },
           ),
         ],
       ),

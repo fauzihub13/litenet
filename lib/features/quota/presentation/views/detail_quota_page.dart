@@ -208,7 +208,9 @@ class _DetailQuotaPageState extends ConsumerState<DetailQuotaPage>
   }
 
   Widget _buildDeviceDropdown({required DetailQuotaDataEntity quota}) {
-    List<String> devices = quota.devices.map((e) => e.name).toList();
+    List<DeviceQuotaDataEntity> devices = quota.devices
+        .map((e) => DeviceQuotaDataEntity(id: e.id, name: e.name))
+        .toList();
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -228,12 +230,12 @@ class _DetailQuotaPageState extends ConsumerState<DetailQuotaPage>
             ),
           ),
           isExpanded: true,
-          value: _selectedDevice,
-          items: devices.map((String value) {
+          value: _selectedDevice, // ini akan menyimpan `id`
+          items: devices.map((DeviceQuotaDataEntity device) {
             return DropdownMenuItem<String>(
-              value: value,
+              value: device.id, // value yang disimpan
               child: Text(
-                value,
+                device.name, // label yang ditampilkan
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w500,
                   color: DefaultColors.purple900,
@@ -401,7 +403,18 @@ class _DetailQuotaPageState extends ConsumerState<DetailQuotaPage>
           Button(
             text: "Pilih Metode Pembayaran",
             onPressed: () {
-              context.pushNamed(RouteName.paymentMethodPage);
+              if (_selectedDevice != null) {
+                context.pushNamed(
+                  RouteName.paymentMethodPage,
+                  extra: {
+                    "deviceId": _selectedDevice,
+                    "dataPlanId": quota.id,
+                    "promoCode": _promoCodeController.text.trim(),
+                  },
+                );
+              } else {
+                context.showError("Pilih perangkat terlebih dahulu");
+              }
             },
           ),
         ],

@@ -6,4 +6,9 @@ extension DateTimeFormatID on DateTime {
     // locale 'id' : bahasa Indonesia
     return DateFormat("d MMMM yyyy", "id").format(this);
   }
+
+  String toIndonesianDateTimeString() {
+    // locale 'id' : bahasa Indonesia
+    return DateFormat("d MMMM yyyy hh:mm", "id").format(this);
+  }
 }

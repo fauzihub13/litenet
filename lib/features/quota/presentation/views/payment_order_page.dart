@@ -1,21 +1,53 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:litenet/core/constants/theme.dart';
+import 'package:litenet/core/extensions/datetime_context.ext.dart';
+import 'package:litenet/core/extensions/num_context.ext.dart';
+import 'package:litenet/core/extensions/string_context.ext.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
+import 'package:litenet/core/widgets/custom_snackbar.dart';
+import 'package:litenet/features/quota/domain/entities/create_transaction.dart';
 
-class PaymentOrderPage extends StatefulWidget {
-  const PaymentOrderPage({super.key});
+class PaymentOrderPage extends HookConsumerWidget {
+  final CreateTransactionDataEntity? createTransactionResponse;
+  const PaymentOrderPage({super.key, this.createTransactionResponse});
 
   @override
-  State<PaymentOrderPage> createState() => _PaymentOrderPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    // expiredAt sudah DateTime dari API
+    final expiredAt = createTransactionResponse!.expiredAt;
 
-class _PaymentOrderPageState extends State<PaymentOrderPage> {
-  @override
-  Widget build(BuildContext context) {
+    // state awal
+    final remaining = useState(
+      expiredAt.difference(DateTime.now().toUtc().add(Duration(hours: 7))),
+    );
+
+    // timer update
+    useEffect(() {
+      final timer = Timer.periodic(const Duration(seconds: 1), (_) {
+        final diff = expiredAt.difference(
+          DateTime.now().toUtc().add(Duration(hours: 7)),
+        );
+        remaining.value = diff.isNegative ? Duration.zero : diff;
+      });
+      return timer.cancel;
+    }, []);
+
+    // format jam:menit:detik
+    String formatDuration(Duration d) {
+      final hours = d.inHours.toString().padLeft(2, '0');
+      final minutes = (d.inMinutes % 60).toString().padLeft(2, '0');
+      final seconds = (d.inSeconds % 60).toString().padLeft(2, '0');
+      return "$hours:$minutes:$seconds";
+    }
+
     return Scaffold(
-      appBar: CustomAppbar(title: 'Metode Pembayaran'),
+      appBar: CustomAppbar(title: 'Pembayaran'),
       body: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: PaddingSize.horizontal,
@@ -52,13 +84,30 @@ class _PaymentOrderPageState extends State<PaymentOrderPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          "Bayar Sebelum",
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: DefaultColors.purple50,
-                              ),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Bayar Sebelum",
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: DefaultColors.purple50,
+                                  ),
+                            ),
+                            Text(
+                              createTransactionResponse?.expiredAt
+                                      .toIndonesianDateTimeString() ??
+                                  '-',
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 14,
+                                    color: DefaultColors.purple50,
+                                  ),
+                            ),
+                          ],
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -78,7 +127,7 @@ class _PaymentOrderPageState extends State<PaymentOrderPage> {
                               ),
                               SizedBox(width: 4),
                               Text(
-                                "00:12:40",
+                                formatDuration(remaining.value),
                                 style: Theme.of(context).textTheme.bodyMedium
                                     ?.copyWith(
                                       fontWeight: FontWeight.w600,
@@ -119,19 +168,25 @@ class _PaymentOrderPageState extends State<PaymentOrderPage> {
                             Container(
                               width: 60,
                               height: 35,
-                              padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.grey.shade200),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Image.network(
-                                "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Bank_Mandiri_logo_2016.svg/1200px-Bank_Mandiri_logo_2016.svg.png",
+                                createTransactionResponse?.imageUrl ?? '-',
                                 fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Icon(
+                                    Icons.monetization_on,
+                                    color: DefaultColors.purple200,
+                                    size: 20,
+                                  );
+                                },
                               ),
                             ),
                             const SizedBox(width: 12),
                             Text(
-                              "Mandiri Virtual Account",
+                              "${createTransactionResponse?.bank.firstWordCapitalize()} Virtual Account",
                               style: Theme.of(context).textTheme.bodyMedium
                                   ?.copyWith(
                                     fontWeight: FontWeight.w600,
@@ -145,7 +200,7 @@ class _PaymentOrderPageState extends State<PaymentOrderPage> {
                         // Field Nomor VA dengan Tombol Copy
                         _buildInfoField(
                           context,
-                          value: "9876 8765 8765 5670",
+                          value: createTransactionResponse?.vaNumber ?? '-',
                           isCopyable: true,
                         ),
 
@@ -163,7 +218,9 @@ class _PaymentOrderPageState extends State<PaymentOrderPage> {
                         // Field Total Nominal
                         _buildInfoField(
                           context,
-                          value: "Rp104.000",
+                          value:
+                              createTransactionResponse?.amount.toRupiah() ??
+                              'Rp0',
                           isCopyable: false,
                         ),
                       ],
@@ -208,7 +265,7 @@ class _PaymentOrderPageState extends State<PaymentOrderPage> {
       decoration: BoxDecoration(
         color: const Color(
           0xFFF3F6F9,
-        ), // Warna abu-abu sangat muda sesuai gambar
+        ), 
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -225,9 +282,7 @@ class _PaymentOrderPageState extends State<PaymentOrderPage> {
             GestureDetector(
               onTap: () {
                 Clipboard.setData(ClipboardData(text: value));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Nomor VA disalin!")),
-                );
+                context.showSuccess('Nomor VA disalin!');
               },
               child: const Icon(
                 Icons.copy_rounded,
