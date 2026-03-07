@@ -11,7 +11,7 @@ import 'package:litenet/core/extensions/string_context.ext.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/custom_snackbar.dart';
-import 'package:litenet/features/quota/domain/entities/create_transaction.dart';
+import 'package:litenet/features/order/domain/entities/create_transaction.dart';
 
 class PaymentOrderPage extends HookConsumerWidget {
   final CreateTransactionDataEntity? createTransactionResponse;
@@ -19,7 +19,6 @@ class PaymentOrderPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // expiredAt sudah DateTime dari API
     final expiredAt = createTransactionResponse!.expiredAt;
 
     // state awal
@@ -263,9 +262,7 @@ class PaymentOrderPage extends HookConsumerWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: const Color(
-          0xFFF3F6F9,
-        ), 
+        color: const Color(0xFFF3F6F9),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(

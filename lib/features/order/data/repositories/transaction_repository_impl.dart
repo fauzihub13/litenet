@@ -2,10 +2,10 @@ import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:litenet/core/errors/dio_error.dart';
 import 'package:litenet/core/errors/failure.dart';
-import 'package:litenet/features/quota/data/datasources/transaction_datasource.dart';
-import 'package:litenet/features/quota/domain/entities/create_transaction.dart';
-import 'package:litenet/features/quota/domain/entities/payment_method.dart';
-import 'package:litenet/features/quota/domain/repositories/transaction_repository.dart';
+import 'package:litenet/features/order/data/datasources/transaction_datasource.dart';
+import 'package:litenet/features/order/domain/entities/create_transaction.dart';
+import 'package:litenet/features/order/domain/entities/payment_method.dart';
+import 'package:litenet/features/order/domain/repositories/transaction_repository.dart';
 
 class TransactionRepositoryImpl extends TransactionRepository {
   final TransactionDatasource transactionDatasource;

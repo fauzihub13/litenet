@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:litenet/core/errors/failure.dart';
-import 'package:litenet/features/quota/domain/entities/create_transaction.dart';
-import 'package:litenet/features/quota/domain/repositories/transaction_repository.dart';
+import 'package:litenet/features/order/domain/entities/create_transaction.dart';
+import 'package:litenet/features/order/domain/repositories/transaction_repository.dart';
 
 class CreateTransactionUsecase {
   final TransactionRepository transactionRepository;

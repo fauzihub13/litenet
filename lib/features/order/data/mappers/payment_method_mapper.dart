@@ -1,5 +1,5 @@
-import 'package:litenet/features/quota/data/models/payment_method_model.dart';
-import 'package:litenet/features/quota/domain/entities/payment_method.dart';
+import 'package:litenet/features/order/data/models/payment_method_model.dart';
+import 'package:litenet/features/order/domain/entities/payment_method.dart';
 
 extension PaymentMethodResponseModelMapper on PaymentMethodResponseModel {
   PaymentMethodResponse toEntity() {

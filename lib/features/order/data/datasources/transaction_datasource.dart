@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
-import 'package:litenet/features/quota/data/mappers/create_transaction_mapper.dart';
-import 'package:litenet/features/quota/data/mappers/payment_method_mapper.dart';
-import 'package:litenet/features/quota/data/models/create_transaction_model.dart';
-import 'package:litenet/features/quota/data/models/payment_method_model.dart';
-import 'package:litenet/features/quota/domain/entities/create_transaction.dart';
-import 'package:litenet/features/quota/domain/entities/payment_method.dart';
+import 'package:litenet/features/order/data/mappers/create_transaction_mapper.dart';
+import 'package:litenet/features/order/data/mappers/payment_method_mapper.dart';
+import 'package:litenet/features/order/data/models/create_transaction_model.dart';
+import 'package:litenet/features/order/data/models/payment_method_model.dart';
+import 'package:litenet/features/order/domain/entities/create_transaction.dart';
+import 'package:litenet/features/order/domain/entities/payment_method.dart';
 
 abstract class TransactionDatasource {
   Future<PaymentMethodResponse> getAllPaymentMethod();

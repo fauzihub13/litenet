@@ -8,9 +8,9 @@ import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/custom_snackbar.dart';
 import 'package:litenet/core/widgets/empty_state.dart';
-import 'package:litenet/features/quota/domain/entities/payment_method.dart';
-import 'package:litenet/features/quota/presentation/controllers/create_transaction_provider.dart';
-import 'package:litenet/features/quota/presentation/controllers/get_all_payment_method_provider.dart';
+import 'package:litenet/features/order/domain/entities/payment_method.dart';
+import 'package:litenet/features/order/presentation/controllers/create_transaction_provider.dart';
+import 'package:litenet/features/order/presentation/controllers/get_all_payment_method_provider.dart';
 import 'package:litenet/routes/route_name.dart';
 
 class PaymentMethodPage extends HookConsumerWidget {

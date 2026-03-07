@@ -1,5 +1,5 @@
-import 'package:litenet/features/quota/data/models/create_transaction_model.dart';
-import 'package:litenet/features/quota/domain/entities/create_transaction.dart';
+import 'package:litenet/features/order/domain/entities/create_transaction.dart';
+import 'package:litenet/features/order/data/models/create_transaction_model.dart';
 
 extension CreateTransactionResponseModelMapper
     on CreateTransactionResponseModel {

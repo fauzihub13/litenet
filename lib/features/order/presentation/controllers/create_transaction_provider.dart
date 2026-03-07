@@ -1,5 +1,5 @@
+import 'package:litenet/features/order/domain/entities/create_transaction.dart';
 import 'package:litenet/features/quota/data/di/usecase_provider.dart';
-import 'package:litenet/features/quota/domain/entities/create_transaction.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'create_transaction_provider.g.dart';

@@ -1,5 +1,5 @@
+import 'package:litenet/features/order/domain/entities/payment_method.dart';
 import 'package:litenet/features/quota/data/di/usecase_provider.dart';
-import 'package:litenet/features/quota/domain/entities/payment_method.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'get_all_payment_method_provider.g.dart';
