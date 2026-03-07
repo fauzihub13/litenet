@@ -10,6 +10,7 @@ import 'package:litenet/core/widgets/custom_snackbar.dart';
 import 'package:litenet/core/widgets/empty_state.dart';
 import 'package:litenet/core/widgets/form_input.dart';
 import 'package:litenet/core/widgets/row_title.dart';
+import 'package:litenet/features/quota/domain/entities/check_promo.dart';
 import 'package:litenet/features/quota/domain/entities/detail_quota.dart';
 import 'package:litenet/features/quota/presentation/controllers/check_promo_provider.dart';
 import 'package:litenet/features/quota/presentation/controllers/get_detail_quota_provider.dart';
@@ -51,6 +52,26 @@ class _DetailQuotaPageState extends ConsumerState<DetailQuotaPage>
   Widget build(BuildContext context) {
     final asyncDetailQuota = ref.watch(getDetailQuotaProvider(id: widget.id));
 
+    final asyncCheckPromo = ref.watch(checkPromoProvider);
+
+    ref.listen(checkPromoProvider, (previous, next) {
+      next.when(
+        data: (data) async {
+          if (data != null) {
+            context.showSuccess(data.message);
+            setState(() {
+              discountPrice = data.data.maxDiscount;
+            });
+          }
+        },
+        error: (err, _) {
+          final error = err as Failure;
+          context.showError(error.message ?? 'Terjadi kesalahan');
+        },
+        loading: () {},
+      );
+    });
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const CustomAppbar(title: 'Detail Kuota', isRounded: false),
@@ -83,7 +104,10 @@ class _DetailQuotaPageState extends ConsumerState<DetailQuotaPage>
                           // 3. Input Kode Promo
                           RowTitle(title: "Kode Promo"),
                           const SizedBox(height: 8),
-                          _buildPromoInput(quota: quota),
+                          _buildPromoInput(
+                            quota: quota,
+                            asyncCheckPromo: asyncCheckPromo,
+                          ),
                           const SizedBox(height: 30),
 
                           // 4. Tab Deskripsi & Syarat
@@ -230,7 +254,7 @@ class _DetailQuotaPageState extends ConsumerState<DetailQuotaPage>
             ),
           ),
           isExpanded: true,
-          value: _selectedDevice, // ini akan menyimpan `id`
+          value: _selectedDevice,
           items: devices.map((DeviceQuotaDataEntity device) {
             return DropdownMenuItem<String>(
               value: device.id, // value yang disimpan
@@ -250,26 +274,10 @@ class _DetailQuotaPageState extends ConsumerState<DetailQuotaPage>
     );
   }
 
-  Widget _buildPromoInput({required DetailQuotaDataEntity quota}) {
-    final asyncCheckPromo = ref.watch(checkPromoProvider);
-    ref.listen(checkPromoProvider, (previous, next) {
-      asyncCheckPromo.when(
-        data: (data) {
-          if (data != null) {
-            context.showSuccess(data.message);
-            setState(() {
-              discountPrice = data.data.maxDiscount;
-            });
-          }
-        },
-        error: (error, stack) {
-          String errorMessage =
-              (error as Failure).message ?? 'Terjadi kesalahan';
-          context.showError(errorMessage);
-        },
-        loading: () {},
-      );
-    });
+  Widget _buildPromoInput({
+    required DetailQuotaDataEntity quota,
+    required AsyncValue<CheckPromoResponse?> asyncCheckPromo,
+  }) {
     return Row(
       children: [
         Expanded(
