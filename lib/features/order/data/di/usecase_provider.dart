@@ -1,5 +1,6 @@
 import 'package:litenet/features/order/domain/usecases/check_payment_status_usecase.dart';
 import 'package:litenet/features/order/domain/usecases/create_transaction_usecase.dart';
+import 'package:litenet/features/order/domain/usecases/download_invoice_usecase.dart';
 import 'package:litenet/features/order/domain/usecases/get_all_payment_method_usecase.dart';
 import 'package:litenet/features/order/domain/usecases/get_all_transaction_method_usecase.dart';
 import 'package:litenet/features/order/domain/usecases/get_detail_transaction_method_usecase.dart';
@@ -31,4 +32,9 @@ GetAllTransactionUsecase getAllTransactionUsecase(Ref ref) {
 @riverpod
 GetDetailTransactionUsecase getDetailTransactionUsecase(Ref ref) {
   return GetDetailTransactionUsecase(ref.read(transactionRepositoryProvider));
+}
+
+@riverpod
+DownloadInvoiceUsecase downloadInvoiceUsecase(Ref ref) {
+  return DownloadInvoiceUsecase(ref.read(transactionRepositoryProvider));
 }

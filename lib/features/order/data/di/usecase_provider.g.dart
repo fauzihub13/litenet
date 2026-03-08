@@ -250,3 +250,51 @@ final class GetDetailTransactionUsecaseProvider
 
 String _$getDetailTransactionUsecaseHash() =>
     r'00b59435338628c021501cd20ba0c0c27bf5cc4c';
+
+@ProviderFor(downloadInvoiceUsecase)
+const downloadInvoiceUsecaseProvider = DownloadInvoiceUsecaseProvider._();
+
+final class DownloadInvoiceUsecaseProvider
+    extends
+        $FunctionalProvider<
+          DownloadInvoiceUsecase,
+          DownloadInvoiceUsecase,
+          DownloadInvoiceUsecase
+        >
+    with $Provider<DownloadInvoiceUsecase> {
+  const DownloadInvoiceUsecaseProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'downloadInvoiceUsecaseProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$downloadInvoiceUsecaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<DownloadInvoiceUsecase> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  DownloadInvoiceUsecase create(Ref ref) {
+    return downloadInvoiceUsecase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(DownloadInvoiceUsecase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<DownloadInvoiceUsecase>(value),
+    );
+  }
+}
+
+String _$downloadInvoiceUsecaseHash() =>
+    r'47c91c2d7ce8d580f721da730391b9f3df88347c';

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:litenet/features/order/data/mappers/check_payment_status_mapper.dart';
 import 'package:litenet/features/order/data/mappers/create_transaction_mapper.dart';
@@ -14,6 +16,7 @@ import 'package:litenet/features/order/domain/entities/create_transaction.dart';
 import 'package:litenet/features/order/domain/entities/detail_transaction.dart';
 import 'package:litenet/features/order/domain/entities/payment_method.dart';
 import 'package:litenet/features/order/domain/entities/transaction.dart';
+import 'package:path_provider/path_provider.dart';
 
 abstract class TransactionDatasource {
   Future<PaymentMethodResponse> getAllPaymentMethod();
@@ -30,6 +33,7 @@ abstract class TransactionDatasource {
   Future<DetailTransactionResponse> getDetailTransaction({
     required String orderId,
   });
+  Future<String> downloadInvoice({required String orderId});
 }
 
 class TransactionDatasourceImpl extends TransactionDatasource {
@@ -96,5 +100,44 @@ class TransactionDatasourceImpl extends TransactionDatasource {
 
     final data = DetailTransactionResponseModel.fromJson(response.data);
     return data.toEntity();
+  }
+
+  @override
+  Future<String> downloadInvoice({required String orderId}) async {
+    String fileUrl = '/transactions/$orderId/invoice';
+
+    Directory directory;
+    if (Platform.isAndroid) {
+      directory = Directory('/storage/emulated/0/Download');
+      // directory = await getDownloadDirectory();
+    } else if (Platform.isIOS) {
+      directory = await getApplicationDocumentsDirectory();
+    } else {
+      throw UnsupportedError("Platform tidak didukung");
+    }
+
+    if (!await directory.exists()) {
+      await directory.create(recursive: true);
+    }
+
+    final savePath = '${directory.path}/$orderId.pdf';
+
+    final response = await httpClient.download(
+      fileUrl,
+      savePath,
+      options: Options(
+        responseType: ResponseType.stream,
+        followRedirects: true,
+        validateStatus: (status) => status! < 500,
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      // await OpenFilex.open(savePath);
+
+      return savePath;
+    } else {
+      throw Exception('Gagal download invoice');
+    }
   }
 }

@@ -122,4 +122,21 @@ class TransactionRepositoryImpl extends TransactionRepository {
       return Left(Failure(message: e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, String>> downloadInvoice({
+    required String orderId,
+  }) async {
+    try {
+      final response = await transactionDatasource.downloadInvoice(
+        orderId: orderId,
+      );
+      return Right(response);
+    } on DioException catch (e) {
+      final error = await DioErrorHandler.handleError(e);
+      return Left(Failure(message: error));
+    } catch (e) {
+      return Left(Failure(message: e.toString()));
+    }
+  }
 }

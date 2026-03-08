@@ -21,4 +21,5 @@ abstract class TransactionRepository {
   Future<Either<Failure, DetailTransactionResponse>> getDetailTransaction({
     required String orderId,
   });
+  Future<Either<Failure, String>> downloadInvoice({required String orderId});
 }

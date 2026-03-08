@@ -8,11 +8,14 @@ import 'package:litenet/core/extensions/datetime_context.ext.dart';
 import 'package:litenet/core/extensions/num_context.ext.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
+import 'package:litenet/core/widgets/custom_snackbar.dart';
 import 'package:litenet/core/widgets/empty_state.dart';
 import 'package:litenet/features/order/domain/entities/detail_transaction.dart';
+import 'package:litenet/features/order/presentation/controllers/download_invoice_provider.dart';
 import 'package:litenet/features/order/presentation/controllers/get_detail_transaction_provider.dart';
 import 'package:litenet/gen/assets.gen.dart';
 import 'package:litenet/routes/route_name.dart';
+import 'package:open_filex/open_filex.dart';
 
 class DetailOrderHistoryPage extends ConsumerWidget {
   final String orderId;
@@ -24,6 +27,22 @@ class DetailOrderHistoryPage extends ConsumerWidget {
     final asyncDetail = ref.watch(
       getDetailTransactionProvider(orderId: orderId),
     );
+    final downloadState = ref.watch(downloadInvoiceProvider);
+
+    ref.listen(downloadInvoiceProvider, (previous, next) {
+      next.whenData((savePath) {
+        if (savePath != null) {
+          // context.showSuccess("Invoice berhasil diunduh");
+          OpenFilex.open(savePath);
+        }
+      });
+
+      next.whenOrNull(
+        error: (err, _) {
+          context.showError("Gagal mengunduh invoice");
+        },
+      );
+    });
 
     return Scaffold(
       appBar: const CustomAppbar(title: 'Detail Pesanan', isRounded: false),
@@ -147,7 +166,12 @@ class DetailOrderHistoryPage extends ConsumerWidget {
                     const Spacer(),
 
                     // Tombol
-                    _buildButton(context: context, detail: detail),
+                    _buildButton(
+                      context: context,
+                      detail: detail,
+                      ref: ref,
+                      downloadState: downloadState,
+                    ),
 
                     const SizedBox(height: 12),
                     Button(
@@ -181,12 +205,17 @@ class DetailOrderHistoryPage extends ConsumerWidget {
   Widget _buildButton({
     required BuildContext context,
     required DetailTransactionDataEntity detail,
+    required WidgetRef ref,
+    required AsyncValue<String?> downloadState,
   }) {
     if (detail.transactionStatus == 'settlement') {
       return Button(
         text: "Unduh Invoice",
         buttonType: ButtonType.filled,
-        onPressed: () {},
+        isLoading: downloadState.isLoading,
+        onPressed: () async {
+          ref.read(downloadInvoiceProvider.notifier).executeDownload(orderId);
+        },
       );
     } else if (detail.transactionStatus == 'pending') {
       return Button(
