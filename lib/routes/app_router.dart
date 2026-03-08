@@ -11,7 +11,6 @@ import 'package:litenet/features/home/presentation/views/home_page.dart';
 import 'package:litenet/features/home/presentation/views/main_page.dart';
 import 'package:litenet/features/onboarding/presentation/controllers/onboarding_provider.dart';
 import 'package:litenet/features/onboarding/presentation/views/onboarding_page.dart';
-import 'package:litenet/features/order/domain/entities/create_transaction.dart';
 import 'package:litenet/features/order/presentation/views/detail_order_history_page.dart';
 import 'package:litenet/features/order/presentation/views/order_history_page.dart';
 import 'package:litenet/features/order/presentation/views/payment_method.page.dart';
@@ -120,12 +119,8 @@ GoRouter appRouter(Ref ref) {
             name: RouteName.paymentPage,
             builder: (context, state) {
               final extras = state.extra as Map<String, dynamic>?;
-              final createTransactionResponse =
-                  extras?['createTransactionResponse']
-                      as CreateTransactionDataEntity?;
-              return PaymentOrderPage(
-                createTransactionResponse: createTransactionResponse,
-              );
+              final orderId = extras?['orderId'] as String;
+              return PaymentOrderPage(orderId: orderId);
             },
           ),
         ],

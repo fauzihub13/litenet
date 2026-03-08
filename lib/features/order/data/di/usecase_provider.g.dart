@@ -153,3 +153,100 @@ final class CheckPaymentStatusUsecaseProvider
 
 String _$checkPaymentStatusUsecaseHash() =>
     r'4571231014c26785c82873b227587bd888f944da';
+
+@ProviderFor(getAllTransactionUsecase)
+const getAllTransactionUsecaseProvider = GetAllTransactionUsecaseProvider._();
+
+final class GetAllTransactionUsecaseProvider
+    extends
+        $FunctionalProvider<
+          GetAllTransactionUsecase,
+          GetAllTransactionUsecase,
+          GetAllTransactionUsecase
+        >
+    with $Provider<GetAllTransactionUsecase> {
+  const GetAllTransactionUsecaseProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'getAllTransactionUsecaseProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$getAllTransactionUsecaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<GetAllTransactionUsecase> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  GetAllTransactionUsecase create(Ref ref) {
+    return getAllTransactionUsecase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(GetAllTransactionUsecase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<GetAllTransactionUsecase>(value),
+    );
+  }
+}
+
+String _$getAllTransactionUsecaseHash() =>
+    r'39857f09dd558e146f6f50103850cab6bf2f88de';
+
+@ProviderFor(getDetailTransactionUsecase)
+const getDetailTransactionUsecaseProvider =
+    GetDetailTransactionUsecaseProvider._();
+
+final class GetDetailTransactionUsecaseProvider
+    extends
+        $FunctionalProvider<
+          GetDetailTransactionUsecase,
+          GetDetailTransactionUsecase,
+          GetDetailTransactionUsecase
+        >
+    with $Provider<GetDetailTransactionUsecase> {
+  const GetDetailTransactionUsecaseProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'getDetailTransactionUsecaseProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$getDetailTransactionUsecaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<GetDetailTransactionUsecase> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  GetDetailTransactionUsecase create(Ref ref) {
+    return getDetailTransactionUsecase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(GetDetailTransactionUsecase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<GetDetailTransactionUsecase>(value),
+    );
+  }
+}
+
+String _$getDetailTransactionUsecaseHash() =>
+    r'14d9dfe56d0b27a74831a3708e8ac5754972fc33';

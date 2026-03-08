@@ -47,7 +47,7 @@ class PaymentMethodPage extends HookConsumerWidget {
           if (data != null) {
             context.pushReplacementNamed(
               RouteName.paymentPage,
-              extra: {'createTransactionResponse': data.data},
+              extra: {'orderId': data.data.orderId},
             );
           }
         },

@@ -2,7 +2,9 @@ import 'package:dartz/dartz.dart';
 import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/features/order/domain/entities/check_payment_status.dart';
 import 'package:litenet/features/order/domain/entities/create_transaction.dart';
+import 'package:litenet/features/order/domain/entities/detail_transaction.dart';
 import 'package:litenet/features/order/domain/entities/payment_method.dart';
+import 'package:litenet/features/order/domain/entities/transaction.dart';
 
 abstract class TransactionRepository {
   Future<Either<Failure, PaymentMethodResponse>> getAllPaymentMethod();
@@ -13,6 +15,10 @@ abstract class TransactionRepository {
     required String promoCode,
   });
   Future<Either<Failure, CheckPaymentStatusResponse>> checkPaymentStatus({
+    required String orderId,
+  });
+  Future<Either<Failure, TransactionResponse>> getAllTransaction();
+  Future<Either<Failure, DetailTransactionResponse>> getDetailTransaction({
     required String orderId,
   });
 }

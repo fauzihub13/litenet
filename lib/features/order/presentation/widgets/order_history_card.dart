@@ -1,32 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:litenet/core/constants/enum.dart';
 import 'package:litenet/core/constants/theme.dart';
-import 'package:litenet/features/order/presentation/views/order_history_page.dart';
+import 'package:litenet/core/extensions/datetime_context.ext.dart';
+import 'package:litenet/core/extensions/num_context.ext.dart';
+import 'package:litenet/features/order/domain/entities/transaction.dart';
 
 class OrderHistoryCard extends StatelessWidget {
-  final OrderHistory order;
+  final TransactionDataEntity order;
   final VoidCallback onTap;
 
   const OrderHistoryCard({super.key, required this.order, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    Color statusBackgroundColor;
-    Color statusTextColor;
-    String statusText;
+    Color statusBackgroundColor = Colors.grey;
+    Color statusTextColor = Colors.black;
+    String statusText = "-";
 
-    switch (order.status) {
-      case TransactionStatus.selesai:
+    switch (order.transactionStatus) {
+      case 'settlement':
         statusBackgroundColor = DefaultColors.purple500;
         statusTextColor = DefaultColors.white;
         statusText = "Selesai";
         break;
-      case TransactionStatus.gagal:
+      case 'expired':
         statusBackgroundColor = DefaultColors.lightRed;
         statusTextColor = DefaultColors.white;
         statusText = "Gagal";
         break;
-      case TransactionStatus.diproses:
+      case 'pending':
         statusBackgroundColor = DefaultColors.lightYellow;
         statusTextColor = DefaultColors.black;
         statusText = "Diproses";
@@ -55,14 +56,14 @@ class OrderHistoryCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  order.trxId,
+                  order.orderId,
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                     color: DefaultColors.purple500,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
-                  order.date,
+                  order.createdAt.toIndonesianDateString(),
                   style: Theme.of(context).textTheme.bodySmall!.copyWith(
                     color: DefaultColors.black200,
                     fontSize: 12,
@@ -76,7 +77,7 @@ class OrderHistoryCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  order.quota,
+                  order.capacity,
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                     color: DefaultColors.purple800,
                     fontWeight: FontWeight.w700,
@@ -86,7 +87,7 @@ class OrderHistoryCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      order.price,
+                      order.grossAmount.toRupiah(),
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                         color: DefaultColors.purple600,
                         fontWeight: FontWeight.w600,

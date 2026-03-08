@@ -1,1 +1,1 @@
-enum TransactionStatus { selesai, diproses, gagal }
+enum TransactionStatus { semua, selesai, diproses, gagal }
