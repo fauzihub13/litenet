@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:litenet/core/constants/theme.dart';
@@ -17,13 +18,19 @@ class DeviceListPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncAllDevice = ref.watch(getAllDeviceProvider);
+    final searchQuery = useState('');
 
     return Scaffold(
       appBar: CustomAppbar(title: 'Daftar Perangkat', isLeading: false),
       body: Column(
         children: [
           // 1. Search Bar (Reusable CustomSearchBar yang kita buat tadi)
-          CustomSearchBar(title: "Top up"),
+          CustomSearchBar(
+            title: "Cari perangkat",
+            onChanged: (value) {
+              searchQuery.value = value;
+            },
+          ),
 
           // 2. List Perangkatx
           Expanded(
@@ -33,8 +40,15 @@ class DeviceListPage extends HookConsumerWidget {
               },
               child: asyncAllDevice.when(
                 data: (data) {
-                  List<DeviceDataEntity> deviceData = data.data;
-                  if (deviceData.isEmpty) {
+                  final filteredDeviceData = data.data.where((quota) {
+                    final nameLower = quota.name.toLowerCase();
+                    final queryLower = searchQuery.value.toLowerCase();
+                    return nameLower.contains(queryLower);
+                  }).toList();
+
+                  // List<DeviceDataEntity> deviceData = data.data;
+
+                  if (filteredDeviceData.isEmpty) {
                     return EmptyState(
                       message: 'Tidak ditemukan data',
                       isRefreshable: true,
@@ -42,10 +56,10 @@ class DeviceListPage extends HookConsumerWidget {
                   }
                   return ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 18),
-                    itemCount: deviceData.length,
+                    itemCount: filteredDeviceData.length,
                     itemBuilder: (context, index) {
-                      DeviceDataEntity device = deviceData[index];
-                      return DeviceCard(device:device);
+                      DeviceDataEntity device = filteredDeviceData[index];
+                      return DeviceCard(device: device);
                     },
                   );
                 },

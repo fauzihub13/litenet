@@ -7,7 +7,6 @@ import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/custom_search_bar.dart';
 import 'package:litenet/core/widgets/empty_state.dart';
-import 'package:litenet/features/order/domain/entities/transaction.dart';
 import 'package:litenet/features/order/presentation/controllers/get_all_transaction_provider.dart';
 import 'package:litenet/features/order/presentation/widgets/order_history_card.dart';
 import 'package:litenet/routes/route_name.dart';
@@ -20,21 +19,51 @@ class OrderHistoryPage extends HookConsumerWidget {
     final asyncTransaction = ref.watch(getAllTransactionProvider);
     final selectedStatus = useState<String>('Semua');
     final List<String> categories = ["Semua", "Selesai", "Diproses", "Gagal"];
+    final searchQuery = useState('');
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
       appBar: const CustomAppbar(title: "Riwayat Pesanan", isLeading: false),
       body: asyncTransaction.when(
         data: (data) {
-          List<TransactionDataEntity> transactions = data.data;
+          final filteredTransaction = data.data.where((trx) {
+            final nameMatch = trx.orderId.toLowerCase().contains(
+              searchQuery.value.toLowerCase(),
+            );
+            bool statusMatch = true;
+            if (selectedStatus.value != 'Semua') {
+              final String currentStatus = trx.transactionStatus.toLowerCase();
+
+              if (selectedStatus.value == 'Selesai') {
+                statusMatch =
+                    (currentStatus == 'settlement' ||
+                    currentStatus == 'capture');
+              } else if (selectedStatus.value == 'Diproses') {
+                statusMatch = (currentStatus == 'pending');
+              } else if (selectedStatus.value == 'Gagal') {
+                statusMatch =
+                    (currentStatus == 'expired' ||
+                    currentStatus == 'cancel' ||
+                    currentStatus == 'failure');
+              }
+            }
+
+            return nameMatch && statusMatch;
+          }).toList();
+
           return RefreshIndicator(
             onRefresh: () async {
               ref.invalidate(getAllTransactionProvider);
             },
             child: Column(
               children: [
-                // 1. Search Bar Reusable
-                CustomSearchBar(title: "Riwayat Pesanan"),
+                // Search Bar Reusable
+                CustomSearchBar(
+                  title: "Cari riwayat Pesanan",
+                  onChanged: (value) {
+                    searchQuery.value = value;
+                  },
+                ),
 
                 Container(
                   height: 44,
@@ -59,32 +88,45 @@ class OrderHistoryPage extends HookConsumerWidget {
 
                 const SizedBox(height: 20),
 
-                // 3. List Riwayat
-                Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 18),
-                    itemCount: transactions.length,
-                    itemBuilder: (context, index) {
-                      return OrderHistoryCard(
-                        order: transactions[index],
-                        onTap: () {
-                          if (transactions[index].transactionStatus ==
-                              'settlement') {
-                            context.pushNamed(
-                              RouteName.detailOrderHistoryPage,
-                              extra: {'orderId': transactions[index].orderId},
-                            );
-                          } else {
-                            context.pushNamed(
-                              RouteName.detailOrderHistoryPage,
-                              extra: {'orderId': transactions[index].orderId},
-                            );
-                          }
-                        },
-                      );
-                    },
+                if (filteredTransaction.isEmpty)
+                  Expanded(
+                    child: EmptyState(
+                      message: 'Tidak ada riwayat pesanan',
+                      isRefreshable: true,
+                    ),
                   ),
-                ),
+
+                //  List Riwayat
+                if (filteredTransaction.isNotEmpty)
+                  Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 18),
+                      itemCount: filteredTransaction.length,
+                      itemBuilder: (context, index) {
+                        return OrderHistoryCard(
+                          order: filteredTransaction[index],
+                          onTap: () {
+                            if (filteredTransaction[index].transactionStatus ==
+                                'settlement') {
+                              context.pushNamed(
+                                RouteName.detailOrderHistoryPage,
+                                extra: {
+                                  'orderId': filteredTransaction[index].orderId,
+                                },
+                              );
+                            } else {
+                              context.pushNamed(
+                                RouteName.detailOrderHistoryPage,
+                                extra: {
+                                  'orderId': filteredTransaction[index].orderId,
+                                },
+                              );
+                            }
+                          },
+                        );
+                      },
+                    ),
+                  ),
               ],
             ),
           );

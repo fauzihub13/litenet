@@ -27,10 +27,10 @@ class CustomSearchBar extends StatelessWidget {
           hintText: title,
 
           prefixIcon: const Icon(Icons.search, size: 24),
-          suffixIcon: IconButton(
-            icon: const Icon(Icons.tune, size: 20),
-            onPressed: onFilterPressed,
-          ),
+          // suffixIcon: IconButton(
+          //   icon: const Icon(Icons.tune, size: 20),
+          //   onPressed: onFilterPressed,
+          // ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50),
             borderSide: const BorderSide(
