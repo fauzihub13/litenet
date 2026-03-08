@@ -156,7 +156,7 @@ class DetailOrderHistoryPage extends ConsumerWidget {
                       backgroundColor: DefaultColors.purple50,
                       textColor: DefaultColors.purple500,
                       onPressed: () {
-                        context.goNamed(RouteName.homePage);
+                        context.goNamed(RouteName.orderHistoryPage);
                       },
                     ),
                     const SizedBox(height: 30),
