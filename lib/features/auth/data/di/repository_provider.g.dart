@@ -22,7 +22,7 @@ final class LoginRepositoryProvider
         argument: null,
         retry: null,
         name: r'loginRepositoryProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -49,7 +49,7 @@ final class LoginRepositoryProvider
   }
 }
 
-String _$loginRepositoryHash() => r'30ee18c7d48021ba1386f39ece162ccb7f9ebdba';
+String _$loginRepositoryHash() => r'940adc77826ea0a203e189270410de48cfb1e6f6';
 
 @ProviderFor(registerRepository)
 const registerRepositoryProvider = RegisterRepositoryProvider._();
@@ -68,7 +68,7 @@ final class RegisterRepositoryProvider
         argument: null,
         retry: null,
         name: r'registerRepositoryProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -97,7 +97,7 @@ final class RegisterRepositoryProvider
 }
 
 String _$registerRepositoryHash() =>
-    r'9505d875763b0a39b149872858969f36b7dd52e7';
+    r'b78a27661c5bc6c7c20b143bb0d29e645a81d619';
 
 @ProviderFor(otpRepository)
 const otpRepositoryProvider = OtpRepositoryProvider._();
@@ -111,7 +111,7 @@ final class OtpRepositoryProvider
         argument: null,
         retry: null,
         name: r'otpRepositoryProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -138,4 +138,4 @@ final class OtpRepositoryProvider
   }
 }
 
-String _$otpRepositoryHash() => r'f5926641e56cd365804a2af3bdc3542361420bbe';
+String _$otpRepositoryHash() => r'40f0fca6fb75a4d9b5cf3138ca71b1120dca0d8e';

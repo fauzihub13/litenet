@@ -26,7 +26,7 @@ final class SettingRepositoryProvider
         argument: null,
         retry: null,
         name: r'settingRepositoryProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -54,4 +54,4 @@ final class SettingRepositoryProvider
   }
 }
 
-String _$settingRepositoryHash() => r'8a2ace8305b2773dce970736b82aece94448655f';
+String _$settingRepositoryHash() => r'd67ac385ab6e1898c72ed93367ad96882ab9d6ad';

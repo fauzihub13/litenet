@@ -4,7 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'usecase_provider.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 GetPromoUsecase getPromoUsecase(Ref ref) {
   return GetPromoUsecase(ref.read(promoRepositoryProvider));
 }

@@ -21,7 +21,7 @@ final class LogoutUsecaseProvider
         argument: null,
         retry: null,
         name: r'logoutUsecaseProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -48,7 +48,7 @@ final class LogoutUsecaseProvider
   }
 }
 
-String _$logoutUsecaseHash() => r'6d40ed9f3e9e900418e2733ff51bdbfa384c8f5c';
+String _$logoutUsecaseHash() => r'e8a03486f3c3acc8195cc8f8026959c24f3a60d5';
 
 @ProviderFor(getProfileUsecase)
 const getProfileUsecaseProvider = GetProfileUsecaseProvider._();
@@ -67,7 +67,7 @@ final class GetProfileUsecaseProvider
         argument: null,
         retry: null,
         name: r'getProfileUsecaseProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -95,7 +95,7 @@ final class GetProfileUsecaseProvider
   }
 }
 
-String _$getProfileUsecaseHash() => r'95e973781a6e6b95a4bae5a21a3fdac68169f1e4';
+String _$getProfileUsecaseHash() => r'7adbf7370ffeaa24f731866ab4f97c30b0682e23';
 
 @ProviderFor(changeProfileUsecase)
 const changeProfileUsecaseProvider = ChangeProfileUsecaseProvider._();
@@ -114,7 +114,7 @@ final class ChangeProfileUsecaseProvider
         argument: null,
         retry: null,
         name: r'changeProfileUsecaseProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -143,7 +143,7 @@ final class ChangeProfileUsecaseProvider
 }
 
 String _$changeProfileUsecaseHash() =>
-    r'fd032d7a6d23ca3a101dc9955e7b7d7cf43ef130';
+    r'9f41fd43b0d0e24cf744a5d75fcffc03469831ff';
 
 @ProviderFor(changePasswordUsecase)
 const changePasswordUsecaseProvider = ChangePasswordUsecaseProvider._();
@@ -162,7 +162,7 @@ final class ChangePasswordUsecaseProvider
         argument: null,
         retry: null,
         name: r'changePasswordUsecaseProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -191,7 +191,7 @@ final class ChangePasswordUsecaseProvider
 }
 
 String _$changePasswordUsecaseHash() =>
-    r'301dad1eb572bb0e126559a10e24fcfee5fcbbdf';
+    r'1c55533df9d9fcd9b08f57323e83662b1b65272d';
 
 @ProviderFor(getFAQUsecase)
 const getFAQUsecaseProvider = GetFAQUsecaseProvider._();
@@ -205,7 +205,7 @@ final class GetFAQUsecaseProvider
         argument: null,
         retry: null,
         name: r'getFAQUsecaseProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -232,7 +232,7 @@ final class GetFAQUsecaseProvider
   }
 }
 
-String _$getFAQUsecaseHash() => r'b50d8bf81dcfde6cfa4120f5dd67a1204bac6eff';
+String _$getFAQUsecaseHash() => r'1541318c056f8ad2e1c4c1e64b8ebd276d3099d8';
 
 @ProviderFor(getPrivacyAndPolicyUsecase)
 const getPrivacyAndPolicyUsecaseProvider =
@@ -252,7 +252,7 @@ final class GetPrivacyAndPolicyUsecaseProvider
         argument: null,
         retry: null,
         name: r'getPrivacyAndPolicyUsecaseProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -281,4 +281,4 @@ final class GetPrivacyAndPolicyUsecaseProvider
 }
 
 String _$getPrivacyAndPolicyUsecaseHash() =>
-    r'b65328dfd849661a68fa21116b7b24dcccd2734a';
+    r'552ac1285009ef15e8a7cf531753470054162a04';

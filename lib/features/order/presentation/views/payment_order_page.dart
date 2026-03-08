@@ -59,6 +59,7 @@ class PaymentOrderPage extends HookConsumerWidget {
             if (status == 'settlement' || status == 'capture') {
               // Hentikan timer SEGERA
               pollTimer.value?.cancel();
+              ref.invalidate(getDetailTransactionProvider(orderId: orderId ));
 
               context.pushReplacementNamed(
                 RouteName.detailOrderHistoryPage,

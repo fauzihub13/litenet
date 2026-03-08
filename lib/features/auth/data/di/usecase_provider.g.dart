@@ -21,7 +21,7 @@ final class LoginUsecaseProvider
         argument: null,
         retry: null,
         name: r'loginUsecaseProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -48,7 +48,7 @@ final class LoginUsecaseProvider
   }
 }
 
-String _$loginUsecaseHash() => r'190cbae45e6f55b40b79a392827f83bae182543a';
+String _$loginUsecaseHash() => r'c3d8aa6cfcd7b225a098ae846916a06508abea24';
 
 @ProviderFor(registerUsecase)
 const registerUsecaseProvider = RegisterUsecaseProvider._();
@@ -63,7 +63,7 @@ final class RegisterUsecaseProvider
         argument: null,
         retry: null,
         name: r'registerUsecaseProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -90,7 +90,7 @@ final class RegisterUsecaseProvider
   }
 }
 
-String _$registerUsecaseHash() => r'4d5bdd21f5c6269e8d0350218588aab0bf343b3f';
+String _$registerUsecaseHash() => r'cc02c796671729935b59c657d1b1cc71bfa1a4ca';
 
 @ProviderFor(verifyOTPUsecase)
 const verifyOTPUsecaseProvider = VerifyOTPUsecaseProvider._();
@@ -109,7 +109,7 @@ final class VerifyOTPUsecaseProvider
         argument: null,
         retry: null,
         name: r'verifyOTPUsecaseProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -136,7 +136,7 @@ final class VerifyOTPUsecaseProvider
   }
 }
 
-String _$verifyOTPUsecaseHash() => r'adf8dbed613a6c55fe186474572f995cb5fa0bb7';
+String _$verifyOTPUsecaseHash() => r'2de64d1bd8ab3e5f2b7ec9fc65788598418d41be';
 
 @ProviderFor(resendOTPUsecase)
 const resendOTPUsecaseProvider = ResendOTPUsecaseProvider._();
@@ -155,7 +155,7 @@ final class ResendOTPUsecaseProvider
         argument: null,
         retry: null,
         name: r'resendOTPUsecaseProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -182,4 +182,4 @@ final class ResendOTPUsecaseProvider
   }
 }
 
-String _$resendOTPUsecaseHash() => r'3e71b739b222e71b7da4df4f795f066e9c393714';
+String _$resendOTPUsecaseHash() => r'dbb2beb0778a709c11733ae2adb12471748052e6';

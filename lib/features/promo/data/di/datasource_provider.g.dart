@@ -22,7 +22,7 @@ final class PromoDatasourceProvider
         argument: null,
         retry: null,
         name: r'promoDatasourceProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -49,4 +49,4 @@ final class PromoDatasourceProvider
   }
 }
 
-String _$promoDatasourceHash() => r'4245b9f6f9a930ae7a0ee16a5994ac3e1e017b67';
+String _$promoDatasourceHash() => r'd2e1732a533a719157b3a5f8994b82f7b2cc8131';

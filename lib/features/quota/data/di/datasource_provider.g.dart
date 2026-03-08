@@ -22,7 +22,7 @@ final class QuotaDatasourceProvider
         argument: null,
         retry: null,
         name: r'quotaDatasourceProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -49,7 +49,7 @@ final class QuotaDatasourceProvider
   }
 }
 
-String _$quotaDatasourceHash() => r'b3b168bada2f991bcfab044eeaf66620f261eccb';
+String _$quotaDatasourceHash() => r'4b1c15fdefc9f0ea24ea080d0fa03d3acb61dd73';
 
 @ProviderFor(transactionDatasource)
 const transactionDatasourceProvider = TransactionDatasourceProvider._();
@@ -68,7 +68,7 @@ final class TransactionDatasourceProvider
         argument: null,
         retry: null,
         name: r'transactionDatasourceProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -97,4 +97,4 @@ final class TransactionDatasourceProvider
 }
 
 String _$transactionDatasourceHash() =>
-    r'664521da19c2a60b4fd99080cee7bce0ee133c67';
+    r'4d396fa19e64954766dc351a4938f1d0e56e5140';

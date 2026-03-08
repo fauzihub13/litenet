@@ -26,7 +26,7 @@ final class SettingDatasourceProvider
         argument: null,
         retry: null,
         name: r'settingDatasourceProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -54,4 +54,4 @@ final class SettingDatasourceProvider
   }
 }
 
-String _$settingDatasourceHash() => r'ea3b3aa19727d7effb586ac82545d872ac9d9d2b';
+String _$settingDatasourceHash() => r'3ada93c7a7b7f2a4c5397300fe62db2b4cdb5db6';

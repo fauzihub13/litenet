@@ -22,7 +22,7 @@ final class GetPromoUsecaseProvider
         argument: null,
         retry: null,
         name: r'getPromoUsecaseProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -49,4 +49,4 @@ final class GetPromoUsecaseProvider
   }
 }
 
-String _$getPromoUsecaseHash() => r'c60a176ecd2e18e2d64f70968a86b51b6c18d3f1';
+String _$getPromoUsecaseHash() => r'e9851471e09d8162a08943287aada018fe2fb450';

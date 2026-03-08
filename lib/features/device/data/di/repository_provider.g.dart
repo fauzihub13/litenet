@@ -26,7 +26,7 @@ final class DeviceRepositoryProvider
         argument: null,
         retry: null,
         name: r'deviceRepositoryProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -53,4 +53,4 @@ final class DeviceRepositoryProvider
   }
 }
 
-String _$deviceRepositoryHash() => r'3cf8917c9e46936160690c0bc7f87faf1aec04a0';
+String _$deviceRepositoryHash() => r'02feeacbe9375cd7158a467c3302c4c6876f55be';

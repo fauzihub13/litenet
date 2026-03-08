@@ -22,7 +22,7 @@ final class PromoRepositoryProvider
         argument: null,
         retry: null,
         name: r'promoRepositoryProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -49,4 +49,4 @@ final class PromoRepositoryProvider
   }
 }
 
-String _$promoRepositoryHash() => r'85731d2f94668451aa9fef8248279f12e4a291d6';
+String _$promoRepositoryHash() => r'e1fb73934298d0443199b6b491dcde2dd3889fc4';

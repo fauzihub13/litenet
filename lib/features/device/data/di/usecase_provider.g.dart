@@ -26,7 +26,7 @@ final class ClaimDeviceUsecaseProvider
         argument: null,
         retry: null,
         name: r'claimDeviceUsecaseProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -55,7 +55,7 @@ final class ClaimDeviceUsecaseProvider
 }
 
 String _$claimDeviceUsecaseHash() =>
-    r'e31a2faa0de6d9aadcd4dec61366f8b5146b385b';
+    r'0d57370b5998459ea63e597f311791364a20245f';
 
 @ProviderFor(getAllDeviceUsecase)
 const getAllDeviceUsecaseProvider = GetAllDeviceUsecaseProvider._();
@@ -74,7 +74,7 @@ final class GetAllDeviceUsecaseProvider
         argument: null,
         retry: null,
         name: r'getAllDeviceUsecaseProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -103,7 +103,7 @@ final class GetAllDeviceUsecaseProvider
 }
 
 String _$getAllDeviceUsecaseHash() =>
-    r'4acc0ba1d1928372089394b342f4d650b80a5e9b';
+    r'd0cd38beab84e63820a376f1bb212b7b37e2fd00';
 
 @ProviderFor(getDetailDeviceUsecase)
 const getDetailDeviceUsecaseProvider = GetDetailDeviceUsecaseProvider._();
@@ -122,7 +122,7 @@ final class GetDetailDeviceUsecaseProvider
         argument: null,
         retry: null,
         name: r'getDetailDeviceUsecaseProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -151,4 +151,4 @@ final class GetDetailDeviceUsecaseProvider
 }
 
 String _$getDetailDeviceUsecaseHash() =>
-    r'3a0d90c4b6bd85421d89467b4977f7bd28bee27e';
+    r'f100e0b76f175151ad86622c3ba37e05ea32119f';

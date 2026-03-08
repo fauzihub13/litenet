@@ -9,32 +9,32 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'usecase_provider.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 LogoutUsecase logoutUsecase(Ref ref) {
   return LogoutUsecase(ref.read(settingRepositoryProvider));
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 GetProfileUsecase getProfileUsecase(Ref ref) {
   return GetProfileUsecase(ref.read(settingRepositoryProvider));
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 ChangeProfileUsecase changeProfileUsecase(Ref ref) {
   return ChangeProfileUsecase(ref.read(settingRepositoryProvider));
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 ChangePasswordUsecase changePasswordUsecase(Ref ref) {
   return ChangePasswordUsecase(ref.read(settingRepositoryProvider));
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 GetFAQUsecase getFAQUsecase(Ref ref) {
   return GetFAQUsecase(ref.read(settingRepositoryProvider));
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 GetPrivacyAndPolicyUsecase getPrivacyAndPolicyUsecase(Ref ref) {
   return GetPrivacyAndPolicyUsecase(ref.read(settingRepositoryProvider));
 }

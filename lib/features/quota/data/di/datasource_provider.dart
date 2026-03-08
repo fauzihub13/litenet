@@ -5,12 +5,12 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'datasource_provider.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 QuotaDatasource quotaDatasource(Ref ref) {
   return QuotaDatasourceImpl(httpClient: ref.read(dioProvider));
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 TransactionDatasource transactionDatasource(Ref ref) {
   return TransactionDatasourceImpl(httpClient: ref.read(dioProvider));
 }

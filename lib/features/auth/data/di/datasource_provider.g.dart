@@ -22,7 +22,7 @@ final class LoginDatasourceProvider
         argument: null,
         retry: null,
         name: r'loginDatasourceProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -49,7 +49,7 @@ final class LoginDatasourceProvider
   }
 }
 
-String _$loginDatasourceHash() => r'5c6ea5767269b791b5a3cab16707a111d0a8aab3';
+String _$loginDatasourceHash() => r'a73423faa41f9379a8bc89076b85c32987d02ec9';
 
 @ProviderFor(registerDatasource)
 const registerDatasourceProvider = RegisterDatasourceProvider._();
@@ -68,7 +68,7 @@ final class RegisterDatasourceProvider
         argument: null,
         retry: null,
         name: r'registerDatasourceProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -97,7 +97,7 @@ final class RegisterDatasourceProvider
 }
 
 String _$registerDatasourceHash() =>
-    r'400858431278cf250e6bc6bd17cbd5d8f9bf044a';
+    r'0f57497c4df70d04a39250d94a6a036aea224032';
 
 @ProviderFor(otpDatasource)
 const otpDatasourceProvider = OtpDatasourceProvider._();
@@ -111,7 +111,7 @@ final class OtpDatasourceProvider
         argument: null,
         retry: null,
         name: r'otpDatasourceProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -138,4 +138,4 @@ final class OtpDatasourceProvider
   }
 }
 
-String _$otpDatasourceHash() => r'c358409364c77f9d49bb9a7f61db240bdc16ecbd';
+String _$otpDatasourceHash() => r'5e850239beb4b0eb7388093b009c6c90d8dbf397';

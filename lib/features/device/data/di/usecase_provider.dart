@@ -6,17 +6,17 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'usecase_provider.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 ClaimDeviceUsecase claimDeviceUsecase(Ref ref) {
   return ClaimDeviceUsecase(ref.read(deviceRepositoryProvider));
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 GetAllDeviceUsecase getAllDeviceUsecase(Ref ref) {
   return GetAllDeviceUsecase(ref.read(deviceRepositoryProvider));
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 GetDetailDeviceUsecase getDetailDeviceUsecase(Ref ref) {
   return GetDetailDeviceUsecase(ref.read(deviceRepositoryProvider));
 }

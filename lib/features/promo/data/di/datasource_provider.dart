@@ -4,7 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'datasource_provider.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 PromoDatasource promoDatasource(Ref ref) {
   return PromoDatasourceImpl(httpClient: ref.read(dioProvider));
 }

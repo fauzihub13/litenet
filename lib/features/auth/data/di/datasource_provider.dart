@@ -6,17 +6,17 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'datasource_provider.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 LoginDatasource loginDatasource(Ref ref) {
   return LoginDatasourceImpl(httpClient: ref.read(dioProvider));
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 RegisterDatasource registerDatasource(Ref ref) {
   return RegisterDatasourceImpl(httpClient: ref.read(dioProvider));
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 OTPDatasource otpDatasource(Ref ref) {
   return OTPDatasourceImpl(httpClient: ref.read(dioProvider));
 }

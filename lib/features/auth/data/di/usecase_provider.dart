@@ -7,22 +7,22 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'usecase_provider.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 LoginUsecase loginUsecase(Ref ref) {
   return LoginUsecase(ref.read(loginRepositoryProvider));
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 RegisterUsecase registerUsecase(Ref ref) {
   return RegisterUsecase(ref.read(registerRepositoryProvider));
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 VerifyOTPUsecase verifyOTPUsecase(Ref ref) {
   return VerifyOTPUsecase(ref.read(otpRepositoryProvider));
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 ResendOTPUsecase resendOTPUsecase(Ref ref) {
   return ResendOTPUsecase(ref.read(otpRepositoryProvider));
 }

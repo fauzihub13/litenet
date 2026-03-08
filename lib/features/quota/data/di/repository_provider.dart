@@ -7,14 +7,14 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'repository_provider.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 QuotaRepository quotaRepository(Ref ref) {
   return QuotaRepositoryImpl(
     quotaDatasource: ref.read(quotaDatasourceProvider),
   );
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 TransactionRepository transactionRepository(Ref ref) {
   return TransactionRepositoryImpl(
     transactionDatasource: ref.read(transactionDatasourceProvider),

@@ -8,27 +8,27 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'usecase_provider.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 GetAllPaymentMethodUsecase getAllPaymentMethodUsecase(Ref ref) {
   return GetAllPaymentMethodUsecase(ref.read(transactionRepositoryProvider));
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 CreateTransactionUsecase createTransactionUsecase(Ref ref) {
   return CreateTransactionUsecase(ref.read(transactionRepositoryProvider));
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 CheckPaymentStatusUsecase checkPaymentStatusUsecase(Ref ref) {
   return CheckPaymentStatusUsecase(ref.read(transactionRepositoryProvider));
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 GetAllTransactionUsecase getAllTransactionUsecase(Ref ref) {
   return GetAllTransactionUsecase(ref.read(transactionRepositoryProvider));
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 GetDetailTransactionUsecase getDetailTransactionUsecase(Ref ref) {
   return GetDetailTransactionUsecase(ref.read(transactionRepositoryProvider));
 }

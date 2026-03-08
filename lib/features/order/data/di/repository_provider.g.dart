@@ -26,7 +26,7 @@ final class TransactionRepositoryProvider
         argument: null,
         retry: null,
         name: r'transactionRepositoryProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -55,4 +55,4 @@ final class TransactionRepositoryProvider
 }
 
 String _$transactionRepositoryHash() =>
-    r'49872bebc6c67f889ce09170fde78a8f597efeea';
+    r'61b22e525e1421d4985d0bf10fcf02772762fd03';

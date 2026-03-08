@@ -26,7 +26,7 @@ final class DeviceDatasourceProvider
         argument: null,
         retry: null,
         name: r'deviceDatasourceProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -53,4 +53,4 @@ final class DeviceDatasourceProvider
   }
 }
 
-String _$deviceDatasourceHash() => r'df225a7264aa07c9fa0450616d46089762753423';
+String _$deviceDatasourceHash() => r'735826788cf3abc235141b94f611bf0c9f8da40b';

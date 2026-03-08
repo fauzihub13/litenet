@@ -26,7 +26,7 @@ final class GetAllQuotasUsecaseProvider
         argument: null,
         retry: null,
         name: r'getAllQuotasUsecaseProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -55,7 +55,7 @@ final class GetAllQuotasUsecaseProvider
 }
 
 String _$getAllQuotasUsecaseHash() =>
-    r'26a200fec410e98b37a25e3fa78e468f394beba9';
+    r'df4d08b96d559cbfde10770b14ea44bc7d3e003b';
 
 @ProviderFor(getDetailQuotaUsecase)
 const getDetailQuotaUsecaseProvider = GetDetailQuotaUsecaseProvider._();
@@ -74,7 +74,7 @@ final class GetDetailQuotaUsecaseProvider
         argument: null,
         retry: null,
         name: r'getDetailQuotaUsecaseProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -103,7 +103,7 @@ final class GetDetailQuotaUsecaseProvider
 }
 
 String _$getDetailQuotaUsecaseHash() =>
-    r'4e7e00a06769e818756c4879b199ac25991a0750';
+    r'9d413958bda2743198fc0f9eef194859cca18d98';
 
 @ProviderFor(checkPromoUsecase)
 const checkPromoUsecaseProvider = CheckPromoUsecaseProvider._();
@@ -122,7 +122,7 @@ final class CheckPromoUsecaseProvider
         argument: null,
         retry: null,
         name: r'checkPromoUsecaseProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -150,7 +150,7 @@ final class CheckPromoUsecaseProvider
   }
 }
 
-String _$checkPromoUsecaseHash() => r'fb1e718fac5674129bdce6fb2626ab59cf5883d5';
+String _$checkPromoUsecaseHash() => r'ac4f14fd9bf77558f666bbfb43abefc958cebe48';
 
 @ProviderFor(getAllPaymentMethodUsecase)
 const getAllPaymentMethodUsecaseProvider =
@@ -170,7 +170,7 @@ final class GetAllPaymentMethodUsecaseProvider
         argument: null,
         retry: null,
         name: r'getAllPaymentMethodUsecaseProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -199,7 +199,7 @@ final class GetAllPaymentMethodUsecaseProvider
 }
 
 String _$getAllPaymentMethodUsecaseHash() =>
-    r'155877eddac7de4517acda6af59b02c28d5905bd';
+    r'a4b597d0938785401ad72211e70452899f1c5e5d';
 
 @ProviderFor(createTransactionUsecase)
 const createTransactionUsecaseProvider = CreateTransactionUsecaseProvider._();
@@ -218,7 +218,7 @@ final class CreateTransactionUsecaseProvider
         argument: null,
         retry: null,
         name: r'createTransactionUsecaseProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -247,4 +247,4 @@ final class CreateTransactionUsecaseProvider
 }
 
 String _$createTransactionUsecaseHash() =>
-    r'7e88c8c8c618e12d1ea0f1abe8d2232fe5eba3a1';
+    r'033b3bc81471a099a356a0ca30626567dd4a2085';

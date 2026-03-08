@@ -4,7 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'datasource_provider.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 SettingDatasource settingDatasource(Ref ref) {
   return SettingDatasourceImpl(httpClient: ref.read(dioProvider));
 }

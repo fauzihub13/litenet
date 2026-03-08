@@ -5,7 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'repository_provider.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 SettingRepository settingRepository(Ref ref) {
   return SettingRepositoryImpl(
     settingDatasource: ref.read(settingDatasourceProvider),

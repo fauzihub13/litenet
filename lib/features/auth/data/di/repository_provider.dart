@@ -9,21 +9,21 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'repository_provider.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 LoginRepository loginRepository(Ref ref) {
   return LoginRepositoryImpl(
     loginDatasource: ref.read(loginDatasourceProvider),
   );
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 RegisterRepository registerRepository(Ref ref) {
   return RegisterRepositoryImpl(
     registerDatasource: ref.read(registerDatasourceProvider),
   );
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 OTPRepository otpRepository(Ref ref) {
   return OTPRepositoryImpl(
     otpDatasource: ref.read(otpDatasourceProvider),

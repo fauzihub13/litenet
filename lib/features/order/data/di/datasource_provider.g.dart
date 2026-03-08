@@ -26,7 +26,7 @@ final class TransactionDatasourceProvider
         argument: null,
         retry: null,
         name: r'transactionDatasourceProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -55,4 +55,4 @@ final class TransactionDatasourceProvider
 }
 
 String _$transactionDatasourceHash() =>
-    r'664521da19c2a60b4fd99080cee7bce0ee133c67';
+    r'4d396fa19e64954766dc351a4938f1d0e56e5140';
