@@ -46,114 +46,129 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
-      body: SingleChildScrollView(
-        child: Stack(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: DefaultColors.purple500,
+        title: Row(
           children: [
-            // Header Ungu
-            Container(
-              height: 280,
-              width: double.infinity,
-              decoration: const BoxDecoration(color: DefaultColors.purple500),
-              padding: const EdgeInsets.symmetric(
-                horizontal: PaddingSize.horizontal,
-              ),
-              child: SafeArea(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 10),
-                    // Logo LiteNet
-                    Row(
-                      children: [
-                        SvgPicture.asset(
-                          Assets.icons.iconLitenet,
-                          width: 22,
-                          height: 22,
-                          colorFilter: const ColorFilter.mode(
-                            Colors.white,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          "LiteNet",
-                          style: Theme.of(context).textTheme.bodyLarge
-                              ?.copyWith(
-                                color: DefaultColors.purple50,
-                                fontWeight: FontWeight.bold,
-                                fontStyle: FontStyle.italic,
-                              ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 30),
-                    userAsync.when(
-                      data: (user) => Text(
-                        "Halo ${user.name}",
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(
-                              color: DefaultColors.purple50,
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                      loading: () => Text(
-                        "Halo ",
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(
-                              color: DefaultColors.purple50,
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ), // Muncul loading sebentar
-                      error: (err, stack) => Text(
-                        "Halo ",
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(
-                              color: DefaultColors.purple50,
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                    ),
-
-                    Text(
-                      "selamat datang kembali!",
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: DefaultColors.purple50,
-                      ),
-                    ),
-                  ],
-                ),
+            SvgPicture.asset(
+              Assets.icons.iconLitenet,
+              width: 22,
+              height: 22,
+              colorFilter: const ColorFilter.mode(
+                Colors.white,
+                BlendMode.srcIn,
               ),
             ),
-
-            // Konten di atas Header (Card Akun Saya)
-            Padding(
-              padding: const EdgeInsets.only(top: 200),
-              child: Column(
-                children: [
-                  _buildAccountCard(),
-                  const SizedBox(height: 24),
-                  _buildSectionHeader(
-                    title: 'Promo',
-                    onTap: () {
-                      context.pushNamed(RouteName.promoPage);
-                    },
-                  ),
-                  _buildPromoSlider(),
-                  const SizedBox(height: 24),
-                  _buildSectionHeader(
-                    title: "Kuota",
-                    onTap: () {
-                      context.pushNamed(RouteName.productPage);
-                    },
-                  ),
-                  _buildQuotaList(),
-                  const SizedBox(
-                    height: 30,
-                  ), // Spasi bawah agar tidak tertutup Navbar
-                ],
+            const SizedBox(width: 8),
+            Text(
+              "LiteNet",
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: DefaultColors.purple50,
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.italic,
               ),
             ),
           ],
+        ),
+      ),
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: () async {
+            ref.invalidate(getCurrentUserProvider);
+            ref.invalidate(getPromoProvider);
+            ref.invalidate(getAllQuotaProvider);
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: ClampingScrollPhysics(),
+            ),
+            // physics: const ClampingScrollPhysics(),
+            child: Stack(
+              children: [
+                // Header Ungu
+                Container(
+                  height: 160,
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    color: DefaultColors.purple500,
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: PaddingSize.horizontal,
+                  ),
+                  child: SafeArea(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 10),
+                        userAsync.when(
+                          data: (user) => Text(
+                            "Halo ${user.name}",
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(
+                                  color: DefaultColors.purple50,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                          loading: () => Text(
+                            "Halo ",
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(
+                                  color: DefaultColors.purple50,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ), // Muncul loading sebentar
+                          error: (err, stack) => Text(
+                            "Halo ",
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(
+                                  color: DefaultColors.purple50,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                        ),
+
+                        Text(
+                          "selamat datang kembali!",
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: DefaultColors.purple50),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Konten di atas Header (Card Akun Saya)
+                Padding(
+                  padding: const EdgeInsets.only(top: 100),
+                  child: Column(
+                    children: [
+                      _buildAccountCard(),
+                      const SizedBox(height: 24),
+                      _buildSectionHeader(
+                        title: 'Promo',
+                        onTap: () {
+                          context.pushNamed(RouteName.promoPage);
+                        },
+                      ),
+                      _buildPromoSlider(),
+                      const SizedBox(height: 24),
+                      _buildSectionHeader(
+                        title: "Kuota",
+                        onTap: () {
+                          context.pushNamed(RouteName.productPage);
+                        },
+                      ),
+                      _buildQuotaList(),
+                      const SizedBox(
+                        height: 30,
+                      ), // Spasi bawah agar tidak tertutup Navbar
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

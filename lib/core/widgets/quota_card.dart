@@ -98,7 +98,12 @@ class QuotaCard extends ConsumerWidget {
             Button(
               text: "Beli Sekarang",
               buttonType: ButtonType.outlined,
-              onPressed: () {},
+              onPressed: () {
+                context.pushNamed(
+                  RouteName.detailProductPage,
+                  extra: {'id': quota.id},
+                );
+              },
             ),
           ],
         ),
