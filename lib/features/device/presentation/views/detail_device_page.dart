@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:litenet/core/constants/theme.dart';
@@ -15,6 +16,7 @@ import 'package:litenet/core/widgets/empty_state.dart';
 import 'package:litenet/features/device/domain/entities/device.dart';
 import 'package:litenet/features/device/presentation/controllers/get_detail_device_provider.dart';
 import 'package:litenet/gen/assets.gen.dart';
+import 'package:litenet/routes/route_name.dart';
 
 class DetailDevicePage extends HookConsumerWidget {
   final String deviceId;
@@ -192,16 +194,18 @@ class DetailDevicePage extends HookConsumerWidget {
           ),
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: PaddingSize.horizontal,
-          vertical: 10,
-        ),
-        child: Button(
-          text: "Beli Kuota",
-          onPressed: () {
-            // context.pushNamed(RouteName.mainPage);
-          },
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: PaddingSize.horizontal,
+            // vertical: 10,
+          ),
+          child: Button(
+            text: "Beli Kuota",
+            onPressed: () {
+              context.pushNamed(RouteName.productPage);
+            },
+          ),
         ),
       ),
     );

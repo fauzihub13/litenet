@@ -70,14 +70,30 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     final registerState = ref.watch(registerProvider);
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(0),
+        child: AppBar(
+          elevation: 0,
+          systemOverlayStyle: const SystemUiOverlayStyle(
+            statusBarColor: DefaultColors.purple500,
+            statusBarIconBrightness: Brightness.light,
+            statusBarBrightness: Brightness.dark,
+          ),
+          backgroundColor: DefaultColors.purple500,
+        ),
+      ),
       body: SingleChildScrollView(
-        child: Column(
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: ClampingScrollPhysics(),
+        ),
+        child: Stack(
           children: [
             // 1. Header Background Ungu (Dinamis mengikuti panjang teks)
             Container(
               width: double.infinity,
+              height: 300,
               padding: const EdgeInsets.only(
-                bottom: 60,
+                bottom: 0,
               ), // Ruang ekstra untuk overlap card
               decoration: const BoxDecoration(color: DefaultColors.purple500),
               child: SafeArea(
@@ -118,178 +134,176 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             ),
 
             // 2. Form Card (Menggunakan Transform.translate agar overlap tanpa menindih teks)
-            Transform.translate(
-              offset: const Offset(0, -70),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: PaddingSize.horizontal,
+            Padding(
+              padding: const EdgeInsets.only(
+                top: 200,
+                left: PaddingSize.horizontal,
+                right: PaddingSize.horizontal,
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
                 ),
-                child: Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Nama Lengkap
+                      const RowTitle(title: "Nama Lengkap"),
+                      const SizedBox(height: 8),
+                      FormInput(
+                        textController: _nameController,
+                        hintText: "Sahroni Ahmad",
+                        validator: (value) => (value == null || value.isEmpty)
+                            ? 'Nama tidak boleh kosong'
+                            : null,
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Email
+                      const RowTitle(title: "Email"),
+                      const SizedBox(height: 8),
+                      FormInput(
+                        textController: _emailController,
+                        hintText: "sahroni@gmail.com",
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Email tidak boleh kosong';
+                          }
+
+                          final emailRegex = RegExp(
+                            r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                          );
+                          if (!emailRegex.hasMatch(value)) {
+                            return 'Format email salah';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 20),
+
+                      // No HP
+                      const RowTitle(title: "No HP"),
+                      const SizedBox(height: 8),
+                      FormInput(
+                        textController: _phoneController,
+                        keyboardType: TextInputType.phone,
+                        hintText: "08123456789",
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(13),
+                        ],
+                        validator: (value) =>
+                            (value == null || value.length < 10)
+                            ? 'No HP minimal 10 digit'
+                            : null,
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Kata Sandi
+                      const RowTitle(title: "Kata Sandi"),
+                      const SizedBox(height: 8),
+                      FormInput(
+                        textController: _passwordController,
+                        hintText: "*******",
+                        obscureText: _isObscure,
+                        suffixIcon: Icon(
+                          _isObscure
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                          size: 22,
+                        ),
+                        onSuffixIconTap: () =>
+                            setState(() => _isObscure = !_isObscure),
+                        validator: (value) =>
+                            (value == null || value.length < 6)
+                            ? 'Sandi minimal 6 karakter'
+                            : null,
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Ulangi Kata Sandi
+                      const RowTitle(title: "Ulangi Kata Sandi"),
+                      const SizedBox(height: 8),
+                      FormInput(
+                        textController: _confirmPasswordController,
+                        hintText: "*******",
+                        obscureText: _isConfirmObscure,
+                        suffixIcon: Icon(
+                          _isConfirmObscure
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                          size: 22,
+                        ),
+                        onSuffixIconTap: () => setState(
+                          () => _isConfirmObscure = !_isConfirmObscure,
+                        ),
+                        validator: (value) =>
+                            (value != _passwordController.text)
+                            ? 'Kata sandi tidak cocok'
+                            : null,
+                      ),
+                      const SizedBox(height: 40),
+
+                      // Tombol Daftar
+                      Button(
+                        text: "Daftar",
+                        isLoading: registerState.isLoading,
+                        isDisabled: registerState.isLoading,
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            ref
+                                .read(registerProvider.notifier)
+                                .register(
+                                  name: _nameController.text,
+                                  email: _emailController.text.trim(),
+                                  password: _passwordController.text,
+                                  passwordConfirmation:
+                                      _confirmPasswordController.text,
+                                  phoneNumber: _phoneController.text,
+                                );
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Link ke Login
+                      Center(
+                        child: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Text(
+                              "Sudah punya akun? ",
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: DefaultColors.black200),
+                            ),
+                            GestureDetector(
+                              onTap: () => context.goNamed(RouteName.loginPage),
+                              child: Text(
+                                "Masuk",
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(
+                                      color: DefaultColors.purple500,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
-                  ),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Nama Lengkap
-                        const RowTitle(title: "Nama Lengkap"),
-                        const SizedBox(height: 8),
-                        FormInput(
-                          textController: _nameController,
-                          hintText: "Sahroni Ahmad",
-                          validator: (value) => (value == null || value.isEmpty)
-                              ? 'Nama tidak boleh kosong'
-                              : null,
-                        ),
-                        const SizedBox(height: 20),
-
-                        // Email
-                        const RowTitle(title: "Email"),
-                        const SizedBox(height: 8),
-                        FormInput(
-                          textController: _emailController,
-                          hintText: "sahroni@gmail.com",
-                          keyboardType: TextInputType.emailAddress,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Email tidak boleh kosong';
-                            }
-
-                            final emailRegex = RegExp(
-                              r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                            );
-                            if (!emailRegex.hasMatch(value)) {
-                              return 'Format email salah';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 20),
-
-                        // No HP
-                        const RowTitle(title: "No HP"),
-                        const SizedBox(height: 8),
-                        FormInput(
-                          textController: _phoneController,
-                          keyboardType: TextInputType.phone,
-                          hintText: "08123456789",
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(13),
-                          ],
-                          validator: (value) =>
-                              (value == null || value.length < 10)
-                              ? 'No HP minimal 10 digit'
-                              : null,
-                        ),
-                        const SizedBox(height: 20),
-
-                        // Kata Sandi
-                        const RowTitle(title: "Kata Sandi"),
-                        const SizedBox(height: 8),
-                        FormInput(
-                          textController: _passwordController,
-                          hintText: "*******",
-                          obscureText: _isObscure,
-                          suffixIcon: Icon(
-                            _isObscure
-                                ? Icons.visibility_off_outlined
-                                : Icons.visibility_outlined,
-                            size: 22,
-                          ),
-                          onSuffixIconTap: () =>
-                              setState(() => _isObscure = !_isObscure),
-                          validator: (value) =>
-                              (value == null || value.length < 6)
-                              ? 'Sandi minimal 6 karakter'
-                              : null,
-                        ),
-                        const SizedBox(height: 20),
-
-                        // Ulangi Kata Sandi
-                        const RowTitle(title: "Ulangi Kata Sandi"),
-                        const SizedBox(height: 8),
-                        FormInput(
-                          textController: _confirmPasswordController,
-                          hintText: "*******",
-                          obscureText: _isConfirmObscure,
-                          suffixIcon: Icon(
-                            _isConfirmObscure
-                                ? Icons.visibility_off_outlined
-                                : Icons.visibility_outlined,
-                            size: 22,
-                          ),
-                          onSuffixIconTap: () => setState(
-                            () => _isConfirmObscure = !_isConfirmObscure,
-                          ),
-                          validator: (value) =>
-                              (value != _passwordController.text)
-                              ? 'Kata sandi tidak cocok'
-                              : null,
-                        ),
-                        const SizedBox(height: 40),
-
-                        // Tombol Daftar
-                        Button(
-                          text: "Daftar",
-                          isLoading: registerState.isLoading,
-                          isDisabled: registerState.isLoading,
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
-                              ref
-                                  .read(registerProvider.notifier)
-                                  .register(
-                                    name: _nameController.text,
-                                    email: _emailController.text.trim(),
-                                    password: _passwordController.text,
-                                    passwordConfirmation:
-                                        _confirmPasswordController.text,
-                                    phoneNumber: _phoneController.text,
-                                  );
-                            }
-                          },
-                        ),
-                        const SizedBox(height: 20),
-
-                        // Link ke Login
-                        Center(
-                          child: Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              Text(
-                                "Sudah punya akun? ",
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(color: DefaultColors.black200),
-                              ),
-                              GestureDetector(
-                                onTap: () =>
-                                    context.goNamed(RouteName.loginPage),
-                                child: Text(
-                                  "Masuk",
-                                  style: Theme.of(context).textTheme.bodySmall
-                                      ?.copyWith(
-                                        color: DefaultColors.purple500,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
                 ),
               ),

@@ -72,9 +72,9 @@ class PaymentOrderPage extends HookConsumerWidget {
           }
         },
         error: (error, _) {
-          String errorMessage =
-              (error as Failure).message ?? 'Terjadi kesalahan';
-          context.showError(errorMessage);
+          // String errorMessage =
+          //     (error as Failure).message ?? 'Terjadi kesalahan';
+          // context.showError(errorMessage);
         },
         loading: () {},
       );

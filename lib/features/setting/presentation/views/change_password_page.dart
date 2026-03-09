@@ -84,7 +84,6 @@ class ChangePasswordPage extends HookConsumerWidget {
               const SizedBox(height: 8),
               FormInput(
                 textController: newPasswordController,
-                keyboardType: TextInputType.number,
                 hintText: "*******",
                 obscureText: isObscureNewpassword.value,
                 suffixIcon: Icon(
@@ -111,7 +110,6 @@ class ChangePasswordPage extends HookConsumerWidget {
               const SizedBox(height: 8),
               FormInput(
                 textController: confirmationNewController,
-                keyboardType: TextInputType.number,
                 hintText: "*******",
                 obscureText: isObscureConfirmNewpassword.value,
                 suffixIcon: Icon(

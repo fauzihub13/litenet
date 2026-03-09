@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -47,13 +48,29 @@ class LoginPage extends HookConsumerWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(0),
+        child: AppBar(
+          elevation: 0,
+          systemOverlayStyle: const SystemUiOverlayStyle(
+            statusBarColor: DefaultColors.purple500,
+            statusBarIconBrightness: Brightness.light,
+            statusBarBrightness: Brightness.dark,
+          ),
+          backgroundColor: DefaultColors.purple500,
+        ),
+      ),
       body: SingleChildScrollView(
-        child: Column(
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: ClampingScrollPhysics(),
+        ),
+        child: Stack(
           children: [
             // Header Background Ungu
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.only(bottom: 10),
+              height: 300,
+              // padding: const EdgeInsets.only(bottom: 10),
               decoration: const BoxDecoration(color: DefaultColors.purple500),
               child: SafeArea(
                 child: Column(
@@ -93,130 +110,121 @@ class LoginPage extends HookConsumerWidget {
             ),
 
             // Form Card
-            Stack(
-              children: [
-                Container(
-                  height: 80,
-                  decoration: const BoxDecoration(
-                    color: DefaultColors.purple500,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: PaddingSize.horizontal,
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.08),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
+            Padding(
+              padding: const EdgeInsets.only(
+                top: 200,
+                left: PaddingSize.horizontal,
+                right: PaddingSize.horizontal,
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
                     ),
-                    child: Form(
-                      key: formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Field Email
-                          const RowTitle(title: "Email"),
-                          const SizedBox(height: 8),
-                          FormInput(
-                            textController: emailController,
-                            hintText: "user@example.com",
-                            keyboardType: TextInputType.emailAddress,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Email tidak boleh kosong';
-                              }
-                              final emailRegex = RegExp(
-                                r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-                              );
-                              if (!emailRegex.hasMatch(value)) {
-                                return 'Format email salah';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 20),
-
-                          // Field Kata Sandi
-                          const RowTitle(title: "Kata Sandi"),
-                          const SizedBox(height: 8),
-                          FormInput(
-                            textController: passwordController,
-                            hintText: "*******",
-                            obscureText: isObscure.value,
-                            suffixIcon: Icon(
-                              isObscure.value
-                                  ? Icons.visibility_off_outlined
-                                  : Icons.visibility_outlined,
-                              size: 22,
-                            ),
-                            onSuffixIconTap: () =>
-                                isObscure.value = !isObscure.value,
-                            validator: (value) =>
-                                (value == null || value.isEmpty)
-                                ? 'Sandi tidak boleh kosong'
-                                : null,
-                          ),
-                          const SizedBox(height: 40),
-
-                          // Tombol Masuk
-                          Button(
-                            text: "Masuk",
-                            isLoading: loginState.isLoading,
-                            isDisabled: loginState.isLoading,
-                            onPressed: () {
-                              if (formKey.currentState!.validate()) {
-                                ref
-                                    .read(loginProvider.notifier)
-                                    .login(
-                                      email: emailController.text.trim(),
-                                      password: passwordController.text,
-                                    );
-                              }
-                            },
-                          ),
-                          const SizedBox(height: 20),
-
-                          // Link Daftar
-                          Center(
-                            child: Wrap(
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              children: [
-                                Text(
-                                  "Belum punya akun? ",
-                                  style: Theme.of(context).textTheme.bodySmall
-                                      ?.copyWith(color: DefaultColors.black200),
-                                ),
-                                GestureDetector(
-                                  onTap: () =>
-                                      context.goNamed(RouteName.registerPage),
-                                  child: Text(
-                                    "Daftar",
-                                    style: Theme.of(context).textTheme.bodySmall
-                                        ?.copyWith(
-                                          color: DefaultColors.purple500,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                  ],
+                ),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Field Email
+                      const RowTitle(title: "Email"),
+                      const SizedBox(height: 8),
+                      FormInput(
+                        textController: emailController,
+                        hintText: "user@example.com",
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Email tidak boleh kosong';
+                          }
+                          final emailRegex = RegExp(
+                            r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                          );
+                          if (!emailRegex.hasMatch(value)) {
+                            return 'Format email salah';
+                          }
+                          return null;
+                        },
                       ),
-                    ),
+                      const SizedBox(height: 20),
+
+                      // Field Kata Sandi
+                      const RowTitle(title: "Kata Sandi"),
+                      const SizedBox(height: 8),
+                      FormInput(
+                        textController: passwordController,
+                        hintText: "*******",
+                        obscureText: isObscure.value,
+                        suffixIcon: Icon(
+                          isObscure.value
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                          size: 22,
+                        ),
+                        onSuffixIconTap: () =>
+                            isObscure.value = !isObscure.value,
+                        validator: (value) => (value == null || value.isEmpty)
+                            ? 'Sandi tidak boleh kosong'
+                            : null,
+                      ),
+                      const SizedBox(height: 40),
+
+                      // Tombol Masuk
+                      Button(
+                        text: "Masuk",
+                        isLoading: loginState.isLoading,
+                        isDisabled: loginState.isLoading,
+                        onPressed: () {
+                          if (formKey.currentState!.validate()) {
+                            ref
+                                .read(loginProvider.notifier)
+                                .login(
+                                  email: emailController.text.trim(),
+                                  password: passwordController.text,
+                                );
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Link Daftar
+                      Center(
+                        child: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Text(
+                              "Belum punya akun? ",
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: DefaultColors.black200),
+                            ),
+                            GestureDetector(
+                              onTap: () =>
+                                  context.goNamed(RouteName.registerPage),
+                              child: Text(
+                                "Daftar",
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(
+                                      color: DefaultColors.purple500,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
             const SizedBox(height: 20),
           ],

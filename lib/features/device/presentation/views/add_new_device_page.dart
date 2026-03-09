@@ -12,6 +12,7 @@ import 'package:litenet/core/widgets/custom_snackbar.dart';
 import 'package:litenet/core/widgets/form_input.dart';
 import 'package:litenet/core/widgets/row_title.dart';
 import 'package:litenet/features/device/presentation/controllers/claim_device_provider.dart';
+import 'package:litenet/features/device/presentation/controllers/get_all_device_provider.dart';
 import 'package:litenet/routes/route_name.dart';
 
 class AddNewDevicePage extends HookConsumerWidget {
@@ -58,6 +59,7 @@ class AddNewDevicePage extends HookConsumerWidget {
       next.when(
         data: (data) async {
           if (data != null) {
+            ref.invalidate(getAllDeviceProvider);
             context.showSuccess(data.message);
             context.goNamed(RouteName.monitoringPage);
           }
@@ -133,7 +135,6 @@ class AddNewDevicePage extends HookConsumerWidget {
                 const SizedBox(height: 8),
                 FormInput(
                   textController: addressController,
-                  keyboardType: TextInputType.number,
                   hintText: "Masukan alamat perangkat",
                   validator: (value) {
                     if (value == null || value.isEmpty) {
