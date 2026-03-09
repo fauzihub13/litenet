@@ -2,12 +2,15 @@ import 'package:dio/dio.dart';
 import 'package:litenet/features/device/data/mappers/claim_device_mapper.dart';
 import 'package:litenet/features/device/data/mappers/detail_device_mapper.dart';
 import 'package:litenet/features/device/data/mappers/device_mapper.dart';
+import 'package:litenet/features/device/data/mappers/topup_history_device_mapper.dart';
 import 'package:litenet/features/device/data/models/claim_device_model.dart';
 import 'package:litenet/features/device/data/models/detail_device_model.dart';
 import 'package:litenet/features/device/data/models/device_model.dart';
+import 'package:litenet/features/device/data/models/topup_history_device_model.dart';
 import 'package:litenet/features/device/domain/entities/claim_device.dart';
 import 'package:litenet/features/device/domain/entities/detail_device.dart';
 import 'package:litenet/features/device/domain/entities/device.dart';
+import 'package:litenet/features/device/domain/entities/topup_history_device.dart';
 
 abstract class DeviceDatasource {
   Future<ClaimDeviceResponse> claimDevice({
@@ -20,6 +23,9 @@ abstract class DeviceDatasource {
   });
   Future<DeviceResponse> getAllDevice();
   Future<DetailDeviceResponse> getDetailDevice({required String deviceId});
+  Future<TopupHistoryDeviceResponse> getTopupHistoryDevice({
+    required String deviceId,
+  });
 }
 
 class DeviceDatasourceImpl extends DeviceDatasource {
@@ -69,6 +75,17 @@ class DeviceDatasourceImpl extends DeviceDatasource {
     final response = await httpClient.get(url);
 
     final data = DetailDeviceResponseModel.fromJson(response.data);
+    return data.toEntity();
+  }
+
+  @override
+  Future<TopupHistoryDeviceResponse> getTopupHistoryDevice({
+    required String deviceId,
+  }) async {
+    String url = '/monitoring/devices/$deviceId/histories';
+    final response = await httpClient.get(url);
+
+    final data = TopupHistoryDeviceResponseModel.fromJson(response.data);
     return data.toEntity();
   }
 }

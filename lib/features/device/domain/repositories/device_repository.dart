@@ -3,6 +3,7 @@ import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/features/device/domain/entities/claim_device.dart';
 import 'package:litenet/features/device/domain/entities/detail_device.dart';
 import 'package:litenet/features/device/domain/entities/device.dart';
+import 'package:litenet/features/device/domain/entities/topup_history_device.dart';
 
 abstract class DeviceRepository {
   Future<Either<Failure, ClaimDeviceResponse>> claimDevice({
@@ -15,6 +16,9 @@ abstract class DeviceRepository {
   });
   Future<Either<Failure, DeviceResponse>> getAllDevice();
   Future<Either<Failure, DetailDeviceResponse>> getDetailDevice({
+    required String deviceId,
+  });
+  Future<Either<Failure, TopupHistoryDeviceResponse>> getTopupHistoryDevice({
     required String deviceId,
   });
 }

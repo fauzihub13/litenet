@@ -2,6 +2,7 @@ import 'package:litenet/features/device/data/di/repository_provider.dart';
 import 'package:litenet/features/device/domain/usecases/claim_device_usecase.dart';
 import 'package:litenet/features/device/domain/usecases/get_all_device_usecase.dart';
 import 'package:litenet/features/device/domain/usecases/get_detail_device_usecase.dart';
+import 'package:litenet/features/device/domain/usecases/get_topup_hisotry_device_usecase.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'usecase_provider.g.dart';
@@ -19,4 +20,9 @@ GetAllDeviceUsecase getAllDeviceUsecase(Ref ref) {
 @riverpod
 GetDetailDeviceUsecase getDetailDeviceUsecase(Ref ref) {
   return GetDetailDeviceUsecase(ref.read(deviceRepositoryProvider));
+}
+
+@riverpod
+GetTopupHistoryDeviceUsecase getTopupHistoryDeviceUsecase(Ref ref) {
+  return GetTopupHistoryDeviceUsecase(ref.read(deviceRepositoryProvider));
 }

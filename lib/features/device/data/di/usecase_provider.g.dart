@@ -152,3 +152,52 @@ final class GetDetailDeviceUsecaseProvider
 
 String _$getDetailDeviceUsecaseHash() =>
     r'f100e0b76f175151ad86622c3ba37e05ea32119f';
+
+@ProviderFor(getTopupHistoryDeviceUsecase)
+const getTopupHistoryDeviceUsecaseProvider =
+    GetTopupHistoryDeviceUsecaseProvider._();
+
+final class GetTopupHistoryDeviceUsecaseProvider
+    extends
+        $FunctionalProvider<
+          GetTopupHistoryDeviceUsecase,
+          GetTopupHistoryDeviceUsecase,
+          GetTopupHistoryDeviceUsecase
+        >
+    with $Provider<GetTopupHistoryDeviceUsecase> {
+  const GetTopupHistoryDeviceUsecaseProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'getTopupHistoryDeviceUsecaseProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$getTopupHistoryDeviceUsecaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<GetTopupHistoryDeviceUsecase> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  GetTopupHistoryDeviceUsecase create(Ref ref) {
+    return getTopupHistoryDeviceUsecase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(GetTopupHistoryDeviceUsecase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<GetTopupHistoryDeviceUsecase>(value),
+    );
+  }
+}
+
+String _$getTopupHistoryDeviceUsecaseHash() =>
+    r'0a912f44c60b191493ef1942cf2a1bb7992cdf94';

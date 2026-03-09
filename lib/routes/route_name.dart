@@ -21,4 +21,5 @@ class RouteName {
   static const String paymentPage = 'payment';
   static const String monitoringPage = 'monitoring';
   static const String detailMonitoringPage = 'detail-monitoring';
+  static const String topupHistoryDevicePage = 'top-up-history-device';
 }

@@ -7,6 +7,7 @@ import 'package:litenet/features/device/presentation/views/add_new_device_page.d
 import 'package:litenet/features/device/presentation/views/coordinate_device_page.dart';
 import 'package:litenet/features/device/presentation/views/detail_device_page.dart';
 import 'package:litenet/features/device/presentation/views/device_list_page.dart';
+import 'package:litenet/features/device/presentation/views/topup_history_device_page.dart';
 import 'package:litenet/features/home/presentation/views/home_page.dart';
 import 'package:litenet/features/home/presentation/views/main_page.dart';
 import 'package:litenet/features/onboarding/presentation/controllers/onboarding_provider.dart';
@@ -214,6 +215,16 @@ GoRouter appRouter(Ref ref) {
       ),
 
       GoRoute(
+        path: "/${RouteName.topupHistoryDevicePage}",
+        name: RouteName.topupHistoryDevicePage,
+        builder: (_, state) {
+          final extras = state.extra as Map<String, dynamic>?;
+          final deviceId = extras?['deviceId'] as String?;
+          return TopupHistoryDevicePage(deviceId: deviceId ?? '');
+        },
+      ),
+
+      GoRoute(
         path: "/${RouteName.detailOrderHistoryPage}",
         name: RouteName.detailOrderHistoryPage,
         builder: (_, state) {
@@ -222,6 +233,8 @@ GoRouter appRouter(Ref ref) {
           return DetailOrderHistoryPage(orderId: orderId ?? '');
         },
       ),
+
+      
 
       // =====================
       // MAIN SHELL

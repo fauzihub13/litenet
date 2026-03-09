@@ -216,87 +216,95 @@ Widget _buildQuotaMonitorCard({
   required BuildContext context,
   required DeviceDataEntity device,
 }) {
-  return Container(
-    padding: const EdgeInsets.all(20),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(20),
-      border: const Border(
-        left: BorderSide(color: DefaultColors.purple500, width: 6.0),
+  return GestureDetector(
+    onTap: () {
+      context.pushNamed(
+        RouteName.topupHistoryDevicePage,
+        extra: {'deviceId': device.deviceId},
+      );
+    },
+    child: Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: const Border(
+          left: BorderSide(color: DefaultColors.purple500, width: 6.0),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: DefaultColors.purple100.withValues(alpha: 0.2),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
-      boxShadow: [
-        BoxShadow(
-          color: DefaultColors.purple100.withValues(alpha: 0.2),
-          blurRadius: 15,
-          offset: const Offset(0, 8),
-        ),
-      ],
-    ),
-    child: Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: DefaultColors.purple50,
-            shape: BoxShape.circle,
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: DefaultColors.purple50,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.language,
+              color: DefaultColors.purple500,
+              size: 30,
+            ),
           ),
-          child: const Icon(
-            Icons.language,
-            color: DefaultColors.purple500,
-            size: 30,
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Sisa Kuota",
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: DefaultColors.purple500,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 8),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: LinearProgressIndicator(
-                  value: device.quotaTotal == 0
-                      ? 0
-                      : device.quotaLeft / device.quotaTotal,
-                  minHeight: 10,
-                  backgroundColor: DefaultColors.purple50,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    DefaultColors.purple500,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              RichText(
-                text: TextSpan(
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Sisa Kuota",
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: DefaultColors.purple500,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
                   ),
-                  children: [
-                    TextSpan(text: "${device.quotaLeft / 1000} GB"),
-                    TextSpan(
-                      text: "/${device.quotaTotal / 1000} GB",
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: DefaultColors.black200,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
                 ),
-              ),
-            ],
+                const SizedBox(height: 8),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: LinearProgressIndicator(
+                    value: device.quotaTotal == 0
+                        ? 0
+                        : device.quotaLeft / device.quotaTotal,
+                    minHeight: 10,
+                    backgroundColor: DefaultColors.purple50,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      DefaultColors.purple500,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                RichText(
+                  text: TextSpan(
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: DefaultColors.purple500,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    children: [
+                      TextSpan(text: "${device.quotaLeft / 1000} GB"),
+                      TextSpan(
+                        text: "/${device.quotaTotal / 1000} GB",
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: DefaultColors.black200,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }
