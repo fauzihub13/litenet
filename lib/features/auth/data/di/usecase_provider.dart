@@ -1,4 +1,5 @@
 import 'package:litenet/features/auth/data/di/repository_provider.dart';
+import 'package:litenet/features/auth/domain/usecases/get_summary_usecase.dart';
 import 'package:litenet/features/auth/domain/usecases/login_usecase.dart';
 import 'package:litenet/features/auth/domain/usecases/register_usecase.dart';
 import 'package:litenet/features/auth/domain/usecases/resend_otp_usecase.dart';
@@ -25,4 +26,9 @@ VerifyOTPUsecase verifyOTPUsecase(Ref ref) {
 @riverpod
 ResendOTPUsecase resendOTPUsecase(Ref ref) {
   return ResendOTPUsecase(ref.read(authRepositoryProvider));
+}
+
+@riverpod
+GetSummaryUsecase getSummaryUsecase(Ref ref) {
+  return GetSummaryUsecase(ref.read(authRepositoryProvider));
 }

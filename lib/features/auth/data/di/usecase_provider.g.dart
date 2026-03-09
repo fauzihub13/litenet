@@ -183,3 +183,50 @@ final class ResendOTPUsecaseProvider
 }
 
 String _$resendOTPUsecaseHash() => r'b754e106c34c4724370fb1888829a841f817f2e1';
+
+@ProviderFor(getSummaryUsecase)
+const getSummaryUsecaseProvider = GetSummaryUsecaseProvider._();
+
+final class GetSummaryUsecaseProvider
+    extends
+        $FunctionalProvider<
+          GetSummaryUsecase,
+          GetSummaryUsecase,
+          GetSummaryUsecase
+        >
+    with $Provider<GetSummaryUsecase> {
+  const GetSummaryUsecaseProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'getSummaryUsecaseProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$getSummaryUsecaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<GetSummaryUsecase> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  GetSummaryUsecase create(Ref ref) {
+    return getSummaryUsecase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(GetSummaryUsecase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<GetSummaryUsecase>(value),
+    );
+  }
+}
+
+String _$getSummaryUsecaseHash() => r'd21f383caa739cc3415ae36250dc9cbc6c8c37ad';

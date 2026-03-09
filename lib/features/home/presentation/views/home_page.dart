@@ -10,6 +10,7 @@ import 'package:litenet/core/widgets/custom_snackbar.dart';
 import 'package:litenet/core/widgets/empty_state.dart';
 import 'package:litenet/core/widgets/promo_card.dart';
 import 'package:litenet/core/widgets/quota_card.dart';
+import 'package:litenet/features/auth/presentation/controllers/get_summary_provider.dart';
 import 'package:litenet/features/promo/domain/entities/promo.dart';
 import 'package:litenet/features/promo/presentation/controllers/get_promo_provider.dart';
 import 'package:litenet/features/quota/domain/entities/quota.dart';
@@ -40,9 +41,24 @@ class _HomePageState extends ConsumerState<HomePage> {
     }
   }
 
+  int totalDevice = 0;
+  String totalQuota = '0 GB';
+  String quotaUsage = '0%';
+
   @override
   Widget build(BuildContext context) {
     final userAsync = ref.watch(getCurrentUserProvider);
+    // final asyncSummary = ref.watch(getSummaryProvider);
+
+    ref.listen(getSummaryProvider, (previous, next) {
+      next.whenData((data) {
+        setState(() {
+          quotaUsage = data.data.totalUsage;
+          totalDevice = data.data.totalDevice;
+          totalQuota = data.data.totalQuota;
+        });
+      });
+    });
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
@@ -78,6 +94,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             ref.invalidate(getCurrentUserProvider);
             ref.invalidate(getPromoProvider);
             ref.invalidate(getAllQuotaProvider);
+            ref.invalidate(getSummaryProvider);
           },
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(
@@ -143,7 +160,11 @@ class _HomePageState extends ConsumerState<HomePage> {
                   padding: const EdgeInsets.only(top: 100),
                   child: Column(
                     children: [
-                      _buildAccountCard(),
+                      _buildAccountCard(
+                        totalDevice: totalDevice,
+                        totalQuota: totalQuota,
+                        quotaUsage: quotaUsage,
+                      ),
                       const SizedBox(height: 24),
                       _buildSectionHeader(
                         title: 'Promo',
@@ -210,7 +231,11 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   // Build Account Card
-  Widget _buildAccountCard() {
+  Widget _buildAccountCard({
+    required int totalDevice,
+    required String totalQuota,
+    required String quotaUsage,
+  }) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: PaddingSize.horizontal),
       padding: const EdgeInsets.all(20),
@@ -238,11 +263,11 @@ class _HomePageState extends ConsumerState<HomePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildAccountStat("12", "Perangkat"),
+              _buildAccountStat(totalDevice.toString(), "Perangkat"),
               _buildDivider(),
-              _buildAccountStat("100GB", "Sisa Kuota"),
+              _buildAccountStat(totalQuota, "Sisa Kuota"),
               _buildDivider(),
-              _buildAccountStat("60%", "Terpakai"),
+              _buildAccountStat(quotaUsage, "Terpakai"),
             ],
           ),
         ],

@@ -6,6 +6,7 @@ import 'package:litenet/features/auth/data/datasources/auth_datasource.dart';
 import 'package:litenet/features/auth/domain/entities/login.dart';
 import 'package:litenet/features/auth/domain/entities/otp.dart';
 import 'package:litenet/features/auth/domain/entities/register.dart';
+import 'package:litenet/features/auth/domain/entities/summary.dart';
 import 'package:litenet/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl extends AuthRepository {
@@ -106,4 +107,23 @@ class AuthRepositoryImpl extends AuthRepository {
       return Left(Failure(message: e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, SummaryResponse>> getSummary() async {
+    try {
+      final response = await authDatasource.getSummary();
+
+      if (!response.success) {
+        return Left(Failure(message: response.message));
+      }
+
+      return Right(response);
+    } on DioException catch (e) {
+      final error = await DioErrorHandler.handleError(e);
+      return Left(Failure(message: error));
+    } catch (e) {
+      return Left(Failure(message: e.toString()));
+    }
+  }
+
 }

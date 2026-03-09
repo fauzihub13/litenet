@@ -2,12 +2,15 @@ import 'package:dio/dio.dart';
 import 'package:litenet/features/auth/data/mappers/login_mapper.dart';
 import 'package:litenet/features/auth/data/mappers/otp_mapper.dart';
 import 'package:litenet/features/auth/data/mappers/register_mapper.dart';
+import 'package:litenet/features/auth/data/mappers/summary_mapper.dart';
 import 'package:litenet/features/auth/data/models/login_model.dart';
 import 'package:litenet/features/auth/data/models/otp_model.dart';
 import 'package:litenet/features/auth/data/models/register_model.dart';
+import 'package:litenet/features/auth/data/models/summary_model.dart';
 import 'package:litenet/features/auth/domain/entities/login.dart';
 import 'package:litenet/features/auth/domain/entities/otp.dart';
 import 'package:litenet/features/auth/domain/entities/register.dart';
+import 'package:litenet/features/auth/domain/entities/summary.dart';
 
 abstract class AuthDatasource {
   Future<LoginResponse> login({
@@ -23,6 +26,7 @@ abstract class AuthDatasource {
     required String passwordConfirmation,
     required String phoneNumber,
   });
+  Future<SummaryResponse> getSummary();
 }
 
 class AuthDatasourceImpl extends AuthDatasource {
@@ -89,6 +93,15 @@ class AuthDatasourceImpl extends AuthDatasource {
     );
 
     final data = RegisterResponseModel.fromJson(response.data);
+    return data.toEntity();
+  }
+
+  @override
+  Future<SummaryResponse> getSummary() async {
+    String url = '/summary';
+    final response = await httpClient.get(url);
+
+    final data = SummaryResponseModel.fromJson(response.data);
     return data.toEntity();
   }
 }

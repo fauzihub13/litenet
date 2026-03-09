@@ -3,6 +3,7 @@ import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/features/auth/domain/entities/login.dart';
 import 'package:litenet/features/auth/domain/entities/otp.dart';
 import 'package:litenet/features/auth/domain/entities/register.dart';
+import 'package:litenet/features/auth/domain/entities/summary.dart';
 
 abstract class AuthRepository {
   Future<Either<Failure, LoginResponse>> login({
@@ -13,7 +14,6 @@ abstract class AuthRepository {
     required String email,
     required String otp,
   });
-
   Future<Either<Failure, OTPResponse>> resendOTP({required String email});
   Future<Either<Failure, RegisterResponse>> register({
     required String name,
@@ -22,4 +22,6 @@ abstract class AuthRepository {
     required String passwordConfirmation,
     required String phoneNumber,
   });
+  Future<Either<Failure, SummaryResponse>> getSummary();
+
 }
