@@ -48,7 +48,7 @@ final class LoginUsecaseProvider
   }
 }
 
-String _$loginUsecaseHash() => r'c3d8aa6cfcd7b225a098ae846916a06508abea24';
+String _$loginUsecaseHash() => r'09c7063a180e41417e112556d10a5f7e7c08082f';
 
 @ProviderFor(registerUsecase)
 const registerUsecaseProvider = RegisterUsecaseProvider._();
@@ -90,7 +90,7 @@ final class RegisterUsecaseProvider
   }
 }
 
-String _$registerUsecaseHash() => r'cc02c796671729935b59c657d1b1cc71bfa1a4ca';
+String _$registerUsecaseHash() => r'0de3a0c9db2de4ffeb9ce6af709683dea312e6c5';
 
 @ProviderFor(verifyOTPUsecase)
 const verifyOTPUsecaseProvider = VerifyOTPUsecaseProvider._();
@@ -136,7 +136,7 @@ final class VerifyOTPUsecaseProvider
   }
 }
 
-String _$verifyOTPUsecaseHash() => r'2de64d1bd8ab3e5f2b7ec9fc65788598418d41be';
+String _$verifyOTPUsecaseHash() => r'29b78723e262b44304413a7a7f0c10374d2bf4a0';
 
 @ProviderFor(resendOTPUsecase)
 const resendOTPUsecaseProvider = ResendOTPUsecaseProvider._();
@@ -182,4 +182,4 @@ final class ResendOTPUsecaseProvider
   }
 }
 
-String _$resendOTPUsecaseHash() => r'dbb2beb0778a709c11733ae2adb12471748052e6';
+String _$resendOTPUsecaseHash() => r'b754e106c34c4724370fb1888829a841f817f2e1';

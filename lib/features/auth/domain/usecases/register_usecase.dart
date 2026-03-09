@@ -1,12 +1,12 @@
 import 'package:dartz/dartz.dart';
 import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/features/auth/domain/entities/register.dart';
-import 'package:litenet/features/auth/domain/repositories/register_repository.dart';
+import 'package:litenet/features/auth/domain/repositories/auth_repository.dart';
 
 class RegisterUsecase {
-  final RegisterRepository registerRepository;
+  final AuthRepository authRepository;
 
-  const RegisterUsecase(this.registerRepository);
+  const RegisterUsecase(this.authRepository);
 
   Future<Either<Failure, RegisterResponse>> call({
     required String name,
@@ -15,7 +15,7 @@ class RegisterUsecase {
     required String passwordConfirmation,
     required String phoneNumber,
   }) async {
-    return await registerRepository.register(
+    return await authRepository.register(
       name: name,
       email: email,
       password: password,

@@ -9,20 +9,20 @@ part 'usecase_provider.g.dart';
 
 @riverpod
 LoginUsecase loginUsecase(Ref ref) {
-  return LoginUsecase(ref.read(loginRepositoryProvider));
+  return LoginUsecase(ref.read(authRepositoryProvider));
 }
 
 @riverpod
 RegisterUsecase registerUsecase(Ref ref) {
-  return RegisterUsecase(ref.read(registerRepositoryProvider));
+  return RegisterUsecase(ref.read(authRepositoryProvider));
 }
 
 @riverpod
 VerifyOTPUsecase verifyOTPUsecase(Ref ref) {
-  return VerifyOTPUsecase(ref.read(otpRepositoryProvider));
+  return VerifyOTPUsecase(ref.read(authRepositoryProvider));
 }
 
 @riverpod
 ResendOTPUsecase resendOTPUsecase(Ref ref) {
-  return ResendOTPUsecase(ref.read(otpRepositoryProvider));
+  return ResendOTPUsecase(ref.read(authRepositoryProvider));
 }

@@ -1,14 +1,14 @@
 import 'package:dartz/dartz.dart';
 import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/features/auth/domain/entities/otp.dart';
-import 'package:litenet/features/auth/domain/repositories/otp_repository.dart';
+import 'package:litenet/features/auth/domain/repositories/auth_repository.dart';
 
 class ResendOTPUsecase {
-  final OTPRepository otpRepository;
+  final AuthRepository authRepository;
 
-  const ResendOTPUsecase(this.otpRepository);
+  const ResendOTPUsecase(this.authRepository);
 
   Future<Either<Failure, OTPResponse>> call({required String email}) async {
-    return await otpRepository.resendOTP(email: email);
+    return await authRepository.resendOTP(email: email);
   }
 }
