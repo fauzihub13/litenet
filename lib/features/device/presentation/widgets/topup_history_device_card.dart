@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/extensions/datetime_context.ext.dart';
-import 'package:litenet/core/extensions/num_context.ext.dart';
 import 'package:litenet/features/device/domain/entities/topup_history_device.dart';
 import 'package:litenet/gen/assets.gen.dart';
 
@@ -45,7 +44,7 @@ class TopupHistoryDeviceCard extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
-                  // spacing: 2,
+                  spacing: 2,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
@@ -57,7 +56,7 @@ class TopupHistoryDeviceCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      history.price.toRupiah(),
+                      "${((history.quotaTotal) - (history.quotaUsed)) / 1024} GB /${(history.quotaTotal) / 1024} GB",
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: DefaultColors.black200,
                         fontSize: 14,
@@ -74,7 +73,7 @@ class TopupHistoryDeviceCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        history.createdAt.toIndonesianDateString(),
+                        "Aktif sampai ${history.endAt.toIndonesianDateString()}",
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: DefaultColors.purple500,
                           fontSize: 10,

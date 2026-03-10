@@ -42,16 +42,26 @@ class AddNewDevicePage extends HookConsumerWidget {
     final locationController = useTextEditingController();
     final addressController = useTextEditingController();
     final mapController = useMemoized(() => MapController());
-    LatLng currentLatLng = const LatLng(-6.5971, 106.8060);
+    // LatLng currentLatLng = const LatLng(-6.5971, 106.8060);
 
-    if (latitude != null && longitude != null) {
-      currentLatLng = LatLng(latitude!, longitude!);
-      locationController.text = "$latitude, $longitude";
-      nameController.text = reqName ?? '';
-      nodelinkController.text = redNodelink ?? '';
-      kitSerialNumberController.text = reqKitSerialNumber ?? '';
-      addressController.text = reqAddress ?? '';
-    }
+    useEffect(() {
+      if (latitude != null && longitude != null) {
+        locationController.text = "$latitude, $longitude";
+        // Gunakan Future.microtask atau langsung isi karena ini didalam useEffect
+        nameController.text = reqName ?? '';
+        nodelinkController.text = redNodelink ?? '';
+        kitSerialNumberController.text = reqKitSerialNumber ?? '';
+        addressController.text = reqAddress ?? '';
+      }
+      return null; // No cleanup needed
+    }, []);
+
+    final currentLatLng = useMemoized(
+      () => (latitude != null && longitude != null)
+          ? LatLng(latitude!, longitude!)
+          : const LatLng(-6.5971, 106.8060),
+      [latitude, longitude],
+    );
 
     final asyncClaimDevice = ref.watch(claimDeviceProvider);
 

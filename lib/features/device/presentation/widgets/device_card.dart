@@ -103,7 +103,7 @@ class DeviceCard extends ConsumerWidget {
                                 ),
                           ),
                           Text(
-                            "${device.quotaLeft / 1000} GB/${device.quotaTotal / 1000} GB",
+                            "${device.quotaLeft / 1024} GB/${device.quotaTotal / 1024} GB",
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(
                                   fontWeight: FontWeight.w700,

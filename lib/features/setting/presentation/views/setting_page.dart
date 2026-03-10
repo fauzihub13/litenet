@@ -10,17 +10,42 @@ import 'package:litenet/core/widgets/custom_snackbar.dart';
 import 'package:litenet/features/setting/presentation/controllers/logout_provider.dart';
 import 'package:litenet/gen/assets.gen.dart';
 import 'package:litenet/routes/route_name.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class SettingPage extends ConsumerStatefulWidget {
+class SettingPage extends ConsumerWidget {
   const SettingPage({super.key});
 
   @override
-  ConsumerState<SettingPage> createState() => _SettingPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Fungsi untuk membuka Email
+    Future<void> launchEmail() async {
+      final Uri emailLaunchUri = Uri(
+        scheme: 'mailto',
+        path:
+            'fauziadisaputra3@gmail.com', // Ganti dengan email support LiteNet
+        queryParameters: {'subject': 'Bantuan Layanan LiteNet'},
+      );
 
-class _SettingPageState extends ConsumerState<SettingPage> {
-  @override
-  Widget build(BuildContext context) {
+      if (!await launchUrl(emailLaunchUri)) {
+        throw Exception('Tidak bisa membuka aplikasi Email');
+      }
+    }
+
+    // Fungsi untuk membuka WhatsApp
+    Future<void> launchWhatsApp() async {
+      // Gunakan format internasional tanpa tanda + atau 0 di depan (Contoh: 62812...)
+      final String phoneNumber = "6289684781433";
+      final String message =
+          "Halo Admin LiteNet, saya butuh bantuan terkait perangkat saya.";
+      final Uri waUrl = Uri.parse(
+        "https://wa.me/$phoneNumber?text=${Uri.encodeComponent(message)}",
+      );
+
+      if (!await launchUrl(waUrl, mode: LaunchMode.externalApplication)) {
+        throw Exception('Tidak bisa membuka WhatsApp');
+      }
+    }
+
     ref.listen(logoutProvider, (previous, next) {
       next.when(
         data: (data) {
@@ -35,6 +60,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
         loading: () {},
       );
     });
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
       // Menggunakan CustomAppbar reusable kita
@@ -102,6 +128,18 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                     title: "Kebijakan Privasi",
                     onTap: () {
                       context.pushNamed(RouteName.tncPage);
+                    },
+                  ),
+                  _buildSettingItem(
+                    context,
+                    icon: Assets.icons.helpCenter,
+                    title: "Kontak Kami",
+                    onTap: () {
+                      showHelpCenterModal(
+                        context: context,
+                        onTapEmail: launchEmail,
+                        onTapWhatsApp: launchWhatsApp,
+                      );
                     },
                   ),
                   _buildSettingItem(

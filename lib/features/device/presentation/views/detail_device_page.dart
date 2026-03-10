@@ -289,9 +289,9 @@ Widget _buildQuotaMonitorCard({
                       fontWeight: FontWeight.w600,
                     ),
                     children: [
-                      TextSpan(text: "${device.quotaLeft / 1000} GB"),
+                      TextSpan(text: "${device.quotaLeft / 1024} GB"),
                       TextSpan(
-                        text: "/${device.quotaTotal / 1000} GB",
+                        text: "/${device.quotaTotal / 1024} GB",
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: DefaultColors.black200,
                           fontSize: 14,

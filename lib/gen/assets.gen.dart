@@ -66,6 +66,9 @@ class $AssetsIconsGen {
   /// File path: assets/icons/globe.svg
   String get globe => 'assets/icons/globe.svg';
 
+  /// File path: assets/icons/help_center.svg
+  String get helpCenter => 'assets/icons/help_center.svg';
+
   /// File path: assets/icons/home.svg
   String get home => 'assets/icons/home.svg';
 
@@ -131,6 +134,7 @@ class $AssetsIconsGen {
     faq,
     filter,
     globe,
+    helpCenter,
     home,
     iconLitenet,
     info,

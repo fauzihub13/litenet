@@ -41,24 +41,10 @@ class _HomePageState extends ConsumerState<HomePage> {
     }
   }
 
-  int totalDevice = 0;
-  String totalQuota = '0 GB';
-  String quotaUsage = '0%';
-
   @override
   Widget build(BuildContext context) {
     final userAsync = ref.watch(getCurrentUserProvider);
-    // final asyncSummary = ref.watch(getSummaryProvider);
-
-    ref.listen(getSummaryProvider, (previous, next) {
-      next.whenData((data) {
-        setState(() {
-          quotaUsage = data.data.totalUsage;
-          totalDevice = data.data.totalDevice;
-          totalQuota = data.data.totalQuota;
-        });
-      });
-    });
+    final asyncSummary = ref.watch(getSummaryProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
@@ -160,11 +146,25 @@ class _HomePageState extends ConsumerState<HomePage> {
                   padding: const EdgeInsets.only(top: 100),
                   child: Column(
                     children: [
-                      _buildAccountCard(
-                        totalDevice: totalDevice,
-                        totalQuota: totalQuota,
-                        quotaUsage: quotaUsage,
+                      asyncSummary.when(
+                        data: (data) => _buildAccountCard(
+                          totalDevice: data.data.totalDevice,
+                          totalQuota: data.data.totalQuota,
+                          quotaUsage: data.data.totalUsage,
+                        ),
+                        // Tampilkan loading kecil atau angka 0 saat fetch awal
+                        loading: () => _buildAccountCard(
+                          totalDevice: 0,
+                          totalQuota: '0 GB',
+                          quotaUsage: '0%',
+                        ),
+                        error: (err, _) => _buildAccountCard(
+                          totalDevice: 0,
+                          totalQuota: '0 GB',
+                          quotaUsage: '0%',
+                        ),
                       ),
+
                       const SizedBox(height: 24),
                       _buildSectionHeader(
                         title: 'Promo',
@@ -265,7 +265,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             children: [
               _buildAccountStat(totalDevice.toString(), "Perangkat"),
               _buildDivider(),
-              _buildAccountStat(totalQuota, "Sisa Kuota"),
+              _buildAccountStat(totalQuota, "Total Kuota"),
               _buildDivider(),
               _buildAccountStat(quotaUsage, "Terpakai"),
             ],
