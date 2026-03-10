@@ -345,31 +345,33 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget _buildQuotaList() {
     final asyncQuota = ref.watch(getAllQuotaProvider);
 
-    return asyncQuota.when(
-      data: (data) {
-        List<QuotaDataEntity> quotaData = data.data;
-        return ListView.builder(
-          scrollDirection: Axis.vertical,
-          itemCount: quotaData.length > 3 ? 3 : quotaData.length,
-          padding: EdgeInsets.zero,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) {
-            QuotaDataEntity quota = quotaData[index];
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 10.0),
-              child: QuotaCard(quota: quota),
-            );
-          },
-        );
-      },
-      error: (error, _) {
-        String errorMessage = (error as Failure).message ?? 'Terjadi kesalahan';
-        return EmptyState(message: errorMessage, isRefreshable: true);
-      },
-      loading: () {
-        return Center(child: const CircularProgressIndicator());
-      },
+    return SizedBox(
+      height: 210,
+      child: asyncQuota.when(
+        data: (data) {
+          List<QuotaDataEntity> quotaData = data.data;
+          return ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: quotaData.length > 3 ? 3 : quotaData.length,
+            padding: const EdgeInsets.only(left: PaddingSize.horizontal),
+            itemBuilder: (context, index) {
+              QuotaDataEntity quota = quotaData[index];
+              return Container(
+                margin: const EdgeInsets.only(right: 16.0),
+                child: QuotaCard(quota: quota),
+              );
+            },
+          );
+        },
+        error: (error, _) {
+          String errorMessage =
+              (error as Failure).message ?? 'Terjadi kesalahan';
+          return EmptyState(message: errorMessage, isRefreshable: true);
+        },
+        loading: () {
+          return Center(child: const CircularProgressIndicator());
+        },
+      ),
     );
   }
 }

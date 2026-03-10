@@ -205,6 +205,34 @@ class OTPPage extends HookConsumerWidget {
                               ],
                             ),
                           ),
+                          const SizedBox(height: 8),
+                          Center(
+                            child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                Text(
+                                  "Sudah punya akun? ",
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(color: DefaultColors.black200),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    context.pushReplacementNamed(
+                                      RouteName.loginPage,
+                                    );
+                                  },
+                                  child: Text(
+                                    "Masuk",
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color: DefaultColors.purple500,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),

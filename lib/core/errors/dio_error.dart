@@ -31,7 +31,7 @@ class DioErrorHandler {
       } else if (e.type == DioExceptionType.connectionError) {
         return 'Connection error';
       } else if (e.type == DioExceptionType.unknown) {
-        return 'Dio Error: ${e.message}';
+        return 'Gagal terhubung jaringan internet';
       } else {
         return 'Error: ${e.message}';
       }

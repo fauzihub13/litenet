@@ -19,7 +19,8 @@ class QuotaCard extends ConsumerWidget {
         context.pushNamed(RouteName.detailProductPage, extra: {'id': quota.id});
       },
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: PaddingSize.horizontal),
+        width: 340,
+        // margin: const EdgeInsets.symmetric(horizontal: PaddingSize.horizontal),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
