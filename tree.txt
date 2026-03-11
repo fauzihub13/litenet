@@ -1,5 +1,5 @@
 STRUKTUR ARSITEKTUR PROYEK LITENET (CLEAN ARCHITECTURE)
-Generated on: 2026-03-11 10:38:07.651216
+Generated on: 2026-03-11 11:52:25.015362
 ==========================================================
 
 ├── clean_architecture_guide.txt
@@ -22,8 +22,7 @@ Generated on: 2026-03-11 10:38:07.651216
 │   ├── provider
 │   │   ├── dio_provider.dart
 │   │   ├── shared_preference_provider.dart
-│   │   ├── token_manager_provider.dart
-│   │   └── user_manager_provider.dart
+│   │   └── token_manager_provider.dart
 │   └── widgets
 │       ├── button.dart
 │       ├── custom_appbar.dart
@@ -33,8 +32,6 @@ Generated on: 2026-03-11 10:38:07.651216
 │       ├── custom_snackbar.dart
 │       ├── empty_state.dart
 │       ├── form_input.dart
-│       ├── promo_card.dart
-│       ├── quota_card.dart
 │       └── row_title.dart
 ├── features
 │   ├── auth
@@ -86,7 +83,8 @@ Generated on: 2026-03-11 10:38:07.651216
 │   │       │   ├── info.txt
 │   │       │   ├── login_provider.dart
 │   │       │   ├── otp_provider.dart
-│   │       │   └── register_provider.dart
+│   │       │   ├── register_provider.dart
+│   │       │   └── user_manager_provider.dart
 │   │       ├── info.txt
 │   │       ├── views
 │   │       │   ├── info.txt
@@ -146,8 +144,8 @@ Generated on: 2026-03-11 10:38:07.651216
 │   │       ├── info.txt
 │   │       ├── views
 │   │       │   ├── add_new_device_page.dart
+│   │       │   ├── backup.txt
 │   │       │   ├── coordinate_device_page.dart
-│   │       │   ├── coordinate_device_page_backup.dart
 │   │       │   ├── detail_device_page.dart
 │   │       │   ├── device_list_page.dart
 │   │       │   ├── info.txt
@@ -316,7 +314,8 @@ Generated on: 2026-03-11 10:38:07.651216
 │   │       │   └── promo_page.txt
 │   │       └── widgets
 │   │           ├── info.txt
-│   │           └── modal_promo.dart
+│   │           ├── modal_promo.dart
+│   │           └── promo_card.dart
 │   ├── quota
 │   │   ├── data
 │   │   │   ├── datasources
@@ -366,7 +365,8 @@ Generated on: 2026-03-11 10:38:07.651216
 │   │       │   ├── info.txt
 │   │       │   └── quota_page.dart
 │   │       └── widgets
-│   │           └── info.txt
+│   │           ├── info.txt
+│   │           └── quota_card.dart
 │   ├── setting
 │   │   ├── data
 │   │   │   ├── datasources

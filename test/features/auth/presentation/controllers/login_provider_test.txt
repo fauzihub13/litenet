@@ -1,0 +1,104 @@
+import 'package:dartz/dartz.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:litenet/core/errors/failure.dart';
+import 'package:litenet/core/provider/token_manager_provider.dart';
+import 'package:litenet/features/auth/data/di/usecase_provider.dart';
+import 'package:litenet/features/auth/domain/entities/login.dart';
+import 'package:litenet/features/auth/domain/usecases/login_usecase.dart';
+import 'package:litenet/features/auth/presentation/controllers/login_provider.dart';
+import 'package:litenet/features/auth/presentation/controllers/user_manager_provider.dart';
+import 'package:mocktail/mocktail.dart';
+
+class MockLoginUsecase extends Mock implements LoginUsecase {}
+
+class MockTokenManager extends Mock {
+  Future<void> saveToken(String token) async {}
+}
+
+class MockUserManager extends Mock {
+  Future<void> saveUser(dynamic user) async {}
+}
+
+void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  late MockLoginUsecase mockLoginUsecase;
+  late ProviderContainer container;
+  late MockTokenManager mockTokenManager;
+  late MockUserManager mockUserManager;
+
+  setUp(() {
+    mockLoginUsecase = MockLoginUsecase();
+    mockTokenManager = MockTokenManager();
+    mockUserManager = MockUserManager();
+    when(() => mockTokenManager.saveToken(any())).thenAnswer((_) async {});
+    when(() => mockUserManager.saveUser(any())).thenAnswer((_) async {});
+    container = ProviderContainer(
+      overrides: [
+        loginUsecaseProvider.overrideWithValue(mockLoginUsecase),
+        tokenManagerProvider.overrideWith((_) => mockTokenManager),
+        userManagerProvider.overrideWith((_) => mockUserManager),
+      ],
+    );
+  });
+
+  test('should emit loading and then data on success', () async {
+    final tLoginResponse = LoginResponse(
+      success: true,
+      message: 'ok',
+      data: LoginDataEntity(
+        user: User(
+          id: '1',
+          name: 'Test',
+          avatar: '',
+          email: 'a',
+          phoneNumber: '',
+          role: '',
+          emailOtp: '',
+          emailOtpExpiredAt: DateTime.now(),
+          emailVerifiedAt: DateTime.now(),
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          deletedAt: DateTime.now(),
+        ),
+        isVerified: true,
+        token: 'token',
+      ),
+    );
+    when(
+      () => mockLoginUsecase(email: 'a', password: 'b'),
+    ).thenAnswer((_) async => Right(tLoginResponse));
+
+    final notifier = container.read(loginProvider.notifier);
+
+    final future = notifier.login(email: 'a', password: 'b');
+    expect(container.read(loginProvider), isA<AsyncLoading>());
+    await future;
+    // polling state sampai bukan loading
+    LoginResponse? value;
+    for (var i = 0; i < 10; i++) {
+      final state = container.read(loginProvider);
+      if (!state.isLoading) {
+        value = state.value;
+        break;
+      }
+      await Future.delayed(const Duration(milliseconds: 10));
+    }
+    expect(value, isNotNull);
+    expect(value, tLoginResponse);
+  });
+
+  test('should emit loading and then error on failure', () async {
+    when(
+      () => mockLoginUsecase(email: 'a', password: 'b'),
+    ).thenAnswer((_) async => Left(Failure(message: 'error')));
+
+    final notifier = container.read(loginProvider.notifier);
+
+    final future = notifier.login(email: 'a', password: 'b');
+    expect(container.read(loginProvider), isA<AsyncLoading>());
+    await future;
+    expect(container.read(loginProvider).hasError, true);
+  });
+}
