@@ -2,8 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:litenet/core/helper/user_agent_helper.dart';
+import 'package:litenet/core/provider/shared_preference_provider.dart';
 import 'package:litenet/core/provider/token_manager_provider.dart';
-import 'package:litenet/core/provider/user_manager_provider.dart';
 import 'package:litenet/routes/app_router.dart';
 import 'package:litenet/routes/route_name.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
@@ -30,7 +30,7 @@ Dio dio(Ref ref) {
       onRequest: (options, handler) async {
         try {
           final tokenManager = await ref.read(tokenManagerProvider.future);
-          final authToken =  tokenManager.getToken();
+          final authToken = tokenManager.getToken();
           options.headers['Authorization'] = 'Bearer $authToken';
 
           // Get the User-Agent
@@ -46,11 +46,11 @@ Dio dio(Ref ref) {
         if (error.response?.statusCode == 401) {
           try {
             final tokenManager = await ref.read(tokenManagerProvider.future);
-            final userManager = await ref.read(userManagerProvider.future);
+            final prefs = await ref.read(sharedPreferenceProvider.future);
 
-            if ( userManager.hasUser()) {
+            if (prefs.containsKey('user')) {
               await tokenManager.removeToken();
-              await userManager.removeUser();
+              await prefs.remove('user');
 
               ref
                   .read(appRouterProvider)

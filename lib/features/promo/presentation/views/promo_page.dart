@@ -5,7 +5,7 @@ import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/custom_search_bar.dart';
 import 'package:litenet/core/widgets/empty_state.dart';
-import 'package:litenet/core/widgets/promo_card.dart';
+import 'package:litenet/features/promo/presentation/widgets/promo_card.dart';
 import 'package:litenet/features/promo/domain/entities/promo.dart';
 import 'package:litenet/features/promo/presentation/controllers/get_promo_provider.dart';
 import 'package:litenet/features/promo/presentation/widgets/modal_promo.dart';

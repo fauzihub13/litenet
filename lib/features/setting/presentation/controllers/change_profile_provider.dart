@@ -1,4 +1,4 @@
-import 'package:litenet/core/provider/user_manager_provider.dart';
+import 'package:litenet/features/auth/presentation/controllers/user_manager_provider.dart';
 import 'package:litenet/features/setting/data/di/usecase_provider.dart';
 import 'package:litenet/features/setting/domain/entities/profile.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

@@ -1,0 +1,466 @@
+STRUKTUR ARSITEKTUR PROYEK LITENET (CLEAN ARCHITECTURE)
+Generated on: 2026-03-11 10:38:07.651216
+==========================================================
+
+├── clean_architecture_guide.txt
+├── clean_architecture_info.txt
+├── core
+│   ├── constants
+│   │   ├── enum.dart
+│   │   ├── theme.dart
+│   │   └── variable.dart
+│   ├── errors
+│   │   ├── dio_error.dart
+│   │   └── failure.dart
+│   ├── extensions
+│   │   ├── datetime_context.ext.dart
+│   │   ├── num_context.ext.dart
+│   │   └── string_context.ext.dart
+│   ├── helper
+│   │   ├── permission.dart
+│   │   └── user_agent_helper.dart
+│   ├── provider
+│   │   ├── dio_provider.dart
+│   │   ├── shared_preference_provider.dart
+│   │   ├── token_manager_provider.dart
+│   │   └── user_manager_provider.dart
+│   └── widgets
+│       ├── button.dart
+│       ├── custom_appbar.dart
+│       ├── custom_badge.dart
+│       ├── custom_modal.dart
+│       ├── custom_search_bar.dart
+│       ├── custom_snackbar.dart
+│       ├── empty_state.dart
+│       ├── form_input.dart
+│       ├── promo_card.dart
+│       ├── quota_card.dart
+│       └── row_title.dart
+├── features
+│   ├── auth
+│   │   ├── data
+│   │   │   ├── datasources
+│   │   │   │   ├── auth_datasource.dart
+│   │   │   │   └── info.txt
+│   │   │   ├── di
+│   │   │   │   ├── datasource_provider.dart
+│   │   │   │   ├── repository_provider.dart
+│   │   │   │   └── usecase_provider.dart
+│   │   │   ├── info.txt
+│   │   │   ├── mappers
+│   │   │   │   ├── login_mapper.dart
+│   │   │   │   ├── otp_mapper.dart
+│   │   │   │   ├── register_mapper.dart
+│   │   │   │   └── summary_mapper.dart
+│   │   │   ├── models
+│   │   │   │   ├── info.txt
+│   │   │   │   ├── login_model.dart
+│   │   │   │   ├── otp_model.dart
+│   │   │   │   ├── register_model.dart
+│   │   │   │   └── summary_model.dart
+│   │   │   └── repositories
+│   │   │       ├── auth_repository_impl.dart
+│   │   │       └── info.txt
+│   │   ├── domain
+│   │   │   ├── entities
+│   │   │   │   ├── info.txt
+│   │   │   │   ├── login.dart
+│   │   │   │   ├── otp.dart
+│   │   │   │   ├── register.dart
+│   │   │   │   └── summary.dart
+│   │   │   ├── info.txt
+│   │   │   ├── repositories
+│   │   │   │   ├── auth_repository.dart
+│   │   │   │   └── info.txt
+│   │   │   └── usecases
+│   │   │       ├── get_summary_usecase.dart
+│   │   │       ├── info.txt
+│   │   │       ├── login_usecase.dart
+│   │   │       ├── register_usecase.dart
+│   │   │       ├── resend_otp_usecase.dart
+│   │   │       └── verify_otp_usecase.dart
+│   │   └── presentation
+│   │       ├── controllers
+│   │       │   ├── bakcup.txt
+│   │       │   ├── get_summary_provider.dart
+│   │       │   ├── info.txt
+│   │       │   ├── login_provider.dart
+│   │       │   ├── otp_provider.dart
+│   │       │   └── register_provider.dart
+│   │       ├── info.txt
+│   │       ├── views
+│   │       │   ├── info.txt
+│   │       │   ├── login_page.dart
+│   │       │   ├── otp_page.dart
+│   │       │   └── register_page.dart
+│   │       └── widgets
+│   │           └── info.txt
+│   ├── device
+│   │   ├── data
+│   │   │   ├── datasources
+│   │   │   │   ├── device_datasource.dart
+│   │   │   │   └── info.txt
+│   │   │   ├── di
+│   │   │   │   ├── datasource_provider.dart
+│   │   │   │   ├── repository_provider.dart
+│   │   │   │   └── usecase_provider.dart
+│   │   │   ├── info.txt
+│   │   │   ├── mappers
+│   │   │   │   ├── claim_device_mapper.dart
+│   │   │   │   ├── detail_device_mapper.dart
+│   │   │   │   ├── device_mapper.dart
+│   │   │   │   └── topup_history_device_mapper.dart
+│   │   │   ├── models
+│   │   │   │   ├── claim_device_model.dart
+│   │   │   │   ├── detail_device_model.dart
+│   │   │   │   ├── device_model.dart
+│   │   │   │   ├── info.txt
+│   │   │   │   └── topup_history_device_model.dart
+│   │   │   └── repositories
+│   │   │       ├── device_repository_impl.dart
+│   │   │       └── info.txt
+│   │   ├── domain
+│   │   │   ├── entities
+│   │   │   │   ├── claim_device.dart
+│   │   │   │   ├── detail_device.dart
+│   │   │   │   ├── device.dart
+│   │   │   │   ├── info.txt
+│   │   │   │   └── topup_history_device.dart
+│   │   │   ├── info.txt
+│   │   │   ├── repositories
+│   │   │   │   ├── device_repository.dart
+│   │   │   │   └── info.txt
+│   │   │   └── usecases
+│   │   │       ├── claim_device_usecase.dart
+│   │   │       ├── get_all_device_usecase.dart
+│   │   │       ├── get_detail_device_usecase.dart
+│   │   │       ├── get_topup_hisotry_device_usecase.dart
+│   │   │       └── info.txt
+│   │   └── presentation
+│   │       ├── controllers
+│   │       │   ├── claim_device_provider.dart
+│   │       │   ├── get_all_device_provider.dart
+│   │       │   ├── get_detail_device_provider.dart
+│   │       │   ├── get_topup_history_device_provider.dart
+│   │       │   └── info.txt
+│   │       ├── info.txt
+│   │       ├── views
+│   │       │   ├── add_new_device_page.dart
+│   │       │   ├── coordinate_device_page.dart
+│   │       │   ├── coordinate_device_page_backup.dart
+│   │       │   ├── detail_device_page.dart
+│   │       │   ├── device_list_page.dart
+│   │       │   ├── info.txt
+│   │       │   └── topup_history_device_page.dart
+│   │       └── widgets
+│   │           ├── device_card.dart
+│   │           ├── info.txt
+│   │           └── topup_history_device_card.dart
+│   ├── home
+│   │   ├── data
+│   │   │   ├── datasources
+│   │   │   │   └── info.txt
+│   │   │   ├── info.txt
+│   │   │   ├── models
+│   │   │   │   └── info.txt
+│   │   │   └── repositories
+│   │   │       └── info.txt
+│   │   ├── domain
+│   │   │   ├── entities
+│   │   │   │   └── info.txt
+│   │   │   ├── info.txt
+│   │   │   ├── repositories
+│   │   │   │   └── info.txt
+│   │   │   └── usecases
+│   │   │       └── info.txt
+│   │   └── presentation
+│   │       ├── controllers
+│   │       │   └── info.txt
+│   │       ├── info.txt
+│   │       ├── views
+│   │       │   ├── home_page.dart
+│   │       │   ├── info.txt
+│   │       │   └── main_page.dart
+│   │       └── widgets
+│   │           ├── bottom_navbar.dart
+│   │           └── info.txt
+│   ├── onboarding
+│   │   ├── data
+│   │   │   ├── datasources
+│   │   │   │   └── info.txt
+│   │   │   ├── info.txt
+│   │   │   ├── models
+│   │   │   │   └── info.txt
+│   │   │   └── repositories
+│   │   │       └── info.txt
+│   │   ├── domain
+│   │   │   ├── entities
+│   │   │   │   └── info.txt
+│   │   │   ├── info.txt
+│   │   │   ├── repositories
+│   │   │   │   └── info.txt
+│   │   │   └── usecases
+│   │   │       └── info.txt
+│   │   └── presentation
+│   │       ├── controllers
+│   │       │   ├── info.txt
+│   │       │   └── onboarding_provider.dart
+│   │       ├── info.txt
+│   │       ├── views
+│   │       │   ├── info.txt
+│   │       │   └── onboarding_page.dart
+│   │       └── widgets
+│   │           └── info.txt
+│   ├── order
+│   │   ├── data
+│   │   │   ├── datasources
+│   │   │   │   ├── info.txt
+│   │   │   │   └── transaction_datasource.dart
+│   │   │   ├── di
+│   │   │   │   ├── datasource_provider.dart
+│   │   │   │   ├── repository_provider.dart
+│   │   │   │   └── usecase_provider.dart
+│   │   │   ├── info.txt
+│   │   │   ├── mappers
+│   │   │   │   ├── check_payment_status_mapper.dart
+│   │   │   │   ├── create_transaction_mapper.dart
+│   │   │   │   ├── detail_transaction_mapper.dart
+│   │   │   │   ├── payment_method_mapper.dart
+│   │   │   │   └── transaction_mapper.dart
+│   │   │   ├── models
+│   │   │   │   ├── check_payment_status_model.dart
+│   │   │   │   ├── create_transaction_model.dart
+│   │   │   │   ├── detail_transaction_model.dart
+│   │   │   │   ├── info.txt
+│   │   │   │   ├── payment_method_model.dart
+│   │   │   │   └── transaction_model.dart
+│   │   │   └── repositories
+│   │   │       ├── info.txt
+│   │   │       └── transaction_repository_impl.dart
+│   │   ├── domain
+│   │   │   ├── entities
+│   │   │   │   ├── check_payment_status.dart
+│   │   │   │   ├── create_transaction.dart
+│   │   │   │   ├── detail_transaction.dart
+│   │   │   │   ├── info.txt
+│   │   │   │   ├── payment_method.dart
+│   │   │   │   └── transaction.dart
+│   │   │   ├── info.txt
+│   │   │   ├── repositories
+│   │   │   │   ├── info.txt
+│   │   │   │   └── transaction_repository.dart
+│   │   │   └── usecases
+│   │   │       ├── check_payment_status_usecase.dart
+│   │   │       ├── create_transaction_usecase.dart
+│   │   │       ├── download_invoice_usecase.dart
+│   │   │       ├── get_all_payment_method_usecase.dart
+│   │   │       ├── get_all_transaction_method_usecase.dart
+│   │   │       ├── get_detail_transaction_method_usecase.dart
+│   │   │       └── info.txt
+│   │   └── presentation
+│   │       ├── controllers
+│   │       │   ├── check_payment_status_provider.dart
+│   │       │   ├── create_transaction_provider.dart
+│   │       │   ├── download_invoice_provider.dart
+│   │       │   ├── get_all_payment_method_provider.dart
+│   │       │   ├── get_all_transaction_provider.dart
+│   │       │   ├── get_detail_transaction_provider.dart
+│   │       │   └── info.txt
+│   │       ├── info.txt
+│   │       ├── views
+│   │       │   ├── detail_order_history_page.dart
+│   │       │   ├── info.txt
+│   │       │   ├── order_history_page.dart
+│   │       │   ├── payment_method.page.dart
+│   │       │   └── payment_order_page.dart
+│   │       └── widgets
+│   │           ├── info.txt
+│   │           └── order_history_card.dart
+│   ├── promo
+│   │   ├── data
+│   │   │   ├── datasources
+│   │   │   │   ├── info.txt
+│   │   │   │   └── promo_datasource.dart
+│   │   │   ├── di
+│   │   │   │   ├── datasource_provider.dart
+│   │   │   │   ├── repository_provider.dart
+│   │   │   │   └── usecase_provider.dart
+│   │   │   ├── info.txt
+│   │   │   ├── mappers
+│   │   │   │   └── promo_mapper.dart
+│   │   │   ├── models
+│   │   │   │   ├── info.txt
+│   │   │   │   └── promo_model.dart
+│   │   │   └── repositories
+│   │   │       ├── info.txt
+│   │   │       └── promo_repository_impl.dart
+│   │   ├── domain
+│   │   │   ├── entities
+│   │   │   │   ├── info.txt
+│   │   │   │   └── promo.dart
+│   │   │   ├── info.txt
+│   │   │   ├── repositories
+│   │   │   │   ├── info.txt
+│   │   │   │   └── promo_repository.dart
+│   │   │   └── usecases
+│   │   │       ├── get_promo_usecase.dart
+│   │   │       └── info.txt
+│   │   └── presentation
+│   │       ├── controllers
+│   │       │   ├── get_promo_provider.dart
+│   │       │   └── info.txt
+│   │       ├── info.txt
+│   │       ├── views
+│   │       │   ├── info.txt
+│   │       │   ├── promo_page.dart
+│   │       │   └── promo_page.txt
+│   │       └── widgets
+│   │           ├── info.txt
+│   │           └── modal_promo.dart
+│   ├── quota
+│   │   ├── data
+│   │   │   ├── datasources
+│   │   │   │   ├── info.txt
+│   │   │   │   └── quota_datasource.dart
+│   │   │   ├── di
+│   │   │   │   ├── datasource_provider.dart
+│   │   │   │   ├── repository_provider.dart
+│   │   │   │   └── usecase_provider.dart
+│   │   │   ├── info.txt
+│   │   │   ├── mappers
+│   │   │   │   ├── check_promo_mapper.dart
+│   │   │   │   ├── detail_quota_mapper.dart
+│   │   │   │   └── quota_mapper.dart
+│   │   │   ├── models
+│   │   │   │   ├── check_promo_model.dart
+│   │   │   │   ├── detail_quota_model.dart
+│   │   │   │   ├── info.txt
+│   │   │   │   └── quota_model.dart
+│   │   │   └── repositories
+│   │   │       ├── info.txt
+│   │   │       └── quota_repository_impl.dart
+│   │   ├── domain
+│   │   │   ├── entities
+│   │   │   │   ├── check_promo.dart
+│   │   │   │   ├── detail_quota.dart
+│   │   │   │   ├── info.txt
+│   │   │   │   └── quota.dart
+│   │   │   ├── info.txt
+│   │   │   ├── repositories
+│   │   │   │   ├── info.txt
+│   │   │   │   └── quota_repository.dart
+│   │   │   └── usecases
+│   │   │       ├── check_promo_usecase.dart
+│   │   │       ├── get_all_quota_usecase.dart
+│   │   │       ├── get_detail_quota_usecase.dart
+│   │   │       └── info.txt
+│   │   └── presentation
+│   │       ├── controllers
+│   │       │   ├── check_promo_provider.dart
+│   │       │   ├── get_all_quota_provider.dart
+│   │       │   ├── get_detail_quota_provider.dart
+│   │       │   └── info.txt
+│   │       ├── info.txt
+│   │       ├── views
+│   │       │   ├── detail_quota_page.dart
+│   │       │   ├── info.txt
+│   │       │   └── quota_page.dart
+│   │       └── widgets
+│   │           └── info.txt
+│   ├── setting
+│   │   ├── data
+│   │   │   ├── datasources
+│   │   │   │   ├── info.txt
+│   │   │   │   └── setting_datasource.dart
+│   │   │   ├── di
+│   │   │   │   ├── datasource_provider.dart
+│   │   │   │   ├── repository_provider.dart
+│   │   │   │   └── usecase_provider.dart
+│   │   │   ├── info.txt
+│   │   │   ├── mappers
+│   │   │   │   ├── change_password_mapper.dart
+│   │   │   │   ├── faq_mapper.dart
+│   │   │   │   ├── logout_mapper.dart
+│   │   │   │   ├── privacy_and_policy_mapper.dart
+│   │   │   │   └── profile_mapper.dart
+│   │   │   ├── models
+│   │   │   │   ├── change_password_model.dart
+│   │   │   │   ├── faq_model.dart
+│   │   │   │   ├── info.txt
+│   │   │   │   ├── logout_model.dart
+│   │   │   │   ├── privacy_and_policy_model.dart
+│   │   │   │   └── profile_model.dart
+│   │   │   └── repositories
+│   │   │       ├── info.txt
+│   │   │       └── setting_repository_impl.dart
+│   │   ├── domain
+│   │   │   ├── entities
+│   │   │   │   ├── change_password.dart
+│   │   │   │   ├── faq.dart
+│   │   │   │   ├── info.txt
+│   │   │   │   ├── logout.dart
+│   │   │   │   ├── privacy_and_policy.dart
+│   │   │   │   └── profile.dart
+│   │   │   ├── info.txt
+│   │   │   ├── repositories
+│   │   │   │   ├── info.txt
+│   │   │   │   └── setting_repository.dart
+│   │   │   └── usecases
+│   │   │       ├── change_password_provider.dart
+│   │   │       ├── change_profile_provider.dart
+│   │   │       ├── get_faq_provider.dart
+│   │   │       ├── get_privacy_and_policy_provider.dart
+│   │   │       ├── get_profile_provider.dart
+│   │   │       ├── info.txt
+│   │   │       └── logout_provider.dart
+│   │   └── presentation
+│   │       ├── controllers
+│   │       │   ├── change_password_provider.dart
+│   │       │   ├── change_profile_provider.dart
+│   │       │   ├── get_faq_provider.dart
+│   │       │   ├── get_privacy_and_policy_provider.dart
+│   │       │   ├── get_profile_provider.dart
+│   │       │   ├── info.txt
+│   │       │   └── logout_provider.dart
+│   │       ├── info.txt
+│   │       ├── views
+│   │       │   ├── change_password_page.dart
+│   │       │   ├── change_profile_page.dart
+│   │       │   ├── faq_page.dart
+│   │       │   ├── info.txt
+│   │       │   ├── setting_page.dart
+│   │       │   └── terms_and_conditions_page.dart
+│   │       └── widgets
+│   │           └── info.txt
+│   └── template
+│       ├── data
+│       │   ├── datasources
+│       │   │   └── info.txt
+│       │   ├── info.txt
+│       │   ├── models
+│       │   │   └── info.txt
+│       │   └── repositories
+│       │       └── info.txt
+│       ├── domain
+│       │   ├── entities
+│       │   │   └── info.txt
+│       │   ├── info.txt
+│       │   ├── repositories
+│       │   │   └── info.txt
+│       │   └── usecases
+│       │       └── info.txt
+│       └── presentation
+│           ├── controllers
+│           │   └── info.txt
+│           ├── info.txt
+│           ├── views
+│           │   └── info.txt
+│           └── widgets
+│               └── info.txt
+├── gen
+│   ├── assets.gen.dart
+│   └── fonts.gen.dart
+├── main.dart
+└── routes
+    ├── app_router.dart
+    └── route_name.dart

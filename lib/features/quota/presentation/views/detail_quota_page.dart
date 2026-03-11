@@ -86,6 +86,9 @@ class _DetailQuotaPageState extends ConsumerState<DetailQuotaPage>
                 data: (data) {
                   final quota = data.data;
                   return SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: ClampingScrollPhysics(),
+                    ),
                     // padding: const EdgeInsets.all(PaddingSize.horizontal),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

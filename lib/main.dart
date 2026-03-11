@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/constants/variable.dart';
-import 'package:litenet/core/provider/user_manager_provider.dart';
+import 'package:litenet/features/auth/presentation/controllers/user_manager_provider.dart';
 import 'package:litenet/features/onboarding/presentation/controllers/onboarding_provider.dart';
 import 'package:litenet/routes/app_router.dart';
 

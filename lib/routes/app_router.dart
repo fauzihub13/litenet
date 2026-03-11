@@ -1,5 +1,5 @@
 import 'package:go_router/go_router.dart';
-import 'package:litenet/core/provider/user_manager_provider.dart';
+import 'package:litenet/features/auth/presentation/controllers/user_manager_provider.dart';
 import 'package:litenet/features/auth/presentation/views/login_page.dart';
 import 'package:litenet/features/auth/presentation/views/otp_page.dart';
 import 'package:litenet/features/auth/presentation/views/register_page.dart';

@@ -6,7 +6,7 @@ import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/custom_search_bar.dart';
 import 'package:litenet/core/widgets/empty_state.dart';
-import 'package:litenet/core/widgets/quota_card.dart';
+import 'package:litenet/features/quota/presentation/widgets/quota_card.dart';
 import 'package:litenet/features/quota/domain/entities/quota.dart';
 import 'package:litenet/features/quota/presentation/controllers/get_all_quota_provider.dart';
 
