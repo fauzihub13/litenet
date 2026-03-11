@@ -8,7 +8,7 @@ class LocationHelper {
     var status = await Permission.location.request();
     // print(status.toString());
     if (status.isGranted) {
-      print("✅ Izin lokasi diberikan");
+      // print("✅ Izin lokasi diberikan");
       Position position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
@@ -17,7 +17,7 @@ class LocationHelper {
       );
       return LatLng(position.latitude, position.longitude);
     } else if (status.isDenied) {
-      print("⚠️ Izin lokasi ditolak");
+      // print("⚠️ Izin lokasi ditolak");
     } else if (status.isPermanentlyDenied) {
       openAppSettings();
     }

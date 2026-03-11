@@ -7,6 +7,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
+import 'package:litenet/core/widgets/custom_snackbar.dart';
 import 'package:litenet/core/widgets/form_input.dart';
 
 class CoordinateDevicePage extends StatefulWidget {
@@ -45,7 +46,6 @@ class _CoordinateDevicePageState extends State<CoordinateDevicePage> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        print(data);
         if (data.isNotEmpty) {
           final lat = double.parse(data[0]['lat']);
           final lon = double.parse(data[0]['lon']);
@@ -59,13 +59,13 @@ class _CoordinateDevicePageState extends State<CoordinateDevicePage> {
           // Gerakkan kamera peta ke lokasi baru
           _mapController.move(newPos, 15.0);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Lokasi tidak ditemukan")),
-          );
+          if (mounted) {
+            context.showError("Lokasi tidak ditemukan");
+          }
         }
       }
     } catch (e) {
-      print("⚠️ Error search: $e");
+      // print("⚠️ Error search: $e");
     } finally {
       setState(() => _isSearching = false);
     }

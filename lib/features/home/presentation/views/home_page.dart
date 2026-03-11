@@ -35,7 +35,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   Future<void> _loadLocation() async {
     final latLng = await LocationHelper.initLocation();
     if (latLng != null) {
-      print("✅ LatLng: $latLng");
+      // print("✅ LatLng: $latLng");
     } else {
       if (mounted) context.showError("Izin lokasi ditolak");
     }
