@@ -27,7 +27,10 @@ class SettingPage extends ConsumerWidget {
       );
 
       if (!await launchUrl(emailLaunchUri)) {
-        throw Exception('Tidak bisa membuka aplikasi Email');
+        if (context.mounted) {
+          context.showError('Tidak bisa membuka aplikasi Email');
+        }
+
       }
     }
 
@@ -42,7 +45,7 @@ class SettingPage extends ConsumerWidget {
       );
 
       if (!await launchUrl(waUrl, mode: LaunchMode.externalApplication)) {
-        throw Exception('Tidak bisa membuka WhatsApp');
+        if (context.mounted) context.showError('Tidak bisa membuka WhatsApp');
       }
     }
 

@@ -1,0 +1,29 @@
+UAT LiteNet
+Fitur	Skenario	Langkah Uji	Data Uji	Hasil yang Diharapkan	Status (Pass/Fail)	Catatan
+Auth	Login berhasil	User memasukkan email & password valid	Email: user@litenet.com, Password: valid123	User masuk ke halaman utama		
+Auth	Login gagal (password salah)	User memasukkan email valid & password salah	Email: user@litenet.com, Password: salah	Muncul pesan error "Password salah"		
+Auth	Register akun baru	User mengisi form registrasi dengan data valid	Nama, Email, Password	User menerima OTP		
+Auth	Verifikasi OTP	User memasukkan OTP yang dikirim ke email	OTP: 123456	Akun terverifikasi, masuk ke aplikasi		
+Device	Lihat daftar device	User membuka menu device	-	Daftar device tampil		
+Device	Lihat detail device	User memilih salah satu device	-	Detail device tampil		
+Device	Claim device	User klik tombol "Claim Device" pada device yang tersedia	-	Device berhasil di-claim		
+Device	Lihat riwayat topup	User membuka riwayat topup device	-	Daftar riwayat topup tampil		
+Device	Tambah device baru	User klik "Add Device" dan mengisi form	Data device baru	Device muncul di daftar		
+Device	Koordinasi device	User klik "Coordinate Device"	-	Lokasi device tampil di peta		
+Home	Akses halaman utama	User login dan diarahkan ke home	-	Home tampil dengan info ringkas		
+Onboarding	Lihat onboarding	User pertama kali install dan buka aplikasi	-	Onboarding tampil		
+Order	Lihat riwayat order	User membuka menu order	-	Daftar order tampil		
+Order	Lihat detail order	User memilih salah satu order	-	Detail order tampil		
+Order	Pembayaran order	User memilih metode pembayaran dan menyelesaikan pembayaran	Metode pembayaran	Status order berubah menjadi "Lunas"		
+Order	Download invoice	User klik "Download Invoice" pada order	-	File invoice terunduh		
+Promo	Lihat daftar promo	User membuka menu promo	-	Daftar promo tampil		
+Promo	Lihat detail promo	User memilih salah satu promo	-	Detail promo tampil		
+Quota	Lihat daftar quota	User membuka menu quota	-	Daftar quota tampil		
+Quota	Lihat detail quota	User memilih salah satu quota	-	Detail quota tampil		
+Quota	Cek promo quota	User klik "Check Promo" pada quota	-	Status promo tampil		
+Setting	Lihat profil	User membuka menu profil	-	Data profil tampil		
+Setting	Ubah profil	User mengubah data profil dan simpan	Data baru	Profil berhasil diubah		
+Setting	Ubah password	User mengubah password lama ke baru	Password lama & baru	Password berhasil diubah		
+Setting	Lihat FAQ	User membuka menu FAQ	-	Daftar FAQ tampil		
+Setting	Lihat Privacy Policy	User membuka menu Privacy Policy	-	Halaman Privacy Policy tampil		
+Setting	Logout	User klik tombol logout	-	User keluar dari aplikasi		

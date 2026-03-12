@@ -1,0 +1,31 @@
+Blackbox Testing LiteNet
+Fitur	Test Case	Langkah Uji	Input	Expected Output	Status (Pass/Fail)	Catatan
+Auth	Login valid	Input email & password valid	user@litenet.com, valid123	Berhasil login		
+Auth	Login invalid	Input email valid & password salah	user@litenet.com, salah	Pesan error login		
+Auth	Register valid	Isi form registrasi valid	Data lengkap	OTP dikirim		
+Auth	Register invalid	Form tidak lengkap	Data kosong	Pesan error validasi		
+Auth	OTP benar	Input OTP benar	123456	Akun terverifikasi		
+Auth	OTP salah	Input OTP salah	654321	Pesan error OTP		
+Device	List device	Akses menu device	-	Daftar device tampil		
+Device	Detail device	Pilih device	-	Detail device tampil		
+Device	Claim device	Klik claim pada device	-	Device status berubah		
+Device	Topup history	Akses riwayat topup	-	Daftar topup tampil		
+Device	Add device	Tambah device baru	Data device	Device muncul		
+Device	Coordinate device	Akses koordinasi device	-	Lokasi device tampil		
+Home	Home tampil	Akses home setelah login	-	Home tampil		
+Onboarding	Onboarding tampil	Buka aplikasi pertama kali	-	Onboarding tampil		
+Order	Order list	Akses menu order	-	Daftar order tampil		
+Order	Order detail	Pilih order	-	Detail order tampil		
+Order	Order payment	Lakukan pembayaran	Data pembayaran	Status order lunas		
+Order	Download invoice	Klik download invoice	-	File invoice terunduh		
+Promo	Promo list	Akses menu promo	-	Daftar promo tampil		
+Promo	Promo detail	Pilih promo	-	Detail promo tampil		
+Quota	Quota list	Akses menu quota	-	Daftar quota tampil		
+Quota	Quota detail	Pilih quota	-	Detail quota tampil		
+Quota	Check promo	Klik check promo	-	Status promo tampil		
+Setting	Profile tampil	Akses menu profil	-	Profil tampil		
+Setting	Edit profile	Ubah data profil	Data baru	Profil berubah		
+Setting	Change password	Ubah password	Password lama & baru	Password berubah		
+Setting	FAQ tampil	Akses menu FAQ	-	FAQ tampil		
+Setting	Privacy Policy tampil	Akses menu Privacy Policy	-	Privacy Policy tampil		
+Setting	Logout	Klik logout	-	Logout sukses		
