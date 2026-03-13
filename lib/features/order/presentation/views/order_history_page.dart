@@ -18,7 +18,7 @@ class OrderHistoryPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncTransaction = ref.watch(getAllTransactionProvider);
     final selectedStatus = useState<String>('Semua');
-    final List<String> categories = ["Semua", "Selesai", "Diproses", "Gagal"];
+    final List<String> categories = ["Semua", "Selesai", "Menunggu", "Gagal"];
     final searchQuery = useState('');
 
     return Scaffold(
@@ -38,7 +38,7 @@ class OrderHistoryPage extends HookConsumerWidget {
                 statusMatch =
                     (currentStatus == 'settlement' ||
                     currentStatus == 'capture');
-              } else if (selectedStatus.value == 'Diproses') {
+              } else if (selectedStatus.value == 'Menunggu') {
                 statusMatch = (currentStatus == 'pending');
               } else if (selectedStatus.value == 'Gagal') {
                 statusMatch =

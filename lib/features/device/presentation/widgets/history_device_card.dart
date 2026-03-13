@@ -80,7 +80,7 @@ class HistoryDeviceCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        "Diubah pada ${history.updatedAt.toIndonesianDateString()}",
+                        "Diubah pada ${history.updatedAt.toIndonesianDateTimeStringPlus7()}",
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: DefaultColors.purple500,
                           fontSize: 10,

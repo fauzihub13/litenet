@@ -59,7 +59,7 @@ class PaymentOrderPage extends HookConsumerWidget {
             if (status == 'settlement' || status == 'capture') {
               // Hentikan timer SEGERA
               pollTimer.value?.cancel();
-              ref.invalidate(getDetailTransactionProvider(orderId: orderId ));
+              ref.invalidate(getDetailTransactionProvider(orderId: orderId));
 
               context.pushReplacementNamed(
                 RouteName.detailOrderHistoryPage,
@@ -341,8 +341,9 @@ class PaymentOrderPage extends HookConsumerWidget {
                 ),
                 Button(
                   text: "Kembali",
-
-                  onPressed: () async {},
+                  onPressed: () async {
+                    context.goNamed(RouteName.orderHistoryPage);
+                  },
                   backgroundColor: DefaultColors.purple50,
                   textColor: DefaultColors.purple500,
                 ),

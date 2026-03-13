@@ -30,7 +30,7 @@ class OrderHistoryCard extends StatelessWidget {
       case 'pending':
         statusBackgroundColor = DefaultColors.lightYellow;
         statusTextColor = DefaultColors.black;
-        statusText = "Diproses";
+        statusText = "Menunggu";
         break;
     }
 
