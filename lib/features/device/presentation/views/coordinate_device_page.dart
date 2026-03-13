@@ -18,12 +18,20 @@ class CoordinateDevicePage extends StatefulWidget {
   final String? redNodelink;
   final String? reqKitSerialNumber;
   final String? reqAddress;
+  final String? deviceId;
+  final double? latitude;
+  final double? longitude;
+  final bool isEdit;
   const CoordinateDevicePage({
-    super.key,
     this.reqName,
     this.redNodelink,
     this.reqKitSerialNumber,
     this.reqAddress,
+    this.deviceId,
+    this.latitude,
+    this.longitude,
+    this.isEdit = false,
+    super.key,
   });
 
   @override
@@ -95,7 +103,18 @@ class _CoordinateDevicePageState extends State<CoordinateDevicePage>
   Future<void> _loadLocation() async {
     final latLng = await LocationHelper.initLocation();
 
-    if (latLng != null) {
+    if (widget.isEdit) {
+      setState(() {
+        _currentLatLng = LatLng(widget.latitude!, widget.longitude!);
+        // Update juga controller koordinat jika ada
+        _coordinatController.text = "${widget.latitude}, ${widget.longitude}";
+      });
+
+      // Gunakan latLng langsung agar lebih instan dan aman
+      // _mapController.move(latLng, 15.0);
+      await Future.delayed(const Duration(milliseconds: 1000));
+      _animatedMapMove(LatLng(widget.latitude!, widget.longitude!), 15.0);
+    } else if (latLng != null) {
       setState(() {
         _currentLatLng = latLng;
         // Update juga controller koordinat jika ada
@@ -355,17 +374,32 @@ class _CoordinateDevicePageState extends State<CoordinateDevicePage>
                     text: "Simpan Lokasi",
                     onPressed: () {
                       if (_coordinatController.text.isNotEmpty) {
-                        context.pushNamed(
-                          RouteName.addNewDevicePage,
-                          extra: {
-                            'latitude': _currentLatLng!.latitude,
-                            'longitude': _currentLatLng!.longitude,
-                            'reqName': widget.reqName,
-                            'redNodelink': widget.redNodelink,
-                            'reqKitSerialNumber': widget.reqKitSerialNumber,
-                            'reqAddress': widget.reqAddress,
-                          },
-                        );
+                        if (widget.isEdit) {
+                          context.pushNamed(
+                            RouteName.editDevicePage,
+                            extra: {
+                              'latitude': _currentLatLng!.latitude,
+                              'longitude': _currentLatLng!.longitude,
+                              'reqName': widget.reqName,
+                              'redNodelink': widget.redNodelink,
+                              'reqKitSerialNumber': widget.reqKitSerialNumber,
+                              'reqAddress': widget.reqAddress,
+                              'deviceId': widget.deviceId,
+                            },
+                          );
+                        } else {
+                          context.pushNamed(
+                            RouteName.addNewDevicePage,
+                            extra: {
+                              'latitude': _currentLatLng!.latitude,
+                              'longitude': _currentLatLng!.longitude,
+                              'reqName': widget.reqName,
+                              'redNodelink': widget.redNodelink,
+                              'reqKitSerialNumber': widget.reqKitSerialNumber,
+                              'reqAddress': widget.reqAddress,
+                            },
+                          );
+                        }
                       }
                     },
                   ),

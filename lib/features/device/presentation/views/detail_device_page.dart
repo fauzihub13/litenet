@@ -57,15 +57,55 @@ class DetailDevicePage extends HookConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 16),
-                    CustomBadge(
-                      text: device.status.firstWordCapitalize(),
-                      backgroundColor: DefaultColors.purple500,
-                      textColor: DefaultColors.purple50,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      paddingHorizontal: 10,
-                      paddingVertical: 4,
-                      borderRadius: 10,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CustomBadge(
+                          text: device.status.firstWordCapitalize(),
+                          backgroundColor: DefaultColors.purple500,
+                          textColor: DefaultColors.purple50,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          paddingHorizontal: 10,
+                          paddingVertical: 4,
+                          borderRadius: 10,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            context.pushNamed(
+                              RouteName.historyDevicePage,
+                              extra: {'deviceId': deviceId},
+                            );
+                          },
+                          child: Wrap(
+                            spacing: 4,
+                            alignment: WrapAlignment.center,
+                            runAlignment: WrapAlignment.center,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Text(
+                                "Riwayat Perangkat",
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(
+                                      color: DefaultColors.purple500,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                              ),
+                              Transform.flip(
+                                flipX: true,
+                                child: SvgPicture.asset(
+                                  height: 16,
+                                  Assets.icons.arrowBack,
+                                  colorFilter: const ColorFilter.mode(
+                                    DefaultColors.purple500,
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 20),
                     Row(
@@ -145,6 +185,7 @@ class DetailDevicePage extends HookConsumerWidget {
                     Container(
                       width: double.infinity,
                       height: 200,
+                      margin: const EdgeInsets.only(bottom: 20),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
                         color: Colors.amber,
@@ -200,11 +241,32 @@ class DetailDevicePage extends HookConsumerWidget {
             horizontal: PaddingSize.horizontal,
             // vertical: 10,
           ),
-          child: Button(
-            text: "Beli Kuota",
-            onPressed: () {
-              context.pushNamed(RouteName.productPage);
-            },
+          child: Row(
+            spacing: 10,
+            children: [
+              Expanded(
+                child: Button(
+                  text: "Edit",
+                  textColor: DefaultColors.purple600,
+                  borderColor: Colors.transparent,
+                  backgroundColor: DefaultColors.purple50,
+                  onPressed: () {
+                    context.pushNamed(
+                      RouteName.editDevicePage,
+                      extra: {'deviceId': deviceId},
+                    );
+                  },
+                ),
+              ),
+              Expanded(
+                child: Button(
+                  text: "Beli Kuota",
+                  onPressed: () {
+                    context.pushNamed(RouteName.productPage);
+                  },
+                ),
+              ),
+            ],
           ),
         ),
       ),

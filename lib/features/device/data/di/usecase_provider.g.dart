@@ -201,3 +201,99 @@ final class GetTopupHistoryDeviceUsecaseProvider
 
 String _$getTopupHistoryDeviceUsecaseHash() =>
     r'0a912f44c60b191493ef1942cf2a1bb7992cdf94';
+
+@ProviderFor(updateDeviceUsecase)
+const updateDeviceUsecaseProvider = UpdateDeviceUsecaseProvider._();
+
+final class UpdateDeviceUsecaseProvider
+    extends
+        $FunctionalProvider<
+          UpdateDeviceUsecase,
+          UpdateDeviceUsecase,
+          UpdateDeviceUsecase
+        >
+    with $Provider<UpdateDeviceUsecase> {
+  const UpdateDeviceUsecaseProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'updateDeviceUsecaseProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$updateDeviceUsecaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<UpdateDeviceUsecase> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  UpdateDeviceUsecase create(Ref ref) {
+    return updateDeviceUsecase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(UpdateDeviceUsecase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<UpdateDeviceUsecase>(value),
+    );
+  }
+}
+
+String _$updateDeviceUsecaseHash() =>
+    r'6c96b6868d7bae729197ff04ceab8e37ad2d7f59';
+
+@ProviderFor(getHistoryDeviceUsecase)
+const getHistoryDeviceUsecaseProvider = GetHistoryDeviceUsecaseProvider._();
+
+final class GetHistoryDeviceUsecaseProvider
+    extends
+        $FunctionalProvider<
+          GetHistoryDeviceUsecase,
+          GetHistoryDeviceUsecase,
+          GetHistoryDeviceUsecase
+        >
+    with $Provider<GetHistoryDeviceUsecase> {
+  const GetHistoryDeviceUsecaseProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'getHistoryDeviceUsecaseProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$getHistoryDeviceUsecaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<GetHistoryDeviceUsecase> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  GetHistoryDeviceUsecase create(Ref ref) {
+    return getHistoryDeviceUsecase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(GetHistoryDeviceUsecase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<GetHistoryDeviceUsecase>(value),
+    );
+  }
+}
+
+String _$getHistoryDeviceUsecaseHash() =>
+    r'4bd34cc30ac4e4be12692e2b26bb3d64f6c51e25';

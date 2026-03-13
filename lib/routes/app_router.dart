@@ -7,6 +7,8 @@ import 'package:litenet/features/device/presentation/views/add_new_device_page.d
 import 'package:litenet/features/device/presentation/views/coordinate_device_page.dart';
 import 'package:litenet/features/device/presentation/views/detail_device_page.dart';
 import 'package:litenet/features/device/presentation/views/device_list_page.dart';
+import 'package:litenet/features/device/presentation/views/edit_device_page.dart';
+import 'package:litenet/features/device/presentation/views/history_device_page.dart';
 import 'package:litenet/features/device/presentation/views/topup_history_device_page.dart';
 import 'package:litenet/features/home/presentation/views/home_page.dart';
 import 'package:litenet/features/home/presentation/views/main_page.dart';
@@ -195,11 +197,19 @@ GoRouter appRouter(Ref ref) {
           final redNodelink = extras?['redNodelink'] as String?;
           final reqKitSerialNumber = extras?['reqKitSerialNumber'] as String?;
           final reqAddress = extras?['reqAddress'] as String?;
+          final deviceId = extras?['deviceId'] as String?;
+          final latitude = extras?['latitude'] as double?;
+          final longitude = extras?['longitude'] as double?;
+          final isEdit = extras?['isEdit'] as bool?;
           return CoordinateDevicePage(
             reqName: reqName,
             redNodelink: redNodelink,
             reqKitSerialNumber: reqKitSerialNumber,
             reqAddress: reqAddress,
+            deviceId:deviceId,
+            latitude: latitude,
+            longitude: longitude,
+            isEdit: isEdit ?? false,
           );
         },
       ),
@@ -211,6 +221,40 @@ GoRouter appRouter(Ref ref) {
           final extras = state.extra as Map<String, dynamic>?;
           final deviceId = extras?['deviceId'] as String?;
           return DetailDevicePage(deviceId: deviceId ?? '');
+        },
+      ),
+      
+      GoRoute(
+        path: "/${RouteName.historyDevicePage}",
+        name: RouteName.historyDevicePage,
+        builder: (context, state) {
+          final extras = state.extra as Map<String, dynamic>?;
+          final deviceId = extras?['deviceId'] as String?;
+          return HistoryDevicePage(deviceId: deviceId ?? '');
+        },
+      ),
+
+      GoRoute(
+        path: "/${RouteName.editDevicePage}",
+        name: RouteName.editDevicePage,
+        builder: (context, state) {
+          final extras = state.extra as Map<String, dynamic>?;
+          final deviceId = extras?['deviceId'] as String;
+          final latitude = extras?['latitude'] as double?;
+          final longitude = extras?['longitude'] as double?;
+          final reqName = extras?['reqName'] as String?;
+          final redNodelink = extras?['redNodelink'] as String?;
+          final reqKitSerialNumber = extras?['reqKitSerialNumber'] as String?;
+          final reqAddress = extras?['reqAddress'] as String?;
+          return EditDevicePage(
+            deviceId: deviceId,
+            latitude: latitude,
+            longitude: longitude,
+            reqName: reqName,
+            redNodelink: redNodelink,
+            reqKitSerialNumber: reqKitSerialNumber,
+            reqAddress: reqAddress,
+          );
         },
       ),
 
@@ -233,8 +277,6 @@ GoRouter appRouter(Ref ref) {
           return DetailOrderHistoryPage(orderId: orderId ?? '');
         },
       ),
-
-      
 
       // =====================
       // MAIN SHELL

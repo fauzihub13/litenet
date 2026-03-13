@@ -22,4 +22,6 @@ class RouteName {
   static const String monitoringPage = 'monitoring';
   static const String detailMonitoringPage = 'detail-monitoring';
   static const String topupHistoryDevicePage = 'top-up-history-device';
+  static const String editDevicePage = 'edit-device-page';
+  static const String historyDevicePage = 'history-device-page';
 }
