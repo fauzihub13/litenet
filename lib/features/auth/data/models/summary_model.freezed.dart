@@ -308,7 +308,7 @@ $SummaryDataModelCopyWith<$Res>? get data {
 /// @nodoc
 mixin _$SummaryDataModel {
 
- int? get totalDevice; String? get totalQuota; String? get totalUsage;
+ int? get totalDevice; int? get onlineDevice; int? get offlineDevice; int? get inactiveDevice;
 /// Create a copy of SummaryDataModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -321,16 +321,16 @@ $SummaryDataModelCopyWith<SummaryDataModel> get copyWith => _$SummaryDataModelCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SummaryDataModel&&(identical(other.totalDevice, totalDevice) || other.totalDevice == totalDevice)&&(identical(other.totalQuota, totalQuota) || other.totalQuota == totalQuota)&&(identical(other.totalUsage, totalUsage) || other.totalUsage == totalUsage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SummaryDataModel&&(identical(other.totalDevice, totalDevice) || other.totalDevice == totalDevice)&&(identical(other.onlineDevice, onlineDevice) || other.onlineDevice == onlineDevice)&&(identical(other.offlineDevice, offlineDevice) || other.offlineDevice == offlineDevice)&&(identical(other.inactiveDevice, inactiveDevice) || other.inactiveDevice == inactiveDevice));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,totalDevice,totalQuota,totalUsage);
+int get hashCode => Object.hash(runtimeType,totalDevice,onlineDevice,offlineDevice,inactiveDevice);
 
 @override
 String toString() {
-  return 'SummaryDataModel(totalDevice: $totalDevice, totalQuota: $totalQuota, totalUsage: $totalUsage)';
+  return 'SummaryDataModel(totalDevice: $totalDevice, onlineDevice: $onlineDevice, offlineDevice: $offlineDevice, inactiveDevice: $inactiveDevice)';
 }
 
 
@@ -341,7 +341,7 @@ abstract mixin class $SummaryDataModelCopyWith<$Res>  {
   factory $SummaryDataModelCopyWith(SummaryDataModel value, $Res Function(SummaryDataModel) _then) = _$SummaryDataModelCopyWithImpl;
 @useResult
 $Res call({
- int? totalDevice, String? totalQuota, String? totalUsage
+ int? totalDevice, int? onlineDevice, int? offlineDevice, int? inactiveDevice
 });
 
 
@@ -358,12 +358,13 @@ class _$SummaryDataModelCopyWithImpl<$Res>
 
 /// Create a copy of SummaryDataModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? totalDevice = freezed,Object? totalQuota = freezed,Object? totalUsage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? totalDevice = freezed,Object? onlineDevice = freezed,Object? offlineDevice = freezed,Object? inactiveDevice = freezed,}) {
   return _then(_self.copyWith(
 totalDevice: freezed == totalDevice ? _self.totalDevice : totalDevice // ignore: cast_nullable_to_non_nullable
-as int?,totalQuota: freezed == totalQuota ? _self.totalQuota : totalQuota // ignore: cast_nullable_to_non_nullable
-as String?,totalUsage: freezed == totalUsage ? _self.totalUsage : totalUsage // ignore: cast_nullable_to_non_nullable
-as String?,
+as int?,onlineDevice: freezed == onlineDevice ? _self.onlineDevice : onlineDevice // ignore: cast_nullable_to_non_nullable
+as int?,offlineDevice: freezed == offlineDevice ? _self.offlineDevice : offlineDevice // ignore: cast_nullable_to_non_nullable
+as int?,inactiveDevice: freezed == inactiveDevice ? _self.inactiveDevice : inactiveDevice // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
@@ -448,10 +449,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? totalDevice,  String? totalQuota,  String? totalUsage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? totalDevice,  int? onlineDevice,  int? offlineDevice,  int? inactiveDevice)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SummaryDataModel() when $default != null:
-return $default(_that.totalDevice,_that.totalQuota,_that.totalUsage);case _:
+return $default(_that.totalDevice,_that.onlineDevice,_that.offlineDevice,_that.inactiveDevice);case _:
   return orElse();
 
 }
@@ -469,10 +470,10 @@ return $default(_that.totalDevice,_that.totalQuota,_that.totalUsage);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? totalDevice,  String? totalQuota,  String? totalUsage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? totalDevice,  int? onlineDevice,  int? offlineDevice,  int? inactiveDevice)  $default,) {final _that = this;
 switch (_that) {
 case _SummaryDataModel():
-return $default(_that.totalDevice,_that.totalQuota,_that.totalUsage);case _:
+return $default(_that.totalDevice,_that.onlineDevice,_that.offlineDevice,_that.inactiveDevice);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -489,10 +490,10 @@ return $default(_that.totalDevice,_that.totalQuota,_that.totalUsage);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? totalDevice,  String? totalQuota,  String? totalUsage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? totalDevice,  int? onlineDevice,  int? offlineDevice,  int? inactiveDevice)?  $default,) {final _that = this;
 switch (_that) {
 case _SummaryDataModel() when $default != null:
-return $default(_that.totalDevice,_that.totalQuota,_that.totalUsage);case _:
+return $default(_that.totalDevice,_that.onlineDevice,_that.offlineDevice,_that.inactiveDevice);case _:
   return null;
 
 }
@@ -504,12 +505,13 @@ return $default(_that.totalDevice,_that.totalQuota,_that.totalUsage);case _:
 @JsonSerializable()
 
 class _SummaryDataModel implements SummaryDataModel {
-  const _SummaryDataModel({this.totalDevice, this.totalQuota, this.totalUsage});
+  const _SummaryDataModel({this.totalDevice, this.onlineDevice, this.offlineDevice, this.inactiveDevice});
   factory _SummaryDataModel.fromJson(Map<String, dynamic> json) => _$SummaryDataModelFromJson(json);
 
 @override final  int? totalDevice;
-@override final  String? totalQuota;
-@override final  String? totalUsage;
+@override final  int? onlineDevice;
+@override final  int? offlineDevice;
+@override final  int? inactiveDevice;
 
 /// Create a copy of SummaryDataModel
 /// with the given fields replaced by the non-null parameter values.
@@ -524,16 +526,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SummaryDataModel&&(identical(other.totalDevice, totalDevice) || other.totalDevice == totalDevice)&&(identical(other.totalQuota, totalQuota) || other.totalQuota == totalQuota)&&(identical(other.totalUsage, totalUsage) || other.totalUsage == totalUsage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SummaryDataModel&&(identical(other.totalDevice, totalDevice) || other.totalDevice == totalDevice)&&(identical(other.onlineDevice, onlineDevice) || other.onlineDevice == onlineDevice)&&(identical(other.offlineDevice, offlineDevice) || other.offlineDevice == offlineDevice)&&(identical(other.inactiveDevice, inactiveDevice) || other.inactiveDevice == inactiveDevice));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,totalDevice,totalQuota,totalUsage);
+int get hashCode => Object.hash(runtimeType,totalDevice,onlineDevice,offlineDevice,inactiveDevice);
 
 @override
 String toString() {
-  return 'SummaryDataModel(totalDevice: $totalDevice, totalQuota: $totalQuota, totalUsage: $totalUsage)';
+  return 'SummaryDataModel(totalDevice: $totalDevice, onlineDevice: $onlineDevice, offlineDevice: $offlineDevice, inactiveDevice: $inactiveDevice)';
 }
 
 
@@ -544,7 +546,7 @@ abstract mixin class _$SummaryDataModelCopyWith<$Res> implements $SummaryDataMod
   factory _$SummaryDataModelCopyWith(_SummaryDataModel value, $Res Function(_SummaryDataModel) _then) = __$SummaryDataModelCopyWithImpl;
 @override @useResult
 $Res call({
- int? totalDevice, String? totalQuota, String? totalUsage
+ int? totalDevice, int? onlineDevice, int? offlineDevice, int? inactiveDevice
 });
 
 
@@ -561,12 +563,13 @@ class __$SummaryDataModelCopyWithImpl<$Res>
 
 /// Create a copy of SummaryDataModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? totalDevice = freezed,Object? totalQuota = freezed,Object? totalUsage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? totalDevice = freezed,Object? onlineDevice = freezed,Object? offlineDevice = freezed,Object? inactiveDevice = freezed,}) {
   return _then(_SummaryDataModel(
 totalDevice: freezed == totalDevice ? _self.totalDevice : totalDevice // ignore: cast_nullable_to_non_nullable
-as int?,totalQuota: freezed == totalQuota ? _self.totalQuota : totalQuota // ignore: cast_nullable_to_non_nullable
-as String?,totalUsage: freezed == totalUsage ? _self.totalUsage : totalUsage // ignore: cast_nullable_to_non_nullable
-as String?,
+as int?,onlineDevice: freezed == onlineDevice ? _self.onlineDevice : onlineDevice // ignore: cast_nullable_to_non_nullable
+as int?,offlineDevice: freezed == offlineDevice ? _self.offlineDevice : offlineDevice // ignore: cast_nullable_to_non_nullable
+as int?,inactiveDevice: freezed == inactiveDevice ? _self.inactiveDevice : inactiveDevice // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 

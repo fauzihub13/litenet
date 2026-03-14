@@ -19,8 +19,9 @@ abstract class SummaryResponseModel with _$SummaryResponseModel {
 abstract class SummaryDataModel with _$SummaryDataModel {
   const factory SummaryDataModel({
     int? totalDevice,
-    String? totalQuota,
-    String? totalUsage,
+    int? onlineDevice,
+    int? offlineDevice,
+    int? inactiveDevice,
   }) = _SummaryDataModel;
 
   factory SummaryDataModel.fromJson(Map<String, dynamic> json) =>

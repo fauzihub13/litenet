@@ -15,8 +15,9 @@ extension SummaryDataModelMapper on SummaryDataModel {
   SummaryDataEntity toEntity() {
     return SummaryDataEntity(
       totalDevice: totalDevice ?? 0,
-      totalQuota: totalQuota ?? '0 GB',
-      totalUsage: totalUsage ?? '0%',
+      onlineDevice: onlineDevice ?? 0,
+      offlineDevice: offlineDevice ?? 0,
+      inactiveDevice: inactiveDevice ?? 0,
     );
   }
 }

@@ -27,13 +27,15 @@ Map<String, dynamic> _$SummaryResponseModelToJson(
 _SummaryDataModel _$SummaryDataModelFromJson(Map<String, dynamic> json) =>
     _SummaryDataModel(
       totalDevice: (json['total_device'] as num?)?.toInt(),
-      totalQuota: json['total_quota'] as String?,
-      totalUsage: json['total_usage'] as String?,
+      onlineDevice: (json['online_device'] as num?)?.toInt(),
+      offlineDevice: (json['offline_device'] as num?)?.toInt(),
+      inactiveDevice: (json['inactive_device'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$SummaryDataModelToJson(_SummaryDataModel instance) =>
     <String, dynamic>{
       'total_device': instance.totalDevice,
-      'total_quota': instance.totalQuota,
-      'total_usage': instance.totalUsage,
+      'online_device': instance.onlineDevice,
+      'offline_device': instance.offlineDevice,
+      'inactive_device': instance.inactiveDevice,
     };

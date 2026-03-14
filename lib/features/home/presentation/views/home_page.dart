@@ -149,17 +149,20 @@ class _HomePageState extends ConsumerState<HomePage> {
                     children: [
                       asyncSummary.when(
                         data: (data) => _buildAccountCard(
-                          onlineDevice: 10,
-                          offlineDevice: 4,
-                          inactiveDevice: 2,
+                          totalDevice: data.data.totalDevice,
+                          onlineDevice: data.data.onlineDevice,
+                          offlineDevice: data.data.offlineDevice,
+                          inactiveDevice: data.data.inactiveDevice,
                         ),
                         // Tampilkan loading kecil atau angka 0 saat fetch awal
                         loading: () => _buildAccountCard(
+                          totalDevice: 0,
                           onlineDevice: 0,
                           offlineDevice: 0,
                           inactiveDevice: 0,
                         ),
                         error: (err, _) => _buildAccountCard(
+                          totalDevice: 0,
                           onlineDevice: 0,
                           offlineDevice: 0,
                           inactiveDevice: 0,
@@ -233,6 +236,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   // Build Account Card
   Widget _buildAccountCard({
+    required int totalDevice,
     required int onlineDevice,
     required int offlineDevice,
     required int inactiveDevice,
@@ -281,8 +285,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     // Teks Total di Tengah
                     Center(
                       child: Text(
-                        (onlineDevice + offlineDevice + inactiveDevice)
-                            .toString(),
+                        totalDevice.toString(),
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w800,

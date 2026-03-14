@@ -14,12 +14,14 @@ class SummaryResponse {
 // dart
 class SummaryDataEntity {
   final int totalDevice;
-  final String totalQuota;
-  final String totalUsage;
+  final int onlineDevice;
+  final int offlineDevice;
+  final int inactiveDevice;
 
   const SummaryDataEntity({
     required this.totalDevice,
-    required this.totalQuota,
-    required this.totalUsage,
+    required this.onlineDevice,
+    required this.offlineDevice,
+    required this.inactiveDevice,
   });
 }
