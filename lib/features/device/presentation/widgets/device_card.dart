@@ -139,15 +139,23 @@ class DeviceCard extends ConsumerWidget {
                       horizontal: 12,
                       vertical: 6,
                     ),
-                    decoration: const BoxDecoration(
-                      color: DefaultColors.purple500,
+                    decoration: BoxDecoration(
+                      color: device.status != 'active'
+                          ? DefaultColors.black100
+                          : device.quotaLeft > 0
+                          ? DefaultColors.purple500
+                          : DefaultColors.black100,
                       borderRadius: BorderRadius.only(
                         topRight: Radius.circular(15),
                         bottomLeft: Radius.circular(15),
                       ),
                     ),
                     child: Text(
-                      device.status.firstWordCapitalize(),
+                      device.status != 'active'
+                          ? device.status.firstWordCapitalize()
+                          : device.quotaLeft > 0
+                          ? 'Online'
+                          : 'Offline',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.w500,
                         color: DefaultColors.white,

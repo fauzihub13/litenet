@@ -100,6 +100,7 @@ class EditDevicePage extends HookConsumerWidget {
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  
                   children: [
                     // Name
                     RowTitle(title: "Nama Perangkat"),
@@ -116,14 +117,14 @@ class EditDevicePage extends HookConsumerWidget {
                     ),
                     const SizedBox(height: 16),
                     // Alamat
-                    RowTitle(title: "Alamat"),
+                    RowTitle(title: "Detail Alamat"),
                     const SizedBox(height: 8),
                     FormInput(
                       textController: addressController,
-                      hintText: "Masukan alamat perangkat",
+                      hintText: "Masukan detail alamat perangkat",
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Alamat tidak boleh kosong';
+                          return 'Detail alamat tidak boleh kosong';
                         }
 
                         return null;

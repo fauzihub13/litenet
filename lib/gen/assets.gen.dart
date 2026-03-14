@@ -39,6 +39,9 @@ class $AssetsIconsGen {
   /// File path: assets/icons/cancel.svg
   String get cancel => 'assets/icons/cancel.svg';
 
+  /// File path: assets/icons/card.svg
+  String get card => 'assets/icons/card.svg';
+
   /// File path: assets/icons/checklist.svg
   String get checklist => 'assets/icons/checklist.svg';
 
@@ -62,6 +65,9 @@ class $AssetsIconsGen {
 
   /// File path: assets/icons/filter.svg
   String get filter => 'assets/icons/filter.svg';
+
+  /// File path: assets/icons/gift.svg
+  String get gift => 'assets/icons/gift.svg';
 
   /// File path: assets/icons/globe.svg
   String get globe => 'assets/icons/globe.svg';
@@ -108,6 +114,9 @@ class $AssetsIconsGen {
   /// File path: assets/icons/quota.svg
   String get quota => 'assets/icons/quota.svg';
 
+  /// File path: assets/icons/reward.svg
+  String get reward => 'assets/icons/reward.svg';
+
   /// File path: assets/icons/search.svg
   String get search => 'assets/icons/search.svg';
 
@@ -117,6 +126,9 @@ class $AssetsIconsGen {
   /// File path: assets/icons/updown.svg
   String get updown => 'assets/icons/updown.svg';
 
+  /// File path: assets/icons/wifi.svg
+  String get wifi => 'assets/icons/wifi.svg';
+
   /// List of all assets
   List<String> get values => [
     appIcon,
@@ -125,6 +137,7 @@ class $AssetsIconsGen {
     arrowForward,
     calendar,
     cancel,
+    card,
     checklist,
     circleFour,
     clock,
@@ -133,6 +146,7 @@ class $AssetsIconsGen {
     discount2,
     faq,
     filter,
+    gift,
     globe,
     helpCenter,
     home,
@@ -148,9 +162,11 @@ class $AssetsIconsGen {
     profile,
     promo,
     quota,
+    reward,
     search,
     setting,
     updown,
+    wifi,
   ];
 }
 

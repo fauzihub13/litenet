@@ -5,16 +5,17 @@ import 'package:go_router/go_router.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/core/helper/permission.dart';
-import 'package:litenet/features/auth/presentation/controllers/user_manager_provider.dart';
 import 'package:litenet/core/widgets/custom_snackbar.dart';
 import 'package:litenet/core/widgets/empty_state.dart';
-import 'package:litenet/features/promo/presentation/widgets/promo_card.dart';
-import 'package:litenet/features/quota/presentation/widgets/quota_card.dart';
 import 'package:litenet/features/auth/presentation/controllers/get_summary_provider.dart';
+import 'package:litenet/features/auth/presentation/controllers/user_manager_provider.dart';
+import 'package:litenet/features/home/presentation/widgets/donut_chart.dart';
 import 'package:litenet/features/promo/domain/entities/promo.dart';
 import 'package:litenet/features/promo/presentation/controllers/get_promo_provider.dart';
+import 'package:litenet/features/promo/presentation/widgets/promo_card.dart';
 import 'package:litenet/features/quota/domain/entities/quota.dart';
 import 'package:litenet/features/quota/presentation/controllers/get_all_quota_provider.dart';
+import 'package:litenet/features/quota/presentation/widgets/quota_card.dart';
 import 'package:litenet/gen/assets.gen.dart';
 import 'package:litenet/routes/route_name.dart';
 
@@ -132,7 +133,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         ),
 
                         Text(
-                          "selamat datang kembali!",
+                          "Selamat datang kembali!",
                           style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(color: DefaultColors.purple50),
                         ),
@@ -148,24 +149,24 @@ class _HomePageState extends ConsumerState<HomePage> {
                     children: [
                       asyncSummary.when(
                         data: (data) => _buildAccountCard(
-                          totalDevice: data.data.totalDevice,
-                          totalQuota: data.data.totalQuota,
-                          quotaUsage: data.data.totalUsage,
+                          onlineDevice: 10,
+                          offlineDevice: 4,
+                          inactiveDevice: 2,
                         ),
                         // Tampilkan loading kecil atau angka 0 saat fetch awal
                         loading: () => _buildAccountCard(
-                          totalDevice: 0,
-                          totalQuota: '0 GB',
-                          quotaUsage: '0%',
+                          onlineDevice: 0,
+                          offlineDevice: 0,
+                          inactiveDevice: 0,
                         ),
                         error: (err, _) => _buildAccountCard(
-                          totalDevice: 0,
-                          totalQuota: '0 GB',
-                          quotaUsage: '0%',
+                          onlineDevice: 0,
+                          offlineDevice: 0,
+                          inactiveDevice: 0,
                         ),
                       ),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 16),
                       _buildSectionHeader(
                         title: 'Promo',
                         onTap: () {
@@ -173,7 +174,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         },
                       ),
                       _buildPromoSlider(),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 16),
                       _buildSectionHeader(
                         title: "Kuota",
                         onTap: () {
@@ -232,9 +233,9 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   // Build Account Card
   Widget _buildAccountCard({
-    required int totalDevice,
-    required String totalQuota,
-    required String quotaUsage,
+    required int onlineDevice,
+    required int offlineDevice,
+    required int inactiveDevice,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: PaddingSize.horizontal),
@@ -254,20 +255,73 @@ class _HomePageState extends ConsumerState<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Akun saya",
+            "Perangkat saya",
             style: Theme.of(
               context,
             ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 10),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildAccountStat(totalDevice.toString(), "Perangkat"),
-              _buildDivider(),
-              _buildAccountStat(totalQuota, "Total Kuota"),
-              _buildDivider(),
-              _buildAccountStat(quotaUsage, "Terpakai"),
+              // 1. Donut Chart
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 30),
+                width: 85,
+                height: 85,
+                child: Stack(
+                  children: [
+                    CustomPaint(
+                      size: const Size(85, 85),
+                      painter: DonutChartPainter(
+                        online: 10,
+                        offline: 3,
+                        inactive: 1,
+                      ),
+                    ),
+                    // Teks Total di Tengah
+                    Center(
+                      child: Text(
+                        (onlineDevice + offlineDevice + inactiveDevice)
+                            .toString(),
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF2E3A59),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 24),
+
+              // 2. Legend Status
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 10.0),
+                  child: Column(
+                    children: [
+                      _buildLegendItem(
+                        "Online",
+                        onlineDevice.toString(),
+                        const Color(0xFF10B981),
+                      ),
+                      const SizedBox(height: 8),
+                      _buildLegendItem(
+                        "Offline",
+                        offlineDevice.toString(),
+                        const Color(0xFFEF4444),
+                      ),
+                      const SizedBox(height: 8),
+                      _buildLegendItem(
+                        "Inactive",
+                        inactiveDevice.toString(),
+                        const Color(0xFFD1D5DB),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ],
@@ -275,41 +329,88 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  // Build each account statistic item
-  Widget _buildAccountStat(String value, String label) {
-    return Column(
+  Widget _buildLegendItem(String label, String value, Color color) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        Row(
+          children: [
+            Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF6B7280), // Text abu-abu
+              ),
+            ),
+          ],
+        ),
         Text(
           value,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: DefaultColors.purple500,
+          style: const TextStyle(
+            fontSize: 14,
             fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: DefaultColors.black200,
-            fontSize: 12,
+            color: Color(0xFF1F2937),
           ),
         ),
       ],
     );
   }
 
+  // Build each account statistic item
+  // Widget _buildAccountStat(String value, String label) {
+  //   return Column(
+  //     children: [
+  //       Text(
+  //         value,
+  //         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+  //           color: DefaultColors.purple500,
+  //           fontWeight: FontWeight.bold,
+  //         ),
+  //       ),
+  //       const SizedBox(height: 4),
+  //       Text(
+  //         label,
+  //         style: Theme.of(context).textTheme.bodySmall?.copyWith(
+  //           color: DefaultColors.black200,
+  //           fontSize: 12,
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
+
   // Build divider between account statistics
-  Widget _buildDivider() {
-    return Container(
-      height: 30,
-      width: 1,
-      color: Colors.grey.withValues(alpha: 0.3),
-    );
-  }
+  // Widget _buildDivider() {
+  //   return Container(
+  //     height: 30,
+  //     width: 1,
+  //     color: Colors.grey.withValues(alpha: 0.3),
+  //   );
+  // }
 
   // Build Promo Slider
   Widget _buildPromoSlider() {
     final asyncPromo = ref.watch(getPromoProvider);
+    final List colors = [
+      [Color(0xFF5F45FD), Color(0xFF7D68FF)],
+      [Color(0xFFFF4801), Color(0xFFFF8701)],
+      [Color(0xFF266FEB), Color(0xFF23C5ED)],
+      [Color(0xFF00C284), Color(0xFF2AD2BA)],
+    ];
+
+    final List icons = [
+      Assets.icons.wifi,
+      Assets.icons.reward,
+      Assets.icons.gift,
+      Assets.icons.card,
+    ];
 
     return SizedBox(
       height: 130,
@@ -322,9 +423,16 @@ class _HomePageState extends ConsumerState<HomePage> {
             itemCount: promoData.length > 3 ? 3 : promoData.length,
             itemBuilder: (context, index) {
               PromoDataEntity promo = promoData[index];
+              final gradient = colors[index % colors.length];
+              final icon = icons[index % icons.length];
               return Padding(
                 padding: const EdgeInsets.only(right: 16.0),
-                child: PromoCard(promo: promo, onTap: () {}),
+                child: PromoCard(
+                  promo: promo,
+                  gradientColors: gradient,
+                  backgroundIcon: icon,
+                  onTap: () {},
+                ),
               );
             },
           );
