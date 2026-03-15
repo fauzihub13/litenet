@@ -117,6 +117,7 @@ class DeviceRepositoryImpl extends DeviceRepository {
     required String nodelink,
     required double latitude,
     required double longitude,
+    required bool status,
   }) async {
    try {
       final response = await deviceDatasource.updateDevice(
@@ -127,6 +128,7 @@ class DeviceRepositoryImpl extends DeviceRepository {
         nodelink: nodelink,
         latitude: latitude,
         longitude: longitude,
+        status: status
       );
 
       if (!response.success) {

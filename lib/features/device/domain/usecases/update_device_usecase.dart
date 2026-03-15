@@ -17,6 +17,7 @@ class UpdateDeviceUsecase {
     required String nodelink,
     required double latitude,
     required double longitude,
+    required bool status,
   }) async {
     return await deviceRepository.updateDevice(
       deviceId: deviceId,
@@ -26,6 +27,7 @@ class UpdateDeviceUsecase {
       nodelink: nodelink,
       latitude: latitude,
       longitude: longitude,
+      status: status
     );
   }
 }

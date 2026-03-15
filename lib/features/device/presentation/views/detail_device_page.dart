@@ -48,11 +48,11 @@ class DetailDevicePage extends HookConsumerWidget {
           onRefresh: () async {
             ref.invalidate(getDetailDeviceProvider(deviceId: deviceId));
           },
-          child: SingleChildScrollView(
-            child: asyncDetailDevice.when(
-              data: (data) {
-                DeviceDataEntity device = data.data;
-                return Column(
+          child: asyncDetailDevice.when(
+            data: (data) {
+              DeviceDataEntity device = data.data;
+              return SingleChildScrollView(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -221,17 +221,19 @@ class DetailDevicePage extends HookConsumerWidget {
                       ),
                     ),
                   ],
-                );
-              },
-              error: (error, _) {
-                String errorMessage =
-                    (error as Failure).message ?? 'Terjadi kesalahan';
-                return EmptyState(message: errorMessage, isRefreshable: true);
-              },
-              loading: () {
-                return Center(child: const CircularProgressIndicator());
-              },
-            ),
+                ),
+              );
+            },
+            error: (error, _) {
+              String errorMessage =
+                  (error as Failure).message ?? 'Terjadi kesalahan';
+              return EmptyState(message: errorMessage, isRefreshable: true);
+            },
+            loading: () {
+              return Expanded(
+                child: Center(child: const CircularProgressIndicator()),
+              );
+            },
           ),
         ),
       ),

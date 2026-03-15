@@ -12,6 +12,7 @@ import 'package:litenet/core/widgets/custom_snackbar.dart';
 import 'package:litenet/core/widgets/empty_state.dart';
 import 'package:litenet/core/widgets/form_input.dart';
 import 'package:litenet/core/widgets/row_title.dart';
+import 'package:litenet/features/device/presentation/controllers/get_all_device_provider.dart';
 import 'package:litenet/features/device/presentation/controllers/get_detail_device_provider.dart';
 import 'package:litenet/features/device/presentation/controllers/update_device_provider.dart';
 import 'package:litenet/routes/route_name.dart';
@@ -24,6 +25,7 @@ class EditDevicePage extends HookConsumerWidget {
   final String? redNodelink;
   final String? reqKitSerialNumber;
   final String? reqAddress;
+  final bool? reqStatus;
 
   const EditDevicePage({
     super.key,
@@ -34,6 +36,7 @@ class EditDevicePage extends HookConsumerWidget {
     this.redNodelink,
     this.reqKitSerialNumber,
     this.reqAddress,
+    this.reqStatus,
   });
 
   @override
@@ -59,6 +62,7 @@ class EditDevicePage extends HookConsumerWidget {
         currentLatLng.value = newPos;
         locationController.text =
             '${data.data.latitude}, ${data.data.longitude}';
+        isActive.value = data.data.status == 'active';
       });
       if (latitude != null && longitude != null) {
         locationController.text = "$latitude, $longitude";
@@ -66,6 +70,7 @@ class EditDevicePage extends HookConsumerWidget {
         addressController.text = reqAddress ?? '';
         final newReqPos = LatLng(latitude!, longitude!);
         currentLatLng.value = newReqPos;
+        isActive.value = reqStatus ?? true;
       }
       return null;
     }, [asyncDetailDevice]);
@@ -75,6 +80,7 @@ class EditDevicePage extends HookConsumerWidget {
         data: (data) async {
           if (data != null) {
             ref.invalidate(getDetailDeviceProvider(deviceId: deviceId));
+            ref.invalidate(getAllDeviceProvider);
             context.showSuccess(data.message);
             // context.pushReplacementNamed(RouteName.detailMonitoringPage);
           }
@@ -262,6 +268,7 @@ class EditDevicePage extends HookConsumerWidget {
                         nodelink: data.data.nodelink,
                         latitude: latitude ?? data.data.latitude,
                         longitude: longitude ?? data.data.longitude,
+                        status: isActive.value,
                       );
                 }
               },

@@ -33,7 +33,7 @@ final class UpdateDeviceProvider
   UpdateDevice create() => UpdateDevice();
 }
 
-String _$updateDeviceHash() => r'81a0e0b23be42a17a12791b6b7788e7b49373f92';
+String _$updateDeviceHash() => r'ee1ff92d1023c2b5fa6a6cde8fedb11060bf6e5d';
 
 abstract class _$UpdateDevice extends $AsyncNotifier<ClaimDeviceResponse?> {
   FutureOr<ClaimDeviceResponse?> build();

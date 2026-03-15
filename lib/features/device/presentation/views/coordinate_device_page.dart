@@ -22,6 +22,7 @@ class CoordinateDevicePage extends StatefulWidget {
   final double? latitude;
   final double? longitude;
   final bool isEdit;
+  final bool? reqStatus;
   const CoordinateDevicePage({
     this.reqName,
     this.redNodelink,
@@ -31,6 +32,7 @@ class CoordinateDevicePage extends StatefulWidget {
     this.latitude,
     this.longitude,
     this.isEdit = false,
+    this.reqStatus,
     super.key,
   });
 
@@ -385,6 +387,7 @@ class _CoordinateDevicePageState extends State<CoordinateDevicePage>
                               'reqKitSerialNumber': widget.reqKitSerialNumber,
                               'reqAddress': widget.reqAddress,
                               'deviceId': widget.deviceId,
+                              'reqStatus': widget.reqStatus,
                             },
                           );
                         } else {

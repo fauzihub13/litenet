@@ -201,6 +201,7 @@ GoRouter appRouter(Ref ref) {
           final latitude = extras?['latitude'] as double?;
           final longitude = extras?['longitude'] as double?;
           final isEdit = extras?['isEdit'] as bool?;
+          final reqStatus = extras?['reqStatus'] as bool?;
           return CoordinateDevicePage(
             reqName: reqName,
             redNodelink: redNodelink,
@@ -210,6 +211,7 @@ GoRouter appRouter(Ref ref) {
             latitude: latitude,
             longitude: longitude,
             isEdit: isEdit ?? false,
+            reqStatus: reqStatus ?? true,
           );
         },
       ),
@@ -246,6 +248,7 @@ GoRouter appRouter(Ref ref) {
           final redNodelink = extras?['redNodelink'] as String?;
           final reqKitSerialNumber = extras?['reqKitSerialNumber'] as String?;
           final reqAddress = extras?['reqAddress'] as String?;
+          final reqStatus = extras?['reqStatus'] as bool?;
           return EditDevicePage(
             deviceId: deviceId,
             latitude: latitude,
@@ -254,6 +257,7 @@ GoRouter appRouter(Ref ref) {
             redNodelink: redNodelink,
             reqKitSerialNumber: reqKitSerialNumber,
             reqAddress: reqAddress,
+            reqStatus: reqStatus,
           );
         },
       ),

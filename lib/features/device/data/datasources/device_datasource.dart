@@ -37,6 +37,7 @@ abstract class DeviceDatasource {
     required String nodelink,
     required double latitude,
     required double longitude,
+    required bool status,
   });
   Future<HistoryDeviceResponse> getHistoryDevice({required String deviceId});
 }
@@ -111,6 +112,7 @@ class DeviceDatasourceImpl extends DeviceDatasource {
     required String nodelink,
     required double latitude,
     required double longitude,
+    required bool status,
   }) async {
     String url = '/devices/$deviceId/update';
     final response = await httpClient.put(
@@ -120,6 +122,7 @@ class DeviceDatasourceImpl extends DeviceDatasource {
         "address": address,
         "latitude": latitude,
         "longitude": longitude,
+        "status": status,
       },
     );
 

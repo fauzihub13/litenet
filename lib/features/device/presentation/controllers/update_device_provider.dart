@@ -19,6 +19,7 @@ class UpdateDevice extends _$UpdateDevice {
     required String nodelink,
     required double latitude,
     required double longitude,
+    required bool status,
   }) async {
     state = const AsyncValue.loading();
 
@@ -31,6 +32,7 @@ class UpdateDevice extends _$UpdateDevice {
       nodelink: nodelink,
       latitude: latitude,
       longitude: longitude,
+      status: status,
     );
 
     return result.fold(

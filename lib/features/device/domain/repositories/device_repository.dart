@@ -30,6 +30,7 @@ abstract class DeviceRepository {
     required String nodelink,
     required double latitude,
     required double longitude,
+    required bool status,
   });
    Future<Either<Failure, HistoryDeviceResponse>> getHistoryDevice({
     required String deviceId,
