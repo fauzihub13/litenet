@@ -25,7 +25,6 @@ class PromoCard extends StatelessWidget {
       child: Container(
         width: 300,
         height: 130,
-        // margin: const EdgeInsets.only(right: 16),
         // Gunakan clipBehavior agar ikon background yang keluar batas otomatis terpotong melengkung
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
@@ -65,7 +64,10 @@ class PromoCard extends StatelessWidget {
               bottom: -20,
               child: SvgPicture.asset(
                 backgroundIcon,
-                color: Colors.white.withValues(alpha: 0.1), // Transparan 10%
+                colorFilter: ColorFilter.mode(
+                  Colors.white.withValues(alpha: 0.3),
+                  BlendMode.srcIn,
+                ), // Transparan 10%
               ),
             ),
 
