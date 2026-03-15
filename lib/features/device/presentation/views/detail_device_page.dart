@@ -62,7 +62,9 @@ class DetailDevicePage extends HookConsumerWidget {
                       children: [
                         CustomBadge(
                           text: device.status.firstWordCapitalize(),
-                          backgroundColor: DefaultColors.purple500,
+                          backgroundColor: data.data.status == 'active'
+                              ? DefaultColors.purple500
+                              : DefaultColors.black100,
                           textColor: DefaultColors.purple50,
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -237,40 +239,51 @@ class DetailDevicePage extends HookConsumerWidget {
           ),
         ),
       ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: PaddingSize.horizontal,
-            // vertical: 10,
-          ),
-          child: Row(
-            spacing: 10,
-            children: [
-              Expanded(
-                child: Button(
-                  text: "Edit",
-                  textColor: DefaultColors.purple600,
-                  borderColor: Colors.transparent,
-                  backgroundColor: DefaultColors.purple50,
-                  onPressed: () {
-                    context.pushNamed(
-                      RouteName.editDevicePage,
-                      extra: {'deviceId': deviceId},
-                    );
-                  },
-                ),
+      bottomNavigationBar: asyncDetailDevice.when(
+        data: (data) {
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: PaddingSize.horizontal,
+                // vertical: 10,
               ),
-              Expanded(
-                child: Button(
-                  text: "Beli Kuota",
-                  onPressed: () {
-                    context.pushNamed(RouteName.productPage);
-                  },
-                ),
+              child: Row(
+                spacing: 10,
+                children: [
+                  Expanded(
+                    child: Button(
+                      text: "Edit",
+                      textColor: DefaultColors.purple600,
+                      borderColor: Colors.transparent,
+                      backgroundColor: DefaultColors.purple50,
+                      onPressed: () {
+                        context.pushNamed(
+                          RouteName.editDevicePage,
+                          extra: {'deviceId': deviceId},
+                        );
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: Button(
+                      text: "Beli Kuota",
+                      isDisabled: data.data.status != 'active',
+                      onPressed: () {
+                        context.pushNamed(RouteName.productPage);
+                      },
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
+        error: (error, _) {
+          return SizedBox();
+        },
+        loading: () {
+          return SizedBox();
+        },
       ),
     );
   }
