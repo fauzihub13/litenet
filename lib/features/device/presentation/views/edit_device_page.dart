@@ -48,6 +48,7 @@ class EditDevicePage extends HookConsumerWidget {
       getDetailDeviceProvider(deviceId: deviceId),
     );
     final asyncUpdateDevice = ref.watch(updateDeviceProvider);
+    final isActive = useState(true);
 
     useEffect(() {
       asyncDetailDevice.whenData((data) {
@@ -100,7 +101,7 @@ class EditDevicePage extends HookConsumerWidget {
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  
+
                   children: [
                     // Name
                     RowTitle(title: "Nama Perangkat"),
@@ -209,6 +210,22 @@ class EditDevicePage extends HookConsumerWidget {
                           );
                         },
                       ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Koordinat
+                    RowTitle(title: "Status Perangkat"),
+                    const SizedBox(height: 8),
+                    Switch(
+                      value: isActive.value,
+                      activeThumbColor: DefaultColors.purple500,
+                      activeTrackColor: DefaultColors.purple100,
+                      inactiveThumbColor: DefaultColors.black200,
+                      inactiveTrackColor: DefaultColors.purple50,
+                      onChanged: (value) {
+                        isActive.value = !isActive.value;
+                      },
                     ),
                   ],
                 ),
