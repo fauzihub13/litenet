@@ -69,6 +69,13 @@ class HistoryDeviceCard extends StatelessWidget {
                         fontSize: 12,
                       ),
                     ),
+                    Text(
+                      "Detail: ${history.detailAddress}",
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: DefaultColors.black200,
+                        fontSize: 12,
+                      ),
+                    ),
                     Container(
                       margin: const EdgeInsets.only(top: 4),
                       padding: const EdgeInsets.symmetric(

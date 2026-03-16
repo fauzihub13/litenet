@@ -277,9 +277,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                     CustomPaint(
                       size: const Size(85, 85),
                       painter: DonutChartPainter(
-                        online: 10,
-                        offline: 3,
-                        inactive: 1,
+                        online: onlineDevice,
+                        offline: offlineDevice,
+                        inactive: inactiveDevice,
                       ),
                     ),
                     // Teks Total di Tengah
