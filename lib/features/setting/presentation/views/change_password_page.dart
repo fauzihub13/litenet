@@ -49,8 +49,8 @@ class ChangePasswordPage extends HookConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: PaddingSize.horizontal),
         child: Form(
           key: formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
             children: [
               const SizedBox(height: 40),
 

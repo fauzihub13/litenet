@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
@@ -11,7 +12,7 @@ import 'package:litenet/features/promo/presentation/widgets/modal_promo.dart';
 import 'package:litenet/features/promo/presentation/widgets/promo_card.dart';
 import 'package:litenet/gen/assets.gen.dart';
 
-class PromoPage extends ConsumerWidget {
+class PromoPage extends HookConsumerWidget {
   const PromoPage({super.key});
 
   @override
@@ -31,6 +32,8 @@ class PromoPage extends ConsumerWidget {
       Assets.icons.card,
     ];
 
+    final searchQuery = useState<String>('');
+
     return Scaffold(
       appBar: CustomAppbar(title: 'Pilihan Promo'),
       body: Column(
@@ -38,7 +41,9 @@ class PromoPage extends ConsumerWidget {
           // 1. Search Bar
           CustomSearchBar(
             title: "Cari promo",
-            onChanged: (value) {},
+            onChanged: (value) {
+              searchQuery.value = value;
+            },
             onFilterPressed: () {},
           ),
 
@@ -50,18 +55,24 @@ class PromoPage extends ConsumerWidget {
               },
               child: asyncPromo.when(
                 data: (data) {
-                  List<PromoDataEntity> promoData = data.data;
-                  if (promoData.isEmpty) {
+                  final filteredPromo = data.data.where((promo) {
+                    final nameLower = promo.title.toLowerCase();
+                    final queryLower = searchQuery.value.toLowerCase();
+                    return nameLower.contains(queryLower);
+                  }).toList();
+
+                  if (filteredPromo.isEmpty) {
                     return EmptyState(
-                      message: 'Tidak ditemukan data',
+                      message: 'Tidak ada data ditemukan',
                       isRefreshable: true,
                     );
                   }
+
                   return ListView.builder(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    itemCount: promoData.length,
+                    itemCount: filteredPromo.length,
                     itemBuilder: (context, index) {
-                      PromoDataEntity promo = promoData[index];
+                      PromoDataEntity promo = filteredPromo[index];
                       final gradient = colors[index % colors.length];
                       final icon = icons[index % icons.length];
                       return Padding(
