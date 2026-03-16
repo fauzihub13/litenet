@@ -151,11 +151,12 @@ class DeviceCard extends ConsumerWidget {
                       ),
                     ),
                     child: Text(
+                      // device.status.firstWordCapitalize(),
                       device.status != 'active'
                           ? device.status.firstWordCapitalize()
                           : device.quotaLeft > 0
                           ? 'Online'
-                          : 'Offline',
+                          : 'Inactive',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.w500,
                         color: DefaultColors.white,

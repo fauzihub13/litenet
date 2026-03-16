@@ -61,8 +61,14 @@ class DetailDevicePage extends HookConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         CustomBadge(
-                          text: device.status.firstWordCapitalize(),
-                          backgroundColor: data.data.status == 'active'
+                          text: device.status != 'active'
+                              ? device.status.firstWordCapitalize()
+                              : device.quotaLeft > 0
+                              ? 'Online'
+                              : 'Inactive',
+                          backgroundColor: data.data.status != 'active'
+                              ? DefaultColors.black100
+                              : device.quotaLeft > 0
                               ? DefaultColors.purple500
                               : DefaultColors.black100,
                           textColor: DefaultColors.purple50,

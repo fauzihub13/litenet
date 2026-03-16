@@ -87,7 +87,6 @@ class _HomePageState extends ConsumerState<HomePage> {
             physics: const AlwaysScrollableScrollPhysics(
               parent: ClampingScrollPhysics(),
             ),
-            // physics: const ClampingScrollPhysics(),
             child: Stack(
               children: [
                 // Header Ungu
@@ -131,7 +130,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 ),
                           ),
                         ),
-
                         Text(
                           "Selamat datang kembali!",
                           style: Theme.of(context).textTheme.bodyMedium
@@ -154,7 +152,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                           offlineDevice: data.data.offlineDevice,
                           inactiveDevice: data.data.inactiveDevice,
                         ),
-                        // Tampilkan loading kecil atau angka 0 saat fetch awal
                         loading: () => _buildAccountCard(
                           totalDevice: 0,
                           onlineDevice: 0,
@@ -168,7 +165,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                           inactiveDevice: 0,
                         ),
                       ),
-
                       const SizedBox(height: 16),
                       _buildSectionHeader(
                         title: 'Promo',
