@@ -28,11 +28,9 @@ class PaymentOrderPage extends HookConsumerWidget {
       getDetailTransactionProvider(orderId: orderId),
     );
     final pollTimer = useRef<Timer?>(null);
-    final expiredAt = useState<DateTime>(DateTime.now());
+    final expiredAt = useState<DateTime>(DateTime.now().toUtc());
     final remaining = useState(
-      expiredAt.value.difference(
-        DateTime.now().toUtc().add(Duration(hours: 7)),
-      ),
+      expiredAt.value.difference(DateTime.now().toUtc()),
     );
 
     ref.listen(getDetailTransactionProvider(orderId: orderId), (
@@ -41,10 +39,15 @@ class PaymentOrderPage extends HookConsumerWidget {
     ) {
       next.when(
         data: (data) {
-          expiredAt.value = data.data.expiredAt;
-          remaining.value = data.data.expiredAt.difference(
-            DateTime.now().toUtc().add(const Duration(hours: 7)),
-          );
+          expiredAt.value = data.data.expiredAt.toUtc();
+          // print("Data baru diterima, expiredAt diperbarui: ${expiredAt.value}");
+          Duration diff = expiredAt.value.difference(DateTime.now().toUtc());
+          Duration capped = diff > const Duration(hours: 24)
+              ? const Duration(hours: 24)
+              : diff;
+
+          remaining.value = capped;
+          // print("Remaining time diperbarui: ${remaining.value}");
         },
         error: (err, _) {},
         loading: () {},
@@ -96,14 +99,13 @@ class PaymentOrderPage extends HookConsumerWidget {
 
     useEffect(() {
       final countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-        final now = DateTime.now().toUtc().add(const Duration(hours: 7));
-        final diff = expiredAt.value.difference(now);
+        var diff = expiredAt.value.difference(DateTime.now().toUtc());
 
         if (diff.isNegative) {
           remaining.value = Duration.zero;
-          pollTimer.value?.cancel(); // Hentikan polling jika waktu habis
+          pollTimer.value?.cancel();
         } else {
-          remaining.value = diff;
+          remaining.value = remaining.value - const Duration(seconds: 1);
         }
       });
       return () => countdownTimer.cancel();
@@ -120,10 +122,13 @@ class PaymentOrderPage extends HookConsumerWidget {
       appBar: CustomAppbar(title: 'Pembayaran'),
       body: asyncDetail.when(
         data: (data) {
-          expiredAt.value = data.data.expiredAt;
-          remaining.value = data.data.expiredAt.difference(
-            DateTime.now().toUtc().add(const Duration(hours: 7)),
-          );
+          expiredAt.value = data.data.expiredAt.toUtc();
+          Duration diff = expiredAt.value.difference(DateTime.now().toUtc());
+          Duration capped = diff > const Duration(hours: 24)
+              ? const Duration(hours: 24)
+              : diff;
+
+          remaining.value = capped;
           final transaction = data.data;
           return Padding(
             padding: const EdgeInsets.symmetric(
@@ -175,7 +180,7 @@ class PaymentOrderPage extends HookConsumerWidget {
                                 ),
                                 Text(
                                   transaction.expiredAt
-                                      .toIndonesianDateTimeString(),
+                                      .toIndonesianDateTimeStringPlus7(),
                                   style: Theme.of(context).textTheme.bodyMedium
                                       ?.copyWith(
                                         fontWeight: FontWeight.w400,
