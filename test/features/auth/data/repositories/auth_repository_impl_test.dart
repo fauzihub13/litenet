@@ -6,6 +6,7 @@ import 'package:litenet/features/auth/data/mappers/login_mapper.dart';
 import 'package:litenet/features/auth/data/models/login_model.dart';
 import 'package:litenet/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:litenet/features/auth/domain/entities/login.dart';
+import 'package:litenet/features/auth/domain/entities/register.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockAuthDatasource extends Mock implements AuthDatasource {}
@@ -118,5 +119,108 @@ void main() {
         ).called(1);
       },
     );
+  });
+
+  group('register', () {
+    test(
+      'should return RegisterResponse when datasource returns success',
+      () async {
+        final tRegisterResponse = RegisterResponse(
+          success: true,
+          message: 'ok',
+        );
+        when(
+          () => mockDatasource.register(
+            name: 'Test',
+            email: 'a',
+            password: 'b',
+            passwordConfirmation: 'b',
+            phoneNumber: '123',
+          ),
+        ).thenAnswer((_) async => tRegisterResponse);
+
+        final result = await repository.register(
+          name: 'Test',
+          email: 'a',
+          password: 'b',
+          passwordConfirmation: 'b',
+          phoneNumber: '123',
+        );
+        expect(result, Right(tRegisterResponse));
+        verify(
+          () => mockDatasource.register(
+            name: 'Test',
+            email: 'a',
+            password: 'b',
+            passwordConfirmation: 'b',
+            phoneNumber: '123',
+          ),
+        ).called(1);
+      },
+    );
+
+    test('should return Failure when datasource throws', () async {
+      when(
+        () => mockDatasource.register(
+          name: 'Test',
+          email: 'a',
+          password: 'b',
+          passwordConfirmation: 'b',
+          phoneNumber: '123',
+        ),
+      ).thenThrow(Exception('error'));
+
+      final result = await repository.register(
+        name: 'Test',
+        email: 'a',
+        password: 'b',
+        passwordConfirmation: 'b',
+        phoneNumber: '123',
+      );
+      expect(result.isLeft(), true);
+      verify(
+        () => mockDatasource.register(
+          name: 'Test',
+          email: 'a',
+          password: 'b',
+          passwordConfirmation: 'b',
+          phoneNumber: '123',
+        ),
+      ).called(1);
+    });
+
+    test('should return Failure when datasource returns !success', () async {
+      final tFailResponse = RegisterResponse(success: false, message: 'Failed');
+      when(
+        () => mockDatasource.register(
+          name: 'Test',
+          email: 'a',
+          password: 'b',
+          passwordConfirmation: 'b',
+          phoneNumber: '123',
+        ),
+      ).thenAnswer((_) async => tFailResponse);
+
+      final result = await repository.register(
+        name: 'Test',
+        email: 'a',
+        password: 'b',
+        passwordConfirmation: 'b',
+        phoneNumber: '123',
+      );
+      result.fold((failure) {
+        expect(failure, isA<Failure>());
+        expect(failure.message, 'Failed');
+      }, (_) => fail('Should not be success'));
+      verify(
+        () => mockDatasource.register(
+          name: 'Test',
+          email: 'a',
+          password: 'b',
+          passwordConfirmation: 'b',
+          phoneNumber: '123',
+        ),
+      ).called(1);
+    });
   });
 }

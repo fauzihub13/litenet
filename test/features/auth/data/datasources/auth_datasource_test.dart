@@ -14,15 +14,11 @@ void main() {
     datasource = AuthDatasourceImpl(httpClient: mockDio);
   });
 
-  test('should return LoginResponse when response is successful', () async {
+  test('should return RegisterResponse when response is successful', () async {
     final responsePayload = {
       'success': true,
       'message': 'ok',
-      'data': {
-        'user': {'id': '1', 'name': 'Test'},
-        'isVerified': true,
-        'token': 'token',
-      },
+      'data': {'user_id': '123'},
     };
     when(() => mockDio.post(any(), data: any(named: 'data'))).thenAnswer(
       (_) async => Response(
@@ -32,15 +28,30 @@ void main() {
       ),
     );
 
-    final result = await datasource.login(email: 'a', password: 'b');
+    final result = await datasource.register(
+      name: 'Test',
+      email: 'a',
+      password: 'b',
+      passwordConfirmation: 'b',
+      phoneNumber: '123',
+    );
     expect(result.success, true);
-    expect(result.data.token, 'token');
+    expect(result.message, 'ok');
   });
 
   test('should throw Exception on error', () async {
     when(
       () => mockDio.post(any(), data: any(named: 'data')),
     ).thenThrow(Exception('error'));
-    expect(() => datasource.login(email: 'a', password: 'b'), throwsException);
+    expect(
+      () => datasource.register(
+        name: 'Test',
+        email: 'a',
+        password: 'b',
+        passwordConfirmation: 'b',
+        phoneNumber: '123',
+      ),
+      throwsException,
+    );
   });
 }
