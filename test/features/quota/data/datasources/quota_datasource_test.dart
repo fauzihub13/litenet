@@ -14,23 +14,89 @@ void main() {
     datasource = QuotaDatasourceImpl(httpClient: mockDio);
   });
 
-  test('should return QuotaResponse when response is successful', () async {
-    final responsePayload = {'success': true, 'message': 'ok', 'data': []};
-    when(() => mockDio.get(any())).thenAnswer(
-      (_) async => Response(
-        data: responsePayload,
-        statusCode: 200,
-        requestOptions: RequestOptions(path: ''),
-      ),
-    );
+  group('getAllQuotas', () {
+    test('should return QuotaResponse when response is successful', () async {
+      final responsePayload = {'success': true, 'message': 'ok', 'data': []};
+      when(() => mockDio.get(any())).thenAnswer(
+        (_) async => Response(
+          data: responsePayload,
+          statusCode: 200,
+          requestOptions: RequestOptions(path: ''),
+        ),
+      );
+      final result = await datasource.getAllQuotas();
+      expect(result.success, true);
+      expect(result.message, 'ok');
+    });
 
-    final result = await datasource.getAllQuotas();
-    expect(result.success, true);
-    expect(result.message, 'ok');
+    test('should throw Exception on error', () async {
+      when(() => mockDio.get(any())).thenThrow(Exception('error'));
+      expect(() => datasource.getAllQuotas(), throwsException);
+    });
   });
 
-  test('should throw Exception on error', () async {
-    when(() => mockDio.get(any())).thenThrow(Exception('error'));
-    expect(() => datasource.getAllQuotas(), throwsException);
+  group('getDetailQuota', () {
+    test(
+      'should return DetailQuotaResponse when response is successful',
+      () async {
+        final responsePayload = {
+          'success': true,
+          'message': 'ok',
+          'data': <String, dynamic>{},
+        };
+        when(() => mockDio.get(any())).thenAnswer(
+          (_) async => Response(
+            data: responsePayload,
+            statusCode: 200,
+            requestOptions: RequestOptions(path: ''),
+          ),
+        );
+        final result = await datasource.getDetailQuota(id: 'id1');
+        expect(result.success, true);
+        expect(result.message, 'ok');
+      },
+    );
+
+    test('should throw Exception on error', () async {
+      when(() => mockDio.get(any())).thenThrow(Exception('error'));
+      expect(() => datasource.getDetailQuota(id: 'id1'), throwsException);
+    });
+  });
+
+  group('checkPromoCode', () {
+    test(
+      'should return CheckPromoResponse when response is successful',
+      () async {
+        final responsePayload = {
+          'success': true,
+          'message': 'ok',
+          'data': <String, dynamic>{},
+        };
+        when(() => mockDio.post(any(), data: any(named: 'data'))).thenAnswer(
+          (_) async => Response(
+            data: responsePayload,
+            statusCode: 200,
+            requestOptions: RequestOptions(path: ''),
+          ),
+        );
+        final result = await datasource.checkPromoCode(
+          dataPlanId: 'plan1',
+          promoCode: 'PROMO',
+        );
+        expect(result.success, true);
+        expect(result.message, 'ok');
+      },
+    );
+
+    test('should throw Exception on error', () async {
+      when(
+        () => mockDio.post(any(), data: any(named: 'data')),
+      ).thenThrow(Exception('error'));
+      expect(
+        () =>
+            datasource.checkPromoCode(dataPlanId: 'plan1', promoCode: 'PROMO'),
+        throwsException,
+      );
+    });
   });
 }
