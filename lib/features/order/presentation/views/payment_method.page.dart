@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/errors/failure.dart';
+import 'package:litenet/core/helper/transaction_logger.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/custom_snackbar.dart';
@@ -45,6 +46,7 @@ class PaymentMethodPage extends HookConsumerWidget {
       next.when(
         data: (data) {
           if (data != null) {
+            TransactionLogger.orderCreated(data.data.orderId);
             context.pushReplacementNamed(
               RouteName.paymentPage,
               extra: {'orderId': data.data.orderId},
@@ -113,6 +115,7 @@ class PaymentMethodPage extends HookConsumerWidget {
           isLoading: asyncCreateTransaction.isLoading,
           onPressed: () {
             if (selectedPayment.value.isNotEmpty) {
+              TransactionLogger.start();
               ref
                   .read(createTransactionProvider.notifier)
                   .createTransaction(

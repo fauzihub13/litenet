@@ -10,6 +10,7 @@ import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/core/extensions/datetime_context.ext.dart';
 import 'package:litenet/core/extensions/num_context.ext.dart';
 import 'package:litenet/core/extensions/string_context.ext.dart';
+import 'package:litenet/core/helper/transaction_logger.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/custom_snackbar.dart';
@@ -60,6 +61,7 @@ class PaymentOrderPage extends HookConsumerWidget {
           if (data != null) {
             final status = data.data.transactionStatus;
             if (status == 'settlement' || status == 'capture') {
+              TransactionLogger.success();
               // Hentikan timer SEGERA
               pollTimer.value?.cancel();
               ref.invalidate(getDetailTransactionProvider(orderId: orderId));
