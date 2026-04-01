@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:litenet/features/setting/data/datasources/setting_datasource.dart';
 import 'package:litenet/features/setting/data/models/change_password_model.dart';
 import 'package:litenet/features/setting/data/models/faq_model.dart';
+import 'package:litenet/features/setting/data/models/logout_model.dart';
 import 'package:litenet/features/setting/data/models/privacy_and_policy_model.dart';
 import 'package:litenet/features/setting/data/models/profile_model.dart';
 import 'package:mocktail/mocktail.dart';
@@ -80,6 +81,38 @@ void main() {
         newPassword: 'new',
         confirmNewPassword: 'new',
       );
+      expect(result.success, true);
+      expect(result.message, 'ok');
+    });
+  });
+
+  group('changeProfile', () {
+    test('should return ProfileResponse on success', () async {
+      final mockData = ProfileResponseModel(success: true, message: 'ok');
+      final mockResponse = MockResponse();
+      when(() => mockResponse.data).thenReturn(mockData.toJson());
+      when(
+        () => mockDio.put(any(), data: any(named: 'data')),
+      ).thenAnswer((_) async => mockResponse);
+      final result = await datasource.changeProfile(
+        name: 'Test',
+        email: 'sadas@gmail.com',
+        phoneNumber: '0929123',
+      );
+      expect(result.success, true);
+      expect(result.message, 'ok');
+    });
+  });
+
+  group('logout', () {
+    test('should return logout on success', () async {
+      final mockData = LogoutResponseModel(success: true, message: 'ok');
+      final mockResponse = MockResponse();
+      when(() => mockResponse.data).thenReturn(mockData.toJson());
+      when(
+        () => mockDio.post(any(), data: any(named: 'data')),
+      ).thenAnswer((_) async => mockResponse);
+      final result = await datasource.logout();
       expect(result.success, true);
       expect(result.message, 'ok');
     });

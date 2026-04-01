@@ -1,11 +1,11 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/features/auth/domain/entities/login.dart';
 import 'package:litenet/features/setting/data/datasources/setting_datasource.dart';
 import 'package:litenet/features/setting/data/repositories/setting_repository_impl.dart';
 import 'package:litenet/features/setting/domain/entities/change_password.dart';
 import 'package:litenet/features/setting/domain/entities/faq.dart';
+import 'package:litenet/features/setting/domain/entities/logout.dart';
 import 'package:litenet/features/setting/domain/entities/privacy_and_policy.dart';
 import 'package:litenet/features/setting/domain/entities/profile.dart';
 import 'package:mocktail/mocktail.dart';
@@ -35,7 +35,6 @@ void main() {
       expect(result.isLeft(), true);
     });
     test('should return Failure on error', () async {
-      final failure = Failure(message: 'Exception: error');
       when(() => mockDatasource.getFAQ()).thenThrow(Exception('error'));
       final result = await repository.getFAQ();
       expect(result.isLeft(), true);
@@ -68,12 +67,11 @@ void main() {
       expect(result.isLeft(), true);
     });
     test('should return Failure on error', () async {
-      final failure = Failure(message: 'Exception: error');
       when(
         () => mockDatasource.getPrivacyAndPolicy(),
       ).thenThrow(Exception('error'));
       final result = await repository.getPrivacyAndPolicy();
-     expect(result.isLeft(), true);
+      expect(result.isLeft(), true);
     });
   });
 
@@ -122,7 +120,7 @@ void main() {
           createdAt: DateTime.now(), // waktu dibuat sekarang
           updatedAt: DateTime.now(), // waktu update sekarang
           deletedAt: DateTime(1970, 1, 1), // default kosong (epoch)
-        )
+        ),
       );
       when(
         () => mockDatasource.getProfile(),
@@ -131,7 +129,6 @@ void main() {
       expect(result.isLeft(), true);
     });
     test('should return Failure on error', () async {
-      final failure = Failure(message: 'Exception: error');
       when(() => mockDatasource.getProfile()).thenThrow(Exception('error'));
       final result = await repository.getProfile();
       expect(result.isLeft(), true);
@@ -171,8 +168,8 @@ void main() {
       );
       expect(result.isLeft(), true);
     });
+
     test('should return Failure on error', () async {
-      final failure = Failure(message: 'Exception: error');
       when(
         () => mockDatasource.changePassword(
           oldPassword: 'old',
@@ -185,6 +182,112 @@ void main() {
         newPassword: 'new',
         confirmNewPassword: 'new',
       );
+      expect(result.isLeft(), true);
+    });
+  });
+
+  group('changeProfile', () {
+    test('should return ChangeProfileResponse on success', () async {
+      final tResponse = ProfileResponse(
+        success: true,
+        message: 'ok',
+        data: User(
+          id: "USR-0000",
+          name: "Dummy User",
+          avatar: "https://dummyimage.com/100x100/000/fff.png",
+          email: "dummy@example.com",
+          phoneNumber: "081234567890",
+          role: "guest",
+          emailOtp: "000000",
+          emailOtpExpiredAt: DateTime.now().add(const Duration(minutes: 5)),
+          emailVerifiedAt: DateTime.now(),
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          deletedAt: DateTime(1970, 1, 1),
+        ),
+      );
+      when(
+        () => mockDatasource.changeProfile(
+          name: 'old',
+          email: 'new',
+          phoneNumber: 'new',
+        ),
+      ).thenAnswer((_) async => tResponse);
+      final result = await repository.changeProfile(
+        name: 'old',
+        email: 'new',
+        phoneNumber: 'new',
+      );
+      expect(result, Right(tResponse));
+    });
+    test('should return Failure when response.success is false', () async {
+      final tResponse = ProfileResponse(
+        success: false,
+        message: 'gagal',
+        data: User(
+          id: "USR-0000",
+          name: "Dummy User",
+          avatar: "https://dummyimage.com/100x100/000/fff.png",
+          email: "dummy@example.com",
+          phoneNumber: "081234567890",
+          role: "guest",
+          emailOtp: "000000",
+          emailOtpExpiredAt: DateTime.now().add(const Duration(minutes: 5)),
+          emailVerifiedAt: DateTime.now(),
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          deletedAt: DateTime(1970, 1, 1),
+        ),
+      );
+      when(
+        () => mockDatasource.changeProfile(
+          name: 'old',
+          email: 'new',
+          phoneNumber: 'new',
+        ),
+      ).thenAnswer((_) async => tResponse);
+      final result = await repository.changeProfile(
+        name: 'old',
+        email: 'new',
+        phoneNumber: 'new',
+      );
+      expect(result.isLeft(), true);
+    });
+
+    test('should return Failure on error', () async {
+      when(
+        () => mockDatasource.changeProfile(
+          name: 'old',
+          email: 'new',
+          phoneNumber: 'new',
+        ),
+      ).thenThrow(Exception('error'));
+      final result = await repository.changeProfile(
+        name: 'old',
+        email: 'new',
+        phoneNumber: 'new',
+      );
+      expect(result.isLeft(), true);
+    });
+  });
+
+  group('logout', () {
+    test('should return logout on success', () async {
+      final tResponse = LogoutResponse(success: true, message: 'ok');
+      when(() => mockDatasource.logout()).thenAnswer((_) async => tResponse);
+      final result = await repository.logout();
+      expect(result, Right(tResponse));
+    });
+    test('should return Failure when response.success is false', () async {
+      final tResponse = LogoutResponse(success: false, message: 'gagal');
+      when(() => mockDatasource.logout()).thenAnswer((_) async => tResponse);
+      final result = await repository.logout();
+      expect(result.isLeft(), true);
+    });
+
+    test('should return Failure on error', () async {
+      when(() => mockDatasource.logout()).thenThrow(Exception('error'));
+      final result = await repository.logout();
       expect(result.isLeft(), true);
     });
   });
