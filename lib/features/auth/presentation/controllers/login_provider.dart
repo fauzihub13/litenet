@@ -21,8 +21,8 @@ class Login extends _$Login {
     final usecase = ref.read(loginUsecaseProvider);
     final result = await usecase.call(email: email, password: password);
 
-    result.fold(
-      (failure) {
+    await result.fold(
+      (failure) async {
         state = AsyncValue.error(failure, StackTrace.current);
       },
       (data) async {

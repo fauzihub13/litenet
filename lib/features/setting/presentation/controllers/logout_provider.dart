@@ -19,8 +19,8 @@ class Logout extends _$Logout {
     final usecase = ref.read(logoutUsecaseProvider);
     final result = await usecase.call();
 
-    result.fold(
-      (failure) {
+    await result.fold(
+      (failure) async {
         state = AsyncValue.error(failure, StackTrace.current);
       },
       (data) async {

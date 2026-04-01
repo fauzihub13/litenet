@@ -26,8 +26,8 @@ class ChangeProfile extends _$ChangeProfile {
       phoneNumber: phoneNumber,
     );
 
-    result.fold(
-      (failure) {
+    await result.fold(
+      (failure) async {
         state = AsyncValue.error(failure, StackTrace.current);
       },
       (data) async {
