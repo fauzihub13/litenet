@@ -11,25 +11,38 @@ void main() {
   late MockTransactionRepository mockRepository;
   late DownloadInvoiceUsecase usecase;
 
+  final tFilePath = '/downloads/invoice_ORD-001.pdf';
+
   setUp(() {
     mockRepository = MockTransactionRepository();
     usecase = DownloadInvoiceUsecase(mockRepository);
   });
 
-  test('should return file path on success', () async {
-    when(
-      () => mockRepository.downloadInvoice(orderId: 'ORD-1'),
-    ).thenAnswer((_) async => Right('/path/to/invoice.pdf'));
-    final result = await usecase(orderId: 'ORD-1');
-    expect(result, Right('/path/to/invoice.pdf'));
-  });
+  group('DownloadInvoiceUsecase', () {
+    test('should call downloadInvoice from repository with correct orderId', () async {
+      // arrange
+      when(() => mockRepository.downloadInvoice(orderId: any(named: 'orderId')))
+          .thenAnswer((_) async => Right(tFilePath));
 
-  test('should return Failure on error', () async {
-    final failure = Failure(message: 'error');
-    when(
-      () => mockRepository.downloadInvoice(orderId: 'ORD-1'),
-    ).thenAnswer((_) async => Left(failure));
-    final result = await usecase(orderId: 'ORD-1');
-    expect(result, Left(failure));
+      // act
+      final result = await usecase(orderId: 'ORD-001');
+
+      // assert
+      expect(result, Right(tFilePath));
+      verify(() => mockRepository.downloadInvoice(orderId: 'ORD-001')).called(1);
+    });
+
+    test('should return Failure from repository when download fails', () async {
+      // arrange
+      final tFailure = Failure(message: 'Download failed');
+      when(() => mockRepository.downloadInvoice(orderId: any(named: 'orderId')))
+          .thenAnswer((_) async => Left(tFailure));
+
+      // act
+      final result = await usecase(orderId: 'ORD-001');
+
+      // assert
+      expect(result, Left(tFailure));
+    });
   });
 }

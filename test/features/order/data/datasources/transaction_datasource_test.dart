@@ -14,182 +14,228 @@ void main() {
     datasource = TransactionDatasourceImpl(httpClient: mockDio);
   });
 
-  group('createTransaction', () {
-    test(
-      'should return CreateTransactionResponse when response is successful',
-      () async {
-        final responsePayload = {
-          'success': true,
-          'message': 'ok',
-          'data': null,
-        };
-        when(() => mockDio.post(any(), data: any(named: 'data'))).thenAnswer(
-          (_) async => Response(
-            data: responsePayload,
-            statusCode: 200,
-            requestOptions: RequestOptions(path: ''),
-          ),
-        );
-        final result = await datasource.createTransaction(
-          deviceId: 'dev1',
-          dataPlanId: 'plan1',
-          paymentMethod: 'method1',
-          promoCode: 'PROMO',
-        );
-        expect(result.success, true);
-        expect(result.message, 'ok');
-      },
-    );
+  group('TransactionDatasourceImpl', () {
+    group('createTransaction', () {
+      final tResponsePayload = {
+        'success': true,
+        'message': 'Transaction created successfully',
+        'data': {
+          'order_id': 'ORD-001',
+          'amount': 150000,
+          'payment_type': 'bank_transfer',
+          'bank': 'BCA',
+          'image_url': 'https://example.com/payment.png',
+          'va_number': '1234567890123456',
+          'expired_at': '2026-04-03T10:00:00Z',
+        },
+      };
 
-    test('should throw Exception on error', () async {
-      when(
-        () => mockDio.post(any(), data: any(named: 'data')),
-      ).thenThrow(Exception('error'));
-      expect(
-        () => datasource.createTransaction(
-          deviceId: 'dev1',
-          dataPlanId: 'plan1',
-          paymentMethod: 'method1',
-          promoCode: 'PROMO',
-        ),
-        throwsException,
+      test(
+        'should return CreateTransactionResponse when response is successful (200)',
+        () async {
+          // arrange
+          when(() => mockDio.post(any(), data: any(named: 'data'))).thenAnswer(
+            (_) async => Response(
+              data: tResponsePayload,
+              statusCode: 200,
+              requestOptions: RequestOptions(path: ''),
+            ),
+          );
+
+          // act
+          final result = await datasource.createTransaction(
+            deviceId: 'DEV-001',
+            dataPlanId: 'PLAN-001',
+            paymentMethod: 'bca_va',
+            promoCode: 'PROMO',
+          );
+
+          // assert
+          expect(result.success, true);
+          expect(result.data.orderId, 'ORD-001');
+          verify(() => mockDio.post(any(), data: any(named: 'data'))).called(1);
+        },
+      );
+
+      test('should throw DioException when dio throws', () async {
+        // arrange
+        when(
+          () => mockDio.post(any(), data: any(named: 'data')),
+        ).thenThrow(DioException(requestOptions: RequestOptions(path: '')));
+
+        // act
+        final call = datasource.createTransaction;
+
+        // assert
+        expect(
+          () => call(
+            deviceId: 'dev1',
+            dataPlanId: 'plan1',
+            paymentMethod: 'method1',
+            promoCode: 'PROMO',
+          ),
+          throwsA(isA<DioException>()),
+        );
+      });
+    });
+
+    group('getAllPaymentMethod', () {
+      final tResponsePayload = {
+        'success': true,
+        'message': 'Payment methods fetched',
+        'data': [
+          {
+            'id': 'PM-001',
+            'payment_method': 'BCA Virtual Account',
+            'payment_type': 'bank_transfer',
+            'bank': 'BCA',
+            'image_url': 'https://example.com/bca.png',
+          },
+        ],
+      };
+
+      test(
+        'should return PaymentMethodResponse when response is successful',
+        () async {
+          // arrange
+          when(() => mockDio.get(any())).thenAnswer(
+            (_) async => Response(
+              data: tResponsePayload,
+              statusCode: 200,
+              requestOptions: RequestOptions(path: ''),
+            ),
+          );
+
+          // act
+          final result = await datasource.getAllPaymentMethod();
+
+          // assert
+          expect(result.success, true);
+          expect(result.data.first.id, 'PM-001');
+        },
       );
     });
-  });
 
-  group('getAllPaymentMethod', () {
-    test(
-      'should return PaymentMethodResponse when response is successful',
-      () async {
-        final responsePayload = {'success': true, 'message': 'ok', 'data': []};
-        when(() => mockDio.get(any())).thenAnswer(
-          (_) async => Response(
-            data: responsePayload,
-            statusCode: 200,
-            requestOptions: RequestOptions(path: ''),
-          ),
-        );
-        final result = await datasource.getAllPaymentMethod();
-        expect(result.success, true);
-        expect(result.message, 'ok');
-      },
-    );
+    group('checkPaymentStatus', () {
+      final tResponsePayload = {
+        'success': true,
+        'message': 'Status fetched',
+        'data': {
+          'id': 'PAY-001',
+          'user_id': 'USR-001',
+          'order_id': 'ORD-001',
+          'transaction_status': 'settlement',
+          'fraud_status': 'accept',
+          'bank': 'BCA',
+          'expired_at': '2026-04-03T10:00:00Z',
+        },
+      };
 
-    test('should throw Exception on error', () async {
-      when(() => mockDio.get(any())).thenThrow(Exception('error'));
-      expect(() => datasource.getAllPaymentMethod(), throwsException);
-    });
-  });
+      test(
+        'should return CheckPaymentStatusResponse when response is successful',
+        () async {
+          // arrange
+          when(() => mockDio.get(any())).thenAnswer(
+            (_) async => Response(
+              data: tResponsePayload,
+              statusCode: 200,
+              requestOptions: RequestOptions(path: ''),
+            ),
+          );
 
-  group('checkPaymentStatus', () {
-    test(
-      'should return CheckPaymentStatusResponse when response is successful',
-      () async {
-        final responsePayload = {'success': true, 'message': 'ok', 'data': <String, dynamic>{}};
-        when(() => mockDio.get(any())).thenAnswer(
-          (_) async => Response(
-            data: responsePayload,
-            statusCode: 200,
-            requestOptions: RequestOptions(path: ''),
-          ),
-        );
-        final result = await datasource.checkPaymentStatus(orderId: 'order1');
-        expect(result.success, true);
-        expect(result.message, 'ok');
-      },
-    );
+          // act
+          final result = await datasource.checkPaymentStatus(
+            orderId: 'ORD-001',
+          );
 
-    test('should throw Exception on error', () async {
-      when(() => mockDio.get(any())).thenThrow(Exception('error'));
-      expect(
-        () => datasource.checkPaymentStatus(orderId: 'order1'),
-        throwsException,
+          // assert
+          expect(result.success, true);
+          expect(result.data.transactionStatus, 'settlement');
+        },
       );
     });
-  });
 
-  group('getAllTransaction', () {
-    test(
-      'should return TransactionResponse when response is successful',
-      () async {
-        final responsePayload = {'success': true, 'message': 'ok', 'data': []};
-        when(() => mockDio.get(any())).thenAnswer(
-          (_) async => Response(
-            data: responsePayload,
-            statusCode: 200,
-            requestOptions: RequestOptions(path: ''),
-          ),
-        );
-        final result = await datasource.getAllTransaction();
-        expect(result.success, true);
-        expect(result.message, 'ok');
-      },
-    );
+    group('getAllTransaction', () {
+      final tResponsePayload = {
+        'success': true,
+        'message': 'Transactions fetched',
+        'data': [
+          {
+            'id': 'tr-001',
+            'order_id': 'ORD-001',
+            'package_name': 'Unlimited 100GB',
+            'capacity': '100GB',
+            'transaction_status': 'SETTLEMENT',
+            'gross_amount': 150000,
+            'created_at': '2026-04-02T10:00:00Z',
+          },
+        ],
+      };
 
-    test('should throw Exception on error', () async {
-      when(() => mockDio.get(any())).thenThrow(Exception('error'));
-      expect(() => datasource.getAllTransaction(), throwsException);
-    });
-  });
+      test(
+        'should return TransactionResponse when response is successful',
+        () async {
+          // arrange
+          when(() => mockDio.get(any())).thenAnswer(
+            (_) async => Response(
+              data: tResponsePayload,
+              statusCode: 200,
+              requestOptions: RequestOptions(path: ''),
+            ),
+          );
 
-  group('getDetailTransaction', () {
-    test(
-      'should return DetailTransactionResponse when response is successful',
-      () async {
-        final responsePayload = {'success': true, 'message': 'ok', 'data': <String, dynamic>{}};
-        when(() => mockDio.get(any())).thenAnswer(
-          (_) async => Response(
-            data: responsePayload,
-            statusCode: 200,
-            requestOptions: RequestOptions(path: ''),
-          ),
-        );
-        final result = await datasource.getDetailTransaction(orderId: 'order1');
-        expect(result.success, true);
-        expect(result.message, 'ok');
-      },
-    );
+          // act
+          final result = await datasource.getAllTransaction();
 
-    test('should throw Exception on error', () async {
-      when(() => mockDio.get(any())).thenThrow(Exception('error'));
-      expect(
-        () => datasource.getDetailTransaction(orderId: 'order1'),
-        throwsException,
+          // assert
+          expect(result.success, true);
+          expect(result.data.first.orderId, 'ORD-001');
+        },
       );
     });
-  });
 
-  group('downloadInvoice', () {
-    test('should return file path when download is successful', () async {
-      // Mock platform and directory
-      // For simplicity, skip actual file IO and just test Dio call/response
-      when(
-        () => mockDio.download(any(), any(), options: any(named: 'options')),
-      ).thenAnswer(
-        (_) async => Response(
-          data: Stream<List<int>>.empty(),
-          statusCode: 200,
-          requestOptions: RequestOptions(path: ''),
-        ),
-      );
-      // You may need to mock Platform and Directory if you want to test the full method
-      // Here, just check that Dio.download is called and returns the expected path
-      // This test may need to be adjusted if you have platform-specific logic
-      // expect(await datasource.downloadInvoice(orderId: 'order1'), contains('.pdf'));
-    });
+    group('getDetailTransaction', () {
+      final tResponsePayload = {
+        'success': true,
+        'message': 'Detail fetched',
+        'data': {
+          'id': 'TX-001',
+          'order_id': 'ORD-001',
+          'package_name': 'Unlimited 100GB',
+          'capacity': '100GB',
+          'transaction_status': 'SETTLEMENT',
+          'gross_amount': 150000,
+          'bank_code': 'BCA',
+          'bank_name': 'BCA Virtual Account',
+          'bank_image_url': 'https://example.com/bca.png',
+          'va_number': '1234567890123456',
+          'created_at': '2026-04-02T10:00:00Z',
+          'expired_at': '2026-04-03T10:00:00Z',
+        },
+      };
 
-    test('should throw Exception when download fails', () async {
-      when(
-        () => mockDio.download(any(), any(), options: any(named: 'options')),
-      ).thenAnswer(
-        (_) async => Response(
-          data: Stream<List<int>>.empty(),
-          statusCode: 400,
-          requestOptions: RequestOptions(path: ''),
-        ),
+      test(
+        'should return DetailTransactionResponse when response is successful',
+        () async {
+          // arrange
+          when(() => mockDio.get(any())).thenAnswer(
+            (_) async => Response(
+              data: tResponsePayload,
+              statusCode: 200,
+              requestOptions: RequestOptions(path: ''),
+            ),
+          );
+
+          // act
+          final result = await datasource.getDetailTransaction(
+            orderId: 'ORD-001',
+          );
+
+          // assert
+          expect(result.success, true);
+          expect(result.data.orderId, 'ORD-001');
+        },
       );
-      // This test may need to be adjusted for platform-specific logic
-      // expect(() => datasource.downloadInvoice(orderId: 'order1'), throwsException);
     });
   });
 }

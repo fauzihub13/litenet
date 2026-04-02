@@ -12,40 +12,50 @@ void main() {
   late MockTransactionRepository mockRepository;
   late CheckPaymentStatusUsecase usecase;
 
+  final tResponse = CheckPaymentStatusResponse(
+    success: true,
+    message: 'Payment status checked successfully',
+    data: CheckPaymentStatusDataEntity(
+      id: "PAY-20260402-001",
+      userId: "USR-001",
+      orderId: "ORD-001",
+      transactionStatus: "settlement",
+      fraudStatus: "accept",
+      bank: "BCA",
+      expiredAt: DateTime(2026, 4, 3, 10, 0, 0),
+    ),
+  );
+
   setUp(() {
     mockRepository = MockTransactionRepository();
     usecase = CheckPaymentStatusUsecase(mockRepository);
   });
 
-  test('should return CheckPaymentStatusResponse on success', () async {
-    final tResponse = CheckPaymentStatusResponse(
-      success: true,
-      message: 'ok',
-      data: CheckPaymentStatusDataEntity(
-        id: "PAY-${DateTime.now().millisecondsSinceEpoch}", // ID unik dummy
-        userId: "USR-0000", // user dummy
-        orderId: "ORD-0000", // order dummy
-        transactionStatus: "pending", // status default
-        fraudStatus: "accept", // fraud status default
-        bank: "BCA", // bank dummy
-        expiredAt: DateTime.now().add(
-          const Duration(hours: 24),
-        ), // expired 24 jam dari sekarang
-      ),
-    );
-    when(
-      () => mockRepository.checkPaymentStatus(orderId: 'ORD-1'),
-    ).thenAnswer((_) async => Right(tResponse));
-    final result = await usecase(orderId: 'ORD-1');
-    expect(result, Right(tResponse));
-  });
+  group('CheckPaymentStatusUsecase', () {
+    test('should call checkPaymentStatus from repository with correct orderId', () async {
+      // arrange
+      when(() => mockRepository.checkPaymentStatus(orderId: any(named: 'orderId')))
+          .thenAnswer((_) async => Right(tResponse));
 
-  test('should return Failure on error', () async {
-    final failure = Failure(message: 'error');
-    when(
-      () => mockRepository.checkPaymentStatus(orderId: 'ORD-1'),
-    ).thenAnswer((_) async => Left(failure));
-    final result = await usecase(orderId: 'ORD-1');
-    expect(result, Left(failure));
+      // act
+      final result = await usecase(orderId: 'ORD-001');
+
+      // assert
+      expect(result, Right(tResponse));
+      verify(() => mockRepository.checkPaymentStatus(orderId: 'ORD-001')).called(1);
+    });
+
+    test('should return Failure from repository when check fails', () async {
+      // arrange
+      final tFailure = Failure(message: 'Network error');
+      when(() => mockRepository.checkPaymentStatus(orderId: any(named: 'orderId')))
+          .thenAnswer((_) async => Left(tFailure));
+
+      // act
+      final result = await usecase(orderId: 'ORD-001');
+
+      // assert
+      expect(result, Left(tFailure));
+    });
   });
 }

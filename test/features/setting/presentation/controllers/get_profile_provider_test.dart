@@ -11,51 +11,102 @@ import 'package:mocktail/mocktail.dart';
 
 class MockGetProfileUsecase extends Mock implements GetProfileUsecase {}
 
+class Listener<T> extends Mock {
+  void call(T? previous, T next);
+}
+
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
   late MockGetProfileUsecase mockUsecase;
   late ProviderContainer container;
+
+  final tUser = User(
+    id: 'USR-001',
+    name: 'Test User',
+    avatar: 'https://example.com/avatar.png',
+    email: 'test@example.com',
+    phoneNumber: '08123456789',
+    role: 'user',
+    emailOtp: '123456',
+    emailOtpExpiredAt: DateTime(2026, 1, 1),
+    emailVerifiedAt: DateTime(2026, 1, 1),
+    createdAt: DateTime(2026, 1, 1),
+    updatedAt: DateTime(2026, 1, 1),
+    deletedAt: DateTime(1970, 1, 1),
+  );
+
+  final tResponse = ProfileResponse(
+    success: true,
+    message: 'Profile fetched successfully',
+    data: tUser,
+  );
+
+  final tFailure = Failure(message: 'Failed to fetch profile');
+
+  setUpAll(() {
+    registerFallbackValue(const AsyncLoading<ProfileResponse>());
+    registerFallbackValue(AsyncData<ProfileResponse>(tResponse));
+  });
 
   setUp(() {
     mockUsecase = MockGetProfileUsecase();
     container = ProviderContainer(
-      overrides: [getProfileUsecaseProvider.overrideWithValue(mockUsecase)],
+      overrides: [
+        getProfileUsecaseProvider.overrideWithValue(mockUsecase),
+      ],
     );
   });
 
-  test('should return ProfileResponse on success', () async {
-    final tResponse = ProfileResponse(
-      success: true,
-      message: 'ok',
-      data: User(
-        id: "USR-${DateTime.now().millisecondsSinceEpoch}", // ID unik dummy
-        name: "Dummy User", // nama kosong
-        avatar: "https://dummyimage.com/100x100/000/fff.png", // avatar dummy
-        email: "dummy@example.com", // email dummy
-        phoneNumber: "081234567890", // nomor dummy
-        role: "guest", // role dummy
-        emailOtp: "000000", // OTP dummy
-        emailOtpExpiredAt: DateTime.now().add(
-          const Duration(minutes: 5),
-        ), // expired 5 menit
-        emailVerifiedAt: DateTime.now(), // dianggap sudah diverifikasi
-        createdAt: DateTime.now(), // waktu dibuat sekarang
-        updatedAt: DateTime.now(), // waktu update sekarang
-        deletedAt: DateTime(1970, 1, 1), // default kosong (epoch)
-      ),
-    );
-    when(() => mockUsecase()).thenAnswer((_) async => Right(tResponse));
-    final result = await container.read(getProfileProvider.future);
-    expect(result, tResponse);
+  tearDown(() {
+    container.dispose();
   });
 
-  test('should throw StateError on error', () async {
-    when(
-      () => mockUsecase(),
-    ).thenAnswer((_) async => Left(Failure(message: 'error')));
-    expect(
-      () => container.read(getProfileProvider.future),
-      throwsA(isA<StateError>()),
-    );
+  group('GetProfileProvider', () {
+    test('should fetch profile and emit AsyncData on success', () async {
+      // arrange
+      when(() => mockUsecase.call()).thenAnswer((_) async => Right(tResponse));
+
+      final listener = Listener<AsyncValue<ProfileResponse>>();
+      container.listen(
+        getProfileProvider,
+        listener.call,
+        fireImmediately: true,
+      );
+
+      // act
+      final state = await container.read(getProfileProvider.future);
+
+      // assert
+      expect(state, tResponse);
+      verify(() => mockUsecase.call()).called(1);
+      
+      verifyInOrder([
+        () => listener(any(), any(that: isA<AsyncLoading>())),
+        () => listener(any(), AsyncData<ProfileResponse>(tResponse)),
+      ]);
+    });
+
+    test('should emit AsyncError when fetching fails', () async {
+      // arrange
+      when(() => mockUsecase.call()).thenAnswer((_) async => Left(tFailure));
+
+      final listener = Listener<AsyncValue<ProfileResponse>>();
+      container.listen(
+        getProfileProvider,
+        listener.call,
+        fireImmediately: true,
+      );
+
+      // act
+      try {
+        await container.read(getProfileProvider.future);
+      } catch (e) {
+        expect(e, tFailure);
+      }
+
+      // assert
+      final finalState = container.read(getProfileProvider);
+      expect(finalState, isA<AsyncError>());
+      expect(finalState.error, tFailure);
+    });
   });
 }

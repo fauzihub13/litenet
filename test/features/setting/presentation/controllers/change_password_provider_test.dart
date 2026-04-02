@@ -10,60 +10,115 @@ import 'package:mocktail/mocktail.dart';
 
 class MockChangePasswordUsecase extends Mock implements ChangePasswordUsecase {}
 
+class Listener<T> extends Mock {
+  void call(T? previous, T next);
+}
+
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
   late MockChangePasswordUsecase mockUsecase;
   late ProviderContainer container;
+
+  final tResponse = ChangePasswordResponse(
+    success: true,
+    message: 'Password changed successfully',
+  );
+
+  final tFailure = Failure(message: 'Invalid old password');
+
+  setUpAll(() {
+    registerFallbackValue(const AsyncLoading<ChangePasswordResponse?>());
+    registerFallbackValue(AsyncData<ChangePasswordResponse?>(tResponse));
+  });
 
   setUp(() {
     mockUsecase = MockChangePasswordUsecase();
     container = ProviderContainer(
-      overrides: [changePasswordUsecaseProvider.overrideWithValue(mockUsecase)],
+      overrides: [
+        changePasswordUsecaseProvider.overrideWithValue(mockUsecase),
+      ],
     );
   });
 
-  test('should emit loading and then data on success', () async {
-    final tResponse = ChangePasswordResponse(success: true, message: 'ok');
-    when(() => mockUsecase(
-      oldPassword: 'old',
-      newPassword: 'new',
-      confirmNewPassword: 'new',
-    )).thenAnswer((_) async => Right(tResponse));
-    final notifier = container.read(changePasswordProvider.notifier);
-    final future = notifier.changePassword(
-      oldPassword: 'old',
-      newPassword: 'new',
-      confirmNewPassword: 'new',
-    );
-    expect(container.read(changePasswordProvider), isA<AsyncLoading>());
-    await future;
-    ChangePasswordResponse? value;
-    for (var i = 0; i < 100; i++) {
-      final state = container.read(changePasswordProvider);
-      if (!state.isLoading) {
-        value = state.value;
-        break;
-      }
-      await Future.delayed(const Duration(milliseconds: 10));
-    }
-    expect(value, isNotNull);
-    expect(value, tResponse);
+  tearDown(() {
+    container.dispose();
   });
 
-  test('should emit loading and then error on failure', () async {
-    when(() => mockUsecase(
-      oldPassword: 'old',
-      newPassword: 'new',
-      confirmNewPassword: 'new',
-    )).thenAnswer((_) async => Left(Failure(message: 'error')));
-    final notifier = container.read(changePasswordProvider.notifier);
-    final future = notifier.changePassword(
-      oldPassword: 'old',
-      newPassword: 'new',
-      confirmNewPassword: 'new',
-    );
-    expect(container.read(changePasswordProvider), isA<AsyncLoading>());
-    await future;
-    expect(container.read(changePasswordProvider).hasError, true);
+  group('ChangePasswordProvider', () {
+    test('initial state should eventually be AsyncData(null)', () async {
+      final state = await container.read(changePasswordProvider.future);
+      expect(state, null);
+    });
+
+    test('should emit AsyncLoading and then AsyncData on success', () async {
+      // arrange
+      when(() => mockUsecase.call(
+            oldPassword: any(named: 'oldPassword'),
+            newPassword: any(named: 'newPassword'),
+            confirmNewPassword: any(named: 'confirmNewPassword'),
+          )).thenAnswer((_) async => Right(tResponse));
+
+      // Wait for build
+      await container.read(changePasswordProvider.future);
+
+      final listener = Listener<AsyncValue<ChangePasswordResponse?>>();
+      container.listen(changePasswordProvider, listener.call, fireImmediately: true);
+
+      final notifier = container.read(changePasswordProvider.notifier);
+
+      // act
+      await notifier.changePassword(
+        oldPassword: 'old_password_123',
+        newPassword: 'new_password_123',
+        confirmNewPassword: 'new_password_123',
+      );
+
+      // assert
+      verifyInOrder([
+        () => listener(any(), const AsyncData<ChangePasswordResponse?>(null)),
+        () => listener(any(), any(that: isA<AsyncLoading>())),
+        () => listener(any(), AsyncData<ChangePasswordResponse?>(tResponse)),
+      ]);
+
+      verify(() => mockUsecase.call(
+            oldPassword: 'old_password_123',
+            newPassword: 'new_password_123',
+            confirmNewPassword: 'new_password_123',
+          )).called(1);
+    });
+
+    test('should emit AsyncError on failure', () async {
+      // arrange
+      when(() => mockUsecase.call(
+            oldPassword: any(named: 'oldPassword'),
+            newPassword: any(named: 'newPassword'),
+            confirmNewPassword: any(named: 'confirmNewPassword'),
+          )).thenAnswer((_) async => Left(tFailure));
+
+      // Wait for build
+      await container.read(changePasswordProvider.future);
+
+      final listener = Listener<AsyncValue<ChangePasswordResponse?>>();
+      container.listen(changePasswordProvider, listener.call, fireImmediately: true);
+
+      final notifier = container.read(changePasswordProvider.notifier);
+
+      // act
+      await notifier.changePassword(
+        oldPassword: 'wrong_password',
+        newPassword: 'new_password_123',
+        confirmNewPassword: 'new_password_123',
+      );
+
+      // assert
+      verifyInOrder([
+        () => listener(any(), const AsyncData<ChangePasswordResponse?>(null)),
+        () => listener(any(), any(that: isA<AsyncLoading>())),
+        () => listener(any(), any(that: isA<AsyncError>())),
+      ]);
+
+      final finalState = container.read(changePasswordProvider);
+      expect(finalState, isA<AsyncError>());
+      expect(finalState.error, tFailure);
+    });
   });
 }

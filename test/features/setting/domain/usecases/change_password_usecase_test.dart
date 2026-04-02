@@ -12,42 +12,59 @@ void main() {
   late MockSettingRepository mockRepository;
   late ChangePasswordUsecase usecase;
 
+  final tResponse = ChangePasswordResponse(
+    success: true,
+    message: 'Password changed successfully',
+  );
+
   setUp(() {
     mockRepository = MockSettingRepository();
     usecase = ChangePasswordUsecase(mockRepository);
   });
 
-  test('should return ChangePasswordResponse on success', () async {
-    final tResponse = ChangePasswordResponse(success: true, message: 'ok');
-    when(
-      () => mockRepository.changePassword(
-        oldPassword: 'old',
-        newPassword: 'new',
-        confirmNewPassword: 'new',
-      ),
-    ).thenAnswer((_) async => Right(tResponse));
-    final result = await usecase(
-      oldPassword: 'old',
-      newPassword: 'new',
-      confirmNewPassword: 'new',
-    );
-    expect(result, Right(tResponse));
-  });
+  group('ChangePasswordUsecase', () {
+    test('should call changePassword from repository with correct parameters', () async {
+      // arrange
+      when(() => mockRepository.changePassword(
+            oldPassword: any(named: 'oldPassword'),
+            newPassword: any(named: 'newPassword'),
+            confirmNewPassword: any(named: 'confirmNewPassword'),
+          )).thenAnswer((_) async => Right(tResponse));
 
-  test('should return Failure on error', () async {
-    final failure = Failure(message: 'error');
-    when(
-      () => mockRepository.changePassword(
-        oldPassword: 'old',
-        newPassword: 'new',
-        confirmNewPassword: 'new',
-      ),
-    ).thenAnswer((_) async => Left(failure));
-    final result = await usecase(
-      oldPassword: 'old',
-      newPassword: 'new',
-      confirmNewPassword: 'new',
-    );
-    expect(result, Left(failure));
+      // act
+      final result = await usecase(
+        oldPassword: 'old_password_123',
+        newPassword: 'new_password_123',
+        confirmNewPassword: 'new_password_123',
+      );
+
+      // assert
+      expect(result, Right(tResponse));
+      verify(() => mockRepository.changePassword(
+            oldPassword: 'old_password_123',
+            newPassword: 'new_password_123',
+            confirmNewPassword: 'new_password_123',
+          )).called(1);
+    });
+
+    test('should return Failure from repository when change fails', () async {
+      // arrange
+      final tFailure = Failure(message: 'Incorrect old password');
+      when(() => mockRepository.changePassword(
+            oldPassword: any(named: 'oldPassword'),
+            newPassword: any(named: 'newPassword'),
+            confirmNewPassword: any(named: 'confirmNewPassword'),
+          )).thenAnswer((_) async => Left(tFailure));
+
+      // act
+      final result = await usecase(
+        oldPassword: 'wrong_password',
+        newPassword: 'new_password_123',
+        confirmNewPassword: 'new_password_123',
+      );
+
+      // assert
+      expect(result, Left(tFailure));
+    });
   });
 }

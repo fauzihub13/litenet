@@ -13,46 +13,64 @@ void main() {
   late MockAuthRepository mockRepository;
   late ResendOTPUsecase usecase;
 
+  final tUser = User(
+    id: "USR-0001",
+    name: "Test User",
+    avatar: "https://example.com/avatar.png",
+    email: "test@example.com",
+    phoneNumber: "081234567890",
+    role: "user",
+    emailOtp: "123456",
+    emailOtpExpiredAt: DateTime(2026, 1, 1),
+    emailVerifiedAt: DateTime(2026, 1, 1),
+    createdAt: DateTime(2026, 1, 1),
+    updatedAt: DateTime(2026, 1, 1),
+    deletedAt: DateTime(1970, 1, 1),
+  );
+
+  final tOTPResponse = OTPResponse(
+    success: true,
+    message: 'OTP resent successfully',
+    data: OTPDataEntity(
+      user: tUser,
+      isVerified: false,
+      token: "valid_token",
+    ),
+  );
+
   setUp(() {
     mockRepository = MockAuthRepository();
     usecase = ResendOTPUsecase(mockRepository);
   });
 
-  test('should return OTPResponse on success', () async {
-    final tOtpResponse = OTPResponse(
-      success: true,
-      message: 'ok',
-      data: OTPDataEntity(
-        user: User(
-          id: "USR-0000",
-          name: "Dummy User",
-          avatar: "https://dummyimage.com/100x100/000/fff.png",
-          email: "dummy@example.com",
-          phoneNumber: "081234567890",
-          role: "guest",
-          emailOtp: "000000",
-          emailOtpExpiredAt: DateTime.now().add(const Duration(minutes: 5)),
-          emailVerifiedAt: DateTime.now(),
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-          deletedAt: DateTime(1970, 1, 1),
-        ),
-        isVerified: false, // default belum terverifikasi
-        token: "DUMMYTOKEN", // token dummy
-      ),
-    );
-    when(
-      () => mockRepository.resendOTP(email: 'test@email.com'),
-    ).thenAnswer((_) async => Right(tOtpResponse));
-    final result = await usecase(email: 'test@email.com');
-    expect(result, Right(tOtpResponse));
-  });
+  group('ResendOTPUsecase', () {
+    test('should call resendOTP from repository with correct parameters', () async {
+      // arrange
+      when(
+        () => mockRepository.resendOTP(email: any(named: 'email')),
+      ).thenAnswer((_) async => Right(tOTPResponse));
 
-  test('should return Failure on error', () async {
-    when(
-      () => mockRepository.resendOTP(email: 'test@email.com'),
-    ).thenAnswer((_) async => Left(Failure(message: 'error')));
-    final result = await usecase(email: 'test@email.com');
-    expect(result.isLeft(), true);
+      // act
+      final result = await usecase(email: 'test@example.com');
+
+      // assert
+      expect(result, Right(tOTPResponse));
+      verify(() => mockRepository.resendOTP(email: 'test@example.com')).called(1);
+    });
+
+    test('should return Failure from repository when resending fails', () async {
+      // arrange
+      final tFailure = Failure(message: 'Failed to resend OTP');
+      when(
+        () => mockRepository.resendOTP(email: any(named: 'email')),
+      ).thenAnswer((_) async => Left(tFailure));
+
+      // act
+      final result = await usecase(email: 'test@example.com');
+
+      // assert
+      expect(result, Left(tFailure));
+      verify(() => mockRepository.resendOTP(email: 'test@example.com')).called(1);
+    });
   });
 }

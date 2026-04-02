@@ -2,8 +2,6 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/features/auth/data/datasources/auth_datasource.dart';
-import 'package:litenet/features/auth/data/mappers/login_mapper.dart';
-import 'package:litenet/features/auth/data/models/login_model.dart';
 import 'package:litenet/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:litenet/features/auth/domain/entities/login.dart';
 import 'package:litenet/features/auth/domain/entities/otp.dart';
@@ -17,432 +15,247 @@ void main() {
   late MockAuthDatasource mockDatasource;
   late AuthRepositoryImpl repository;
 
+  final tUser = User(
+    id: 'USR-001',
+    name: 'Test User',
+    avatar: 'https://example.com/avatar.png',
+    email: 'test@example.com',
+    phoneNumber: '08123456789',
+    role: 'user',
+    emailOtp: '123456',
+    emailOtpExpiredAt: DateTime(2026, 1, 1),
+    emailVerifiedAt: DateTime(2026, 1, 1),
+    createdAt: DateTime(2026, 1, 1),
+    updatedAt: DateTime(2026, 1, 1),
+    deletedAt: DateTime(1970, 1, 1),
+  );
+
+  final tLoginResponse = LoginResponse(
+    success: true,
+    message: 'Login successful',
+    data: LoginDataEntity(
+      user: tUser,
+      isVerified: true,
+      token: 'valid_token',
+    ),
+  );
+
+  final tRegisterResponse = RegisterResponse(
+    success: true,
+    message: 'Registration successful',
+  );
+
+  final tOTPResponse = OTPResponse(
+    success: true,
+    message: 'OTP verified successfully',
+    data: OTPDataEntity(
+      user: tUser,
+      isVerified: true,
+      token: 'valid_token',
+    ),
+  );
+
+  final tSummaryResponse = SummaryResponse(
+    success: true,
+    message: 'Summary fetched successfully',
+    data: SummaryDataEntity(
+      totalDevice: 10,
+      onlineDevice: 7,
+      offlineDevice: 2,
+      inactiveDevice: 1,
+    ),
+  );
+
   setUp(() {
     mockDatasource = MockAuthDatasource();
     repository = AuthRepositoryImpl(authDatasource: mockDatasource);
   });
 
-  group('login', () {
-    const tEmail = 'test@email.com';
-    const tPassword = 'password123';
-    final tUserModel = UserModel(
-      id: '1',
-      name: 'Test',
-      avatar: '',
-      email: tEmail,
-      phoneNumber: '08123456789',
-      role: 'user',
-      emailOtp: '',
-      emailOtpExpiredAt: DateTime(2023, 1, 1),
-      emailVerifiedAt: DateTime(2023, 1, 1),
-      createdAt: DateTime(2023, 1, 1),
-      updatedAt: DateTime(2023, 1, 1),
-      deletedAt: DateTime(2023, 1, 1),
-    );
-    // final tLoginDataModel = LoginDataModel(
-    //   user: tUserModel,
-    //   isVerified: true,
-    //   token: 'token',
-    // );
-    // final tLoginModel = LoginResponseModel(
-    //   success: true,
-    //   message: 'Success',
-    //   data: tLoginDataModel,
-    // );
-    final tLoginEntity = LoginResponse(
-      success: true,
-      message: 'Success',
-      data: LoginDataEntity(
-        user: tUserModel.toEntity(),
-        isVerified: true,
-        token: 'token',
-      ),
-    );
+  group('AuthRepositoryImpl', () {
+    group('login', () {
+      const tEmail = 'test@example.com';
+      const tPassword = 'password123';
 
-    test(
-      'should return LoginResponse entity when datasource returns model with success',
-      () async {
-        when(
-          () => mockDatasource.login(email: tEmail, password: tPassword),
-        ).thenAnswer((_) async => tLoginEntity);
+      test('should return LoginResponse when datasource returns success', () async {
+        // arrange
+        when(() => mockDatasource.login(email: tEmail, password: tPassword))
+            .thenAnswer((_) async => tLoginResponse);
 
-        final result = await repository.login(
-          email: tEmail,
-          password: tPassword,
-        );
+        // act
+        final result = await repository.login(email: tEmail, password: tPassword);
 
-        expect(result, Right(tLoginEntity));
-        verify(
-          () => mockDatasource.login(email: tEmail, password: tPassword),
-        ).called(1);
-      },
-    );
+        // assert
+        expect(result, Right(tLoginResponse));
+        verify(() => mockDatasource.login(email: tEmail, password: tPassword)).called(1);
+      });
 
-    test('should return Failure when datasource throws', () async {
-      when(
-        () => mockDatasource.login(email: tEmail, password: tPassword),
-      ).thenThrow(Exception('error'));
-
-      final result = await repository.login(email: tEmail, password: tPassword);
-
-      expect(result.isLeft(), true);
-      verify(
-        () => mockDatasource.login(email: tEmail, password: tPassword),
-      ).called(1);
-    });
-
-    test(
-      'should return Failure when datasource returns model with !success',
-      () async {
-        final tFailEntity = LoginResponse(
+      test('should return Failure when datasource returns !success', () async {
+        // arrange
+        final tFailResponse = LoginResponse(
           success: false,
-          message: 'Failed',
+          message: 'Invalid credentials',
           data: LoginDataEntity(
-            user: tUserModel.toEntity(),
-            isVerified: false,
-            token: '',
+            user: tUser,
+            isVerified: true,
+            token: 'valid_token',
           ),
         );
-        when(
-          () => mockDatasource.login(email: tEmail, password: tPassword),
-        ).thenAnswer((_) async => tFailEntity);
+        when(() => mockDatasource.login(email: tEmail, password: tPassword))
+            .thenAnswer((_) async => tFailResponse);
 
-        final result = await repository.login(
+        // act
+        final result = await repository.login(email: tEmail, password: tPassword);
+
+        // assert
+        result.fold(
+          (failure) {
+            expect(failure, isA<Failure>());
+            expect(failure.message, 'Invalid credentials');
+          },
+          (_) => fail('Should not be success'),
+        );
+        verify(() => mockDatasource.login(email: tEmail, password: tPassword)).called(1);
+      });
+
+      test('should return Failure when datasource throws an exception', () async {
+        // arrange
+        when(() => mockDatasource.login(email: tEmail, password: tPassword))
+            .thenThrow(Exception('Server error'));
+
+        // act
+        final result = await repository.login(email: tEmail, password: tPassword);
+
+        // assert
+        result.fold(
+          (failure) {
+            expect(failure, isA<Failure>());
+            expect(failure.message, contains('Server error'));
+          },
+          (_) => fail('Should not be success'),
+        );
+        verify(() => mockDatasource.login(email: tEmail, password: tPassword)).called(1);
+      });
+    });
+
+    group('register', () {
+      const tName = 'Test User';
+      const tEmail = 'test@example.com';
+      const tPassword = 'password123';
+      const tPasswordConfirmation = 'password123';
+      const tPhoneNumber = '08123456789';
+
+      test('should return RegisterResponse when datasource returns success', () async {
+        // arrange
+        when(() => mockDatasource.register(
+              name: tName,
+              email: tEmail,
+              password: tPassword,
+              passwordConfirmation: tPasswordConfirmation,
+              phoneNumber: tPhoneNumber,
+            )).thenAnswer((_) async => tRegisterResponse);
+
+        // act
+        final result = await repository.register(
+          name: tName,
           email: tEmail,
           password: tPassword,
+          passwordConfirmation: tPasswordConfirmation,
+          phoneNumber: tPhoneNumber,
         );
 
-        result.fold((failure) {
-          expect(failure, isA<Failure>());
-          expect(failure.message, 'Failed');
-        }, (_) => fail('Should not be success'));
-        verify(
-          () => mockDatasource.login(email: tEmail, password: tPassword),
-        ).called(1);
-      },
-    );
-  });
-
-  group('register', () {
-    test(
-      'should return RegisterResponse when datasource returns success',
-      () async {
-        final tRegisterResponse = RegisterResponse(
-          success: true,
-          message: 'ok',
-        );
-        when(
-          () => mockDatasource.register(
-            name: 'Test',
-            email: 'a',
-            password: 'b',
-            passwordConfirmation: 'b',
-            phoneNumber: '123',
-          ),
-        ).thenAnswer((_) async => tRegisterResponse);
-
-        final result = await repository.register(
-          name: 'Test',
-          email: 'a',
-          password: 'b',
-          passwordConfirmation: 'b',
-          phoneNumber: '123',
-        );
+        // assert
         expect(result, Right(tRegisterResponse));
-        verify(
-          () => mockDatasource.register(
-            name: 'Test',
-            email: 'a',
-            password: 'b',
-            passwordConfirmation: 'b',
-            phoneNumber: '123',
-          ),
-        ).called(1);
-      },
-    );
+        verify(() => mockDatasource.register(
+              name: tName,
+              email: tEmail,
+              password: tPassword,
+              passwordConfirmation: tPasswordConfirmation,
+              phoneNumber: tPhoneNumber,
+            )).called(1);
+      });
 
-    test('should return Failure when datasource throws', () async {
-      when(
-        () => mockDatasource.register(
-          name: 'Test',
-          email: 'a',
-          password: 'b',
-          passwordConfirmation: 'b',
-          phoneNumber: '123',
-        ),
-      ).thenThrow(Exception('error'));
-
-      final result = await repository.register(
-        name: 'Test',
-        email: 'a',
-        password: 'b',
-        passwordConfirmation: 'b',
-        phoneNumber: '123',
-      );
-      expect(result.isLeft(), true);
-      verify(
-        () => mockDatasource.register(
-          name: 'Test',
-          email: 'a',
-          password: 'b',
-          passwordConfirmation: 'b',
-          phoneNumber: '123',
-        ),
-      ).called(1);
-    });
-
-    test('should return Failure when datasource returns !success', () async {
-      final tFailResponse = RegisterResponse(success: false, message: 'Failed');
-      when(
-        () => mockDatasource.register(
-          name: 'Test',
-          email: 'a',
-          password: 'b',
-          passwordConfirmation: 'b',
-          phoneNumber: '123',
-        ),
-      ).thenAnswer((_) async => tFailResponse);
-
-      final result = await repository.register(
-        name: 'Test',
-        email: 'a',
-        password: 'b',
-        passwordConfirmation: 'b',
-        phoneNumber: '123',
-      );
-      result.fold((failure) {
-        expect(failure, isA<Failure>());
-        expect(failure.message, 'Failed');
-      }, (_) => fail('Should not be success'));
-      verify(
-        () => mockDatasource.register(
-          name: 'Test',
-          email: 'a',
-          password: 'b',
-          passwordConfirmation: 'b',
-          phoneNumber: '123',
-        ),
-      ).called(1);
-    });
-  });
-
-  group('resendOTP', () {
-    test('should return OTPResponse when datasource returns success', () async {
-      final tOtpResponse = OTPResponse(
-        success: true,
-        message: 'ok',
-        data: OTPDataEntity(
-          user: User(
-            id: "USR-0000",
-            name: "Dummy User",
-            avatar: "https://dummyimage.com/100x100/000/fff.png",
-            email: "dummy@example.com",
-            phoneNumber: "081234567890",
-            role: "guest",
-            emailOtp: "000000",
-            emailOtpExpiredAt: DateTime.now().add(const Duration(minutes: 5)),
-            emailVerifiedAt: DateTime.now(),
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-            deletedAt: DateTime(1970, 1, 1),
-          ),
-          isVerified: false, // default belum terverifikasi
-          token: "DUMMYTOKEN", // token dummy
-        ),
-      );
-      when(
-        () => mockDatasource.resendOTP(email: 'test@email.com'),
-      ).thenAnswer((_) async => tOtpResponse);
-      final result = await repository.resendOTP(email: 'test@email.com');
-      expect(result, Right(tOtpResponse));
-      verify(() => mockDatasource.resendOTP(email: 'test@email.com')).called(1);
-    });
-
-    test('should return Failure when datasource throws', () async {
-      when(
-        () => mockDatasource.resendOTP(email: 'test@email.com'),
-      ).thenThrow(Exception('error'));
-      final result = await repository.resendOTP(email: 'test@email.com');
-      expect(result.isLeft(), true);
-      verify(() => mockDatasource.resendOTP(email: 'test@email.com')).called(1);
-    });
-
-    test('should return Failure when datasource returns !success', () async {
-      final tFailResponse = OTPResponse(
-        success: false,
-        message: 'Failed',
-        data: OTPDataEntity(
-          user: User(
-            id: "USR-0000",
-            name: "Dummy User",
-            avatar: "https://dummyimage.com/100x100/000/fff.png",
-            email: "dummy@example.com",
-            phoneNumber: "081234567890",
-            role: "guest",
-            emailOtp: "000000",
-            emailOtpExpiredAt: DateTime.now().add(const Duration(minutes: 5)),
-            emailVerifiedAt: DateTime.now(),
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-            deletedAt: DateTime(1970, 1, 1),
-          ),
-          isVerified: false, // default belum terverifikasi
-          token: "DUMMYTOKEN", // token dummy
-        ),
-      );
-      when(
-        () => mockDatasource.resendOTP(email: 'test@email.com'),
-      ).thenAnswer((_) async => tFailResponse);
-      final result = await repository.resendOTP(email: 'test@email.com');
-      result.fold((failure) {
-        expect(failure, isA<Failure>());
-        expect(failure.message, 'Failed');
-      }, (_) => fail('Should not be success'));
-      verify(() => mockDatasource.resendOTP(email: 'test@email.com')).called(1);
-    });
-  });
-
-  group('verifyOTP', () {
-    test('should return OTPResponse when datasource returns success', () async {
-      final tOtpResponse = OTPResponse(
-        success: true,
-        message: 'ok',
-        data: OTPDataEntity(
-          user: User(
-            id: "USR-0000",
-            name: "Dummy User",
-            avatar: "https://dummyimage.com/100x100/000/fff.png",
-            email: "dummy@example.com",
-            phoneNumber: "081234567890",
-            role: "guest",
-            emailOtp: "000000",
-            emailOtpExpiredAt: DateTime.now().add(const Duration(minutes: 5)),
-            emailVerifiedAt: DateTime.now(),
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-            deletedAt: DateTime(1970, 1, 1),
-          ),
-          isVerified: false, // default belum terverifikasi
-          token: "DUMMYTOKEN", // token dummy
-        ),
-      );
-      when(
-        () => mockDatasource.verifyOTP(email: 'test@email.com', otp: '123456'),
-      ).thenAnswer((_) async => tOtpResponse);
-      final result = await repository.verifyOTP(
-        email: 'test@email.com',
-        otp: '123456',
-      );
-      expect(result, Right(tOtpResponse));
-      verify(
-        () => mockDatasource.verifyOTP(email: 'test@email.com', otp: '123456'),
-      ).called(1);
-    });
-
-    test('should return Failure when datasource throws', () async {
-      when(
-        () => mockDatasource.verifyOTP(email: 'test@email.com', otp: '123456'),
-      ).thenThrow(Exception('error'));
-      final result = await repository.verifyOTP(
-        email: 'test@email.com',
-        otp: '123456',
-      );
-      expect(result.isLeft(), true);
-      verify(
-        () => mockDatasource.verifyOTP(email: 'test@email.com', otp: '123456'),
-      ).called(1);
-    });
-
-    test('should return Failure when datasource returns !success', () async {
-      final tFailResponse = OTPResponse(
-        success: false,
-        message: 'Failed',
-        data: OTPDataEntity(
-          user: User(
-            id: "USR-0000",
-            name: "Dummy User",
-            avatar: "https://dummyimage.com/100x100/000/fff.png",
-            email: "dummy@example.com",
-            phoneNumber: "081234567890",
-            role: "guest",
-            emailOtp: "000000",
-            emailOtpExpiredAt: DateTime.now().add(const Duration(minutes: 5)),
-            emailVerifiedAt: DateTime.now(),
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-            deletedAt: DateTime(1970, 1, 1),
-          ),
-          isVerified: false, // default belum terverifikasi
-          token: "DUMMYTOKEN", // token dummy
-        ),
-      );
-      when(
-        () => mockDatasource.verifyOTP(email: 'test@email.com', otp: '123456'),
-      ).thenAnswer((_) async => tFailResponse);
-      final result = await repository.verifyOTP(
-        email: 'test@email.com',
-        otp: '123456',
-      );
-      result.fold((failure) {
-        expect(failure, isA<Failure>());
-        expect(failure.message, 'Failed');
-      }, (_) => fail('Should not be success'));
-      verify(
-        () => mockDatasource.verifyOTP(email: 'test@email.com', otp: '123456'),
-      ).called(1);
-    });
-  });
-
-  group('getSummary', () {
-    test(
-      'should return QuotaResponse when datasource returns success',
-      () async {
-        final tQuotaResponse = SummaryResponse(
-          success: true,
-          message: 'ok',
-          data: SummaryDataEntity(
-            totalDevice: 0, // jumlah total device kosong
-            onlineDevice: 0, // jumlah device online kosong
-            offlineDevice: 0, // jumlah device offline kosong
-            inactiveDevice: 0, // jumlah device tidak aktif kosong
-          ),
+      test('should return Failure when datasource returns !success', () async {
+        // arrange
+        final tFailResponse = RegisterResponse(
+          success: false,
+          message: 'Email already exists',
         );
-        when(
-          () => mockDatasource.getSummary(),
-        ).thenAnswer((_) async => tQuotaResponse);
-        final result = await repository.getSummary();
-        expect(result, Right(tQuotaResponse));
-        verify(() => mockDatasource.getSummary()).called(1);
-      },
-    );
+        when(() => mockDatasource.register(
+              name: tName,
+              email: tEmail,
+              password: tPassword,
+              passwordConfirmation: tPasswordConfirmation,
+              phoneNumber: tPhoneNumber,
+            )).thenAnswer((_) async => tFailResponse);
 
-    test('should return Failure when datasource throws', () async {
-      when(() => mockDatasource.getSummary()).thenThrow(Exception('error'));
-      final result = await repository.getSummary();
-      expect(result.isLeft(), true);
-      verify(() => mockDatasource.getSummary()).called(1);
+        // act
+        final result = await repository.register(
+          name: tName,
+          email: tEmail,
+          password: tPassword,
+          passwordConfirmation: tPasswordConfirmation,
+          phoneNumber: tPhoneNumber,
+        );
+
+        // assert
+        result.fold(
+          (failure) {
+            expect(failure, isA<Failure>());
+            expect(failure.message, 'Email already exists');
+          },
+          (_) => fail('Should not be success'),
+        );
+      });
     });
 
-    test('should return Failure when datasource returns !success', () async {
-      final tFailResponse = SummaryResponse(
-        success: false,
-        message: 'Failed',
-        data: SummaryDataEntity(
-          totalDevice: 0, // jumlah total device kosong
-          onlineDevice: 0, // jumlah device online kosong
-          offlineDevice: 0, // jumlah device offline kosong
-          inactiveDevice: 0, // jumlah device tidak aktif kosong
-        ),
-      );
-      when(
-        () => mockDatasource.getSummary(),
-      ).thenAnswer((_) async => tFailResponse);
-      final result = await repository.getSummary();
-      result.fold((failure) {
-        expect(failure, isA<Failure>());
-        expect(failure.message, 'Failed');
-      }, (_) => fail('Should not be success'));
-      verify(() => mockDatasource.getSummary()).called(1);
+    group('resendOTP', () {
+      const tEmail = 'test@example.com';
+
+      test('should return OTPResponse when datasource returns success', () async {
+        // arrange
+        when(() => mockDatasource.resendOTP(email: tEmail))
+            .thenAnswer((_) async => tOTPResponse);
+
+        // act
+        final result = await repository.resendOTP(email: tEmail);
+
+        // assert
+        expect(result, Right(tOTPResponse));
+        verify(() => mockDatasource.resendOTP(email: tEmail)).called(1);
+      });
+    });
+
+    group('verifyOTP', () {
+      const tEmail = 'test@example.com';
+      const tOTP = '123456';
+
+      test('should return OTPResponse when datasource returns success', () async {
+        // arrange
+        when(() => mockDatasource.verifyOTP(email: tEmail, otp: tOTP))
+            .thenAnswer((_) async => tOTPResponse);
+
+        // act
+        final result = await repository.verifyOTP(email: tEmail, otp: tOTP);
+
+        // assert
+        expect(result, Right(tOTPResponse));
+        verify(() => mockDatasource.verifyOTP(email: tEmail, otp: tOTP)).called(1);
+      });
+    });
+
+    group('getSummary', () {
+      test('should return SummaryResponse when datasource returns success', () async {
+        // arrange
+        when(() => mockDatasource.getSummary())
+            .thenAnswer((_) async => tSummaryResponse);
+
+        // act
+        final result = await repository.getSummary();
+
+        // assert
+        expect(result, Right(tSummaryResponse));
+        verify(() => mockDatasource.getSummary()).called(1);
+      });
     });
   });
 }

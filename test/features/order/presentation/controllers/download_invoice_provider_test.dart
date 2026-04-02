@@ -10,11 +10,21 @@ import 'package:mocktail/mocktail.dart';
 class MockDownloadInvoiceUsecase extends Mock
     implements DownloadInvoiceUsecase {}
 
-void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+class Listener<T> extends Mock {
+  void call(T? previous, T next);
+}
 
+void main() {
   late MockDownloadInvoiceUsecase mockUsecase;
   late ProviderContainer container;
+
+  final tFilePath = '/downloads/invoice_ORD-001.pdf';
+  final tFailure = Failure(message: 'Failed to download invoice');
+
+  setUpAll(() {
+    registerFallbackValue(const AsyncLoading<String?>());
+    registerFallbackValue(AsyncData<String?>(tFilePath));
+  });
 
   setUp(() {
     mockUsecase = MockDownloadInvoiceUsecase();
@@ -25,37 +35,68 @@ void main() {
     );
   });
 
-  test('should emit loading and then data on success', () async {
-    when(
-      () => mockUsecase(orderId: 'ORD-1'),
-    ).thenAnswer((_) async => Right('/tmp/invoice.pdf'));
-
-    final notifier = container.read(downloadInvoiceProvider.notifier);
-    final future = notifier.executeDownload('ORD-1');
-    expect(container.read(downloadInvoiceProvider), isA<AsyncLoading>());
-    await future;
-    String? value;
-    for (var i = 0; i < 100; i++) {
-      final state = container.read(downloadInvoiceProvider);
-      if (!state.isLoading) {
-        value = state.value;
-        break;
-      }
-      await Future.delayed(const Duration(milliseconds: 10));
-    }
-    expect(value, isNotNull);
-    expect(value, '/tmp/invoice.pdf');
+  tearDown(() {
+    container.dispose();
   });
 
-  test('should emit loading and then error on failure', () async {
-    when(
-      () => mockUsecase(orderId: 'ORD-1'),
-    ).thenAnswer((_) async => Left(Failure(message: 'error')));
+  group('DownloadInvoiceProvider', () {
+    test('initial state should eventually be AsyncData(null)', () async {
+      final state = await container.read(downloadInvoiceProvider.future);
+      expect(state, null);
+    });
 
-    final notifier = container.read(downloadInvoiceProvider.notifier);
-    final future = notifier.executeDownload('ORD-1');
-    expect(container.read(downloadInvoiceProvider), isA<AsyncLoading>());
-    await future;
-    expect(container.read(downloadInvoiceProvider).hasError, true);
+    test('should emit AsyncLoading and then AsyncData on success', () async {
+      // arrange
+      when(() => mockUsecase.call(orderId: any(named: 'orderId')))
+          .thenAnswer((_) async => Right(tFilePath));
+
+      // Wait for build
+      await container.read(downloadInvoiceProvider.future);
+
+      final listener = Listener<AsyncValue<String?>>();
+      container.listen(downloadInvoiceProvider, listener.call, fireImmediately: true);
+
+      final notifier = container.read(downloadInvoiceProvider.notifier);
+
+      // act
+      await notifier.executeDownload('ORD-001');
+
+      // assert
+      verifyInOrder([
+        () => listener(any(), const AsyncData<String?>(null)),
+        () => listener(any(), any(that: isA<AsyncLoading>())),
+        () => listener(any(), AsyncData<String?>(tFilePath)),
+      ]);
+
+      verify(() => mockUsecase.call(orderId: 'ORD-001')).called(1);
+    });
+
+    test('should emit AsyncError on failure', () async {
+      // arrange
+      when(() => mockUsecase.call(orderId: any(named: 'orderId')))
+          .thenAnswer((_) async => Left(tFailure));
+
+      // Wait for build
+      await container.read(downloadInvoiceProvider.future);
+
+      final listener = Listener<AsyncValue<String?>>();
+      container.listen(downloadInvoiceProvider, listener.call, fireImmediately: true);
+
+      final notifier = container.read(downloadInvoiceProvider.notifier);
+
+      // act
+      await notifier.executeDownload('ORD-001');
+
+      // assert
+      verifyInOrder([
+        () => listener(any(), const AsyncData<String?>(null)),
+        () => listener(any(), any(that: isA<AsyncLoading>())),
+        () => listener(any(), any(that: isA<AsyncError>())),
+      ]);
+
+      final finalState = container.read(downloadInvoiceProvider);
+      expect(finalState, isA<AsyncError>());
+      expect(finalState.error, tFailure);
+    });
   });
 }

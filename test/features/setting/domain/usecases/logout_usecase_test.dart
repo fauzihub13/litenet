@@ -12,24 +12,41 @@ void main() {
   late MockSettingRepository mockRepository;
   late LogoutUsecase usecase;
 
+  final tLogoutResponse = LogoutResponse(
+    success: true,
+    message: 'Logout successful',
+  );
+
   setUp(() {
     mockRepository = MockSettingRepository();
     usecase = LogoutUsecase(mockRepository);
   });
 
-  test('should return ProfileResponse on success', () async {
-    final tResponse = LogoutResponse(success: true, message: 'ok');
-    when(
-      () => mockRepository.logout(),
-    ).thenAnswer((_) async => Right(tResponse));
-    final result = await usecase();
-    expect(result, Right(tResponse));
-  });
+  group('LogoutUsecase', () {
+    test('should call logout from repository', () async {
+      // arrange
+      when(() => mockRepository.logout())
+          .thenAnswer((_) async => Right(tLogoutResponse));
 
-  test('should return Failure on error', () async {
-    final failure = Failure(message: 'error');
-    when(() => mockRepository.logout()).thenAnswer((_) async => Left(failure));
-    final result = await usecase();
-    expect(result, Left(failure));
+      // act
+      final result = await usecase();
+
+      // assert
+      expect(result, Right(tLogoutResponse));
+      verify(() => mockRepository.logout()).called(1);
+    });
+
+    test('should return Failure from repository when logout fails', () async {
+      // arrange
+      final tFailure = Failure(message: 'Logout failed');
+      when(() => mockRepository.logout())
+          .thenAnswer((_) async => Left(tFailure));
+
+      // act
+      final result = await usecase();
+
+      // assert
+      expect(result, Left(tFailure));
+    });
   });
 }

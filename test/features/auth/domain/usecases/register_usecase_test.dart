@@ -12,51 +12,92 @@ void main() {
   late MockAuthRepository mockRepository;
   late RegisterUsecase usecase;
 
+  final tRegisterResponse = RegisterResponse(
+    success: true,
+    message: 'Registration successful',
+  );
+
+  final tParams = {
+    'name': 'Test User',
+    'email': 'test@example.com',
+    'password': 'password123',
+    'passwordConfirmation': 'password123',
+    'phoneNumber': '08123456789',
+  };
+
   setUp(() {
     mockRepository = MockAuthRepository();
     usecase = RegisterUsecase(mockRepository);
   });
 
-  test('should return RegisterResponse on success', () async {
-    final tRegisterResponse = RegisterResponse(success: true, message: 'ok');
-    when(
-      () => mockRepository.register(
-        name: 'Test',
-        email: 'a',
-        password: 'b',
-        passwordConfirmation: 'b',
-        phoneNumber: '123',
-      ),
-    ).thenAnswer((_) async => Right(tRegisterResponse));
+  group('RegisterUsecase', () {
+    test('should call register from repository with correct parameters', () async {
+      // arrange
+      when(
+        () => mockRepository.register(
+          name: any(named: 'name'),
+          email: any(named: 'email'),
+          password: any(named: 'password'),
+          passwordConfirmation: any(named: 'passwordConfirmation'),
+          phoneNumber: any(named: 'phoneNumber'),
+        ),
+      ).thenAnswer((_) async => Right(tRegisterResponse));
 
-    final result = await usecase(
-      name: 'Test',
-      email: 'a',
-      password: 'b',
-      passwordConfirmation: 'b',
-      phoneNumber: '123',
-    );
-    expect(result, Right(tRegisterResponse));
-  });
+      // act
+      final result = await usecase(
+        name: tParams['name']!,
+        email: tParams['email']!,
+        password: tParams['password']!,
+        passwordConfirmation: tParams['passwordConfirmation']!,
+        phoneNumber: tParams['phoneNumber']!,
+      );
 
-  test('should return Failure on error', () async {
-    when(
-      () => mockRepository.register(
-        name: 'Test',
-        email: 'a',
-        password: 'b',
-        passwordConfirmation: 'b',
-        phoneNumber: '123',
-      ),
-    ).thenAnswer((_) async => Left(Failure(message: 'error')));
+      // assert
+      expect(result, Right(tRegisterResponse));
+      verify(
+        () => mockRepository.register(
+          name: tParams['name']!,
+          email: tParams['email']!,
+          password: tParams['password']!,
+          passwordConfirmation: tParams['passwordConfirmation']!,
+          phoneNumber: tParams['phoneNumber']!,
+        ),
+      ).called(1);
+    });
 
-    final result = await usecase(
-      name: 'Test',
-      email: 'a',
-      password: 'b',
-      passwordConfirmation: 'b',
-      phoneNumber: '123',
-    );
-    expect(result.isLeft(), true);
+    test('should return Failure from repository when registration fails', () async {
+      // arrange
+      final tFailure = Failure(message: 'Registration failed');
+      when(
+        () => mockRepository.register(
+          name: any(named: 'name'),
+          email: any(named: 'email'),
+          password: any(named: 'password'),
+          passwordConfirmation: any(named: 'passwordConfirmation'),
+          phoneNumber: any(named: 'phoneNumber'),
+        ),
+      ).thenAnswer((_) async => Left(tFailure));
+
+      // act
+      final result = await usecase(
+        name: tParams['name']!,
+        email: tParams['email']!,
+        password: tParams['password']!,
+        passwordConfirmation: tParams['passwordConfirmation']!,
+        phoneNumber: tParams['phoneNumber']!,
+      );
+
+      // assert
+      expect(result, Left(tFailure));
+      verify(
+        () => mockRepository.register(
+          name: tParams['name']!,
+          email: tParams['email']!,
+          password: tParams['password']!,
+          passwordConfirmation: tParams['passwordConfirmation']!,
+          phoneNumber: tParams['phoneNumber']!,
+        ),
+      ).called(1);
+    });
   });
 }

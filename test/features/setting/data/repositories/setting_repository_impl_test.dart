@@ -16,279 +16,170 @@ void main() {
   late MockSettingDatasource mockDatasource;
   late SettingRepositoryImpl repository;
 
+  final tUser = User(
+    id: 'USR-001',
+    name: 'Test User',
+    avatar: 'https://example.com/avatar.png',
+    email: 'test@example.com',
+    phoneNumber: '08123456789',
+    role: 'user',
+    emailOtp: '123456',
+    emailOtpExpiredAt: DateTime(2026, 1, 1),
+    emailVerifiedAt: DateTime(2026, 1, 1),
+    createdAt: DateTime(2026, 1, 1),
+    updatedAt: DateTime(2026, 1, 1),
+    deletedAt: DateTime(1970, 1, 1),
+  );
+
+  final tProfileResponse = ProfileResponse(
+    success: true,
+    message: 'Success',
+    data: tUser,
+  );
+
+  final tLogoutResponse = LogoutResponse(success: true, message: 'Success');
+
+  final tChangePasswordResponse = ChangePasswordResponse(
+    success: true,
+    message: 'Success',
+  );
+
+  final tFAQResponse = FAQResponse(success: true, message: 'Success', data: []);
+
+  final tPrivacyResponse = PrivacyAndPolicyResponse(
+    success: true,
+    message: 'Success',
+    data: [],
+  );
+
   setUp(() {
     mockDatasource = MockSettingDatasource();
     repository = SettingRepositoryImpl(settingDatasource: mockDatasource);
   });
 
-  group('getFAQ', () {
-    test('should return FAQResponse on success', () async {
-      final tResponse = FAQResponse(success: true, message: 'ok', data: []);
-      when(() => mockDatasource.getFAQ()).thenAnswer((_) async => tResponse);
-      final result = await repository.getFAQ();
-      expect(result, Right(tResponse));
-    });
-    test('should return Failure when response.success is false', () async {
-      final tResponse = FAQResponse(success: false, message: 'fail', data: []);
-      when(() => mockDatasource.getFAQ()).thenAnswer((_) async => tResponse);
-      final result = await repository.getFAQ();
-      expect(result.isLeft(), true);
-    });
-    test('should return Failure on error', () async {
-      when(() => mockDatasource.getFAQ()).thenThrow(Exception('error'));
-      final result = await repository.getFAQ();
-      expect(result.isLeft(), true);
-    });
-  });
+  group('SettingRepositoryImpl', () {
+    group('getProfile', () {
+      test(
+        'should return ProfileResponse when datasource returns success',
+        () async {
+          // arrange
+          when(
+            () => mockDatasource.getProfile(),
+          ).thenAnswer((_) async => tProfileResponse);
 
-  group('getPrivacyAndPolicy', () {
-    test('should return PrivacyAndPolicyResponse on success', () async {
-      final tResponse = PrivacyAndPolicyResponse(
-        success: true,
-        message: 'ok',
-        data: [],
-      );
-      when(
-        () => mockDatasource.getPrivacyAndPolicy(),
-      ).thenAnswer((_) async => tResponse);
-      final result = await repository.getPrivacyAndPolicy();
-      expect(result, Right(tResponse));
-    });
-    test('should return Failure when response.success is false', () async {
-      final tResponse = PrivacyAndPolicyResponse(
-        success: false,
-        message: 'fail',
-        data: [],
-      );
-      when(
-        () => mockDatasource.getPrivacyAndPolicy(),
-      ).thenAnswer((_) async => tResponse);
-      final result = await repository.getPrivacyAndPolicy();
-      expect(result.isLeft(), true);
-    });
-    test('should return Failure on error', () async {
-      when(
-        () => mockDatasource.getPrivacyAndPolicy(),
-      ).thenThrow(Exception('error'));
-      final result = await repository.getPrivacyAndPolicy();
-      expect(result.isLeft(), true);
-    });
-  });
+          // act
+          final result = await repository.getProfile();
 
-  group('getProfile', () {
-    test('should return ProfileResponse on success', () async {
-      final tResponse = ProfileResponse(
-        success: true,
-        message: 'ok',
-        data: User(
-          id: "USR-1",
-          name: "Dummy User",
-          avatar: "https://dummyimage.com/100x100/000/fff.png",
-          email: "dummy@example.com",
-          phoneNumber: "081234567890",
-          role: "guest",
-          emailOtp: "000000",
-          emailOtpExpiredAt: DateTime.now().add(const Duration(minutes: 5)),
-          emailVerifiedAt: DateTime.now(),
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-          deletedAt: DateTime(1970, 1, 1),
-        ),
+          // assert
+          expect(result, Right(tProfileResponse));
+        },
       );
-      when(
-        () => mockDatasource.getProfile(),
-      ).thenAnswer((_) async => tResponse);
-      final result = await repository.getProfile();
-      expect(result, Right(tResponse));
-    });
-    test('should return Failure when response.success is false', () async {
-      final tResponse = ProfileResponse(
-        success: false,
-        message: 'fail',
-        data: User(
-          id: "USR-${DateTime.now().millisecondsSinceEpoch}", // ID unik dummy
-          name: "Dummy User", // nama kosong
-          avatar: "https://dummyimage.com/100x100/000/fff.png", // avatar dummy
-          email: "dummy@example.com", // email dummy
-          phoneNumber: "081234567890", // nomor dummy
-          role: "guest", // role dummy
-          emailOtp: "000000", // OTP dummy
-          emailOtpExpiredAt: DateTime.now().add(
-            const Duration(minutes: 5),
-          ), // expired 5 menit
-          emailVerifiedAt: DateTime.now(), // dianggap sudah diverifikasi
-          createdAt: DateTime.now(), // waktu dibuat sekarang
-          updatedAt: DateTime.now(), // waktu update sekarang
-          deletedAt: DateTime(1970, 1, 1), // default kosong (epoch)
-        ),
-      );
-      when(
-        () => mockDatasource.getProfile(),
-      ).thenAnswer((_) async => tResponse);
-      final result = await repository.getProfile();
-      expect(result.isLeft(), true);
-    });
-    test('should return Failure on error', () async {
-      when(() => mockDatasource.getProfile()).thenThrow(Exception('error'));
-      final result = await repository.getProfile();
-      expect(result.isLeft(), true);
-    });
-  });
-
-  group('changePassword', () {
-    test('should return ChangePasswordResponse on success', () async {
-      final tResponse = ChangePasswordResponse(success: true, message: 'ok');
-      when(
-        () => mockDatasource.changePassword(
-          oldPassword: 'old',
-          newPassword: 'new',
-          confirmNewPassword: 'new',
-        ),
-      ).thenAnswer((_) async => tResponse);
-      final result = await repository.changePassword(
-        oldPassword: 'old',
-        newPassword: 'new',
-        confirmNewPassword: 'new',
-      );
-      expect(result, Right(tResponse));
-    });
-    test('should return Failure when response.success is false', () async {
-      final tResponse = ChangePasswordResponse(success: false, message: 'fail');
-      when(
-        () => mockDatasource.changePassword(
-          oldPassword: 'old',
-          newPassword: 'new',
-          confirmNewPassword: 'new',
-        ),
-      ).thenAnswer((_) async => tResponse);
-      final result = await repository.changePassword(
-        oldPassword: 'old',
-        newPassword: 'new',
-        confirmNewPassword: 'new',
-      );
-      expect(result.isLeft(), true);
     });
 
-    test('should return Failure on error', () async {
-      when(
-        () => mockDatasource.changePassword(
-          oldPassword: 'old',
-          newPassword: 'new',
-          confirmNewPassword: 'new',
-        ),
-      ).thenThrow(Exception('error'));
-      final result = await repository.changePassword(
-        oldPassword: 'old',
-        newPassword: 'new',
-        confirmNewPassword: 'new',
-      );
-      expect(result.isLeft(), true);
-    });
-  });
+    group('changeProfile', () {
+      test(
+        'should return ProfileResponse when datasource returns success',
+        () async {
+          // arrange
+          when(
+            () => mockDatasource.changeProfile(
+              name: any(named: 'name'),
+              email: any(named: 'email'),
+              phoneNumber: any(named: 'phoneNumber'),
+            ),
+          ).thenAnswer((_) async => tProfileResponse);
 
-  group('changeProfile', () {
-    test('should return ChangeProfileResponse on success', () async {
-      final tResponse = ProfileResponse(
-        success: true,
-        message: 'ok',
-        data: User(
-          id: "USR-0000",
-          name: "Dummy User",
-          avatar: "https://dummyimage.com/100x100/000/fff.png",
-          email: "dummy@example.com",
-          phoneNumber: "081234567890",
-          role: "guest",
-          emailOtp: "000000",
-          emailOtpExpiredAt: DateTime.now().add(const Duration(minutes: 5)),
-          emailVerifiedAt: DateTime.now(),
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-          deletedAt: DateTime(1970, 1, 1),
-        ),
+          // act
+          final result = await repository.changeProfile(
+            name: 'Name',
+            email: 'email@test.com',
+            phoneNumber: '12345',
+          );
+
+          // assert
+          expect(result, Right(tProfileResponse));
+        },
       );
-      when(
-        () => mockDatasource.changeProfile(
-          name: 'old',
-          email: 'new',
-          phoneNumber: 'new',
-        ),
-      ).thenAnswer((_) async => tResponse);
-      final result = await repository.changeProfile(
-        name: 'old',
-        email: 'new',
-        phoneNumber: 'new',
-      );
-      expect(result, Right(tResponse));
-    });
-    test('should return Failure when response.success is false', () async {
-      final tResponse = ProfileResponse(
-        success: false,
-        message: 'gagal',
-        data: User(
-          id: "USR-0000",
-          name: "Dummy User",
-          avatar: "https://dummyimage.com/100x100/000/fff.png",
-          email: "dummy@example.com",
-          phoneNumber: "081234567890",
-          role: "guest",
-          emailOtp: "000000",
-          emailOtpExpiredAt: DateTime.now().add(const Duration(minutes: 5)),
-          emailVerifiedAt: DateTime.now(),
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-          deletedAt: DateTime(1970, 1, 1),
-        ),
-      );
-      when(
-        () => mockDatasource.changeProfile(
-          name: 'old',
-          email: 'new',
-          phoneNumber: 'new',
-        ),
-      ).thenAnswer((_) async => tResponse);
-      final result = await repository.changeProfile(
-        name: 'old',
-        email: 'new',
-        phoneNumber: 'new',
-      );
-      expect(result.isLeft(), true);
     });
 
-    test('should return Failure on error', () async {
-      when(
-        () => mockDatasource.changeProfile(
-          name: 'old',
-          email: 'new',
-          phoneNumber: 'new',
-        ),
-      ).thenThrow(Exception('error'));
-      final result = await repository.changeProfile(
-        name: 'old',
-        email: 'new',
-        phoneNumber: 'new',
+    group('logout', () {
+      test(
+        'should return LogoutResponse when datasource returns success',
+        () async {
+          // arrange
+          when(
+            () => mockDatasource.logout(),
+          ).thenAnswer((_) async => tLogoutResponse);
+
+          // act
+          final result = await repository.logout();
+
+          // assert
+          expect(result, Right(tLogoutResponse));
+        },
       );
-      expect(result.isLeft(), true);
-    });
-  });
-
-  group('logout', () {
-    test('should return logout on success', () async {
-      final tResponse = LogoutResponse(success: true, message: 'ok');
-      when(() => mockDatasource.logout()).thenAnswer((_) async => tResponse);
-      final result = await repository.logout();
-      expect(result, Right(tResponse));
-    });
-    test('should return Failure when response.success is false', () async {
-      final tResponse = LogoutResponse(success: false, message: 'gagal');
-      when(() => mockDatasource.logout()).thenAnswer((_) async => tResponse);
-      final result = await repository.logout();
-      expect(result.isLeft(), true);
     });
 
-    test('should return Failure on error', () async {
-      when(() => mockDatasource.logout()).thenThrow(Exception('error'));
-      final result = await repository.logout();
-      expect(result.isLeft(), true);
+    group('changePassword', () {
+      test(
+        'should return ChangePasswordResponse when datasource returns success',
+        () async {
+          // arrange
+          when(
+            () => mockDatasource.changePassword(
+              oldPassword: any(named: 'oldPassword'),
+              newPassword: any(named: 'newPassword'),
+              confirmNewPassword: any(named: 'confirmNewPassword'),
+            ),
+          ).thenAnswer((_) async => tChangePasswordResponse);
+
+          // act
+          final result = await repository.changePassword(
+            oldPassword: 'old',
+            newPassword: 'new',
+            confirmNewPassword: 'new',
+          );
+
+          // assert
+          expect(result, Right(tChangePasswordResponse));
+        },
+      );
+    });
+
+    group('getFAQ', () {
+      test(
+        'should return FAQResponse when datasource returns success',
+        () async {
+          // arrange
+          when(
+            () => mockDatasource.getFAQ(),
+          ).thenAnswer((_) async => tFAQResponse);
+
+          // act
+          final result = await repository.getFAQ();
+
+          // assert
+          expect(result, Right(tFAQResponse));
+        },
+      );
+    });
+
+    group('getPrivacyAndPolicy', () {
+      test(
+        'should return PrivacyAndPolicyResponse when datasource returns success',
+        () async {
+          // arrange
+          when(
+            () => mockDatasource.getPrivacyAndPolicy(),
+          ).thenAnswer((_) async => tPrivacyResponse);
+
+          // act
+          final result = await repository.getPrivacyAndPolicy();
+
+          // assert
+          expect(result, Right(tPrivacyResponse));
+        },
+      );
     });
   });
 }

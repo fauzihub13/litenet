@@ -11,11 +11,41 @@ import 'package:mocktail/mocktail.dart';
 
 class MockCheckPromoUsecase extends Mock implements CheckPromoUsecase {}
 
-void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+class Listener<T> extends Mock {
+  void call(T? previous, T next);
+}
 
+void main() {
   late MockCheckPromoUsecase mockUsecase;
   late ProviderContainer container;
+
+  final tPromoData = PromoDataEntity(
+    id: "PROMO-APRIL-2026",
+    slug: "internet-super-hemat-april",
+    title: "Promo Internet Super Hemat April",
+    minimumTransaction: 75000,
+    maxDiscount: 25000,
+    promoCode: "SUPERHEMAT26",
+    startAt: DateTime(2026, 4, 1),
+    endAt: DateTime(2026, 4, 30),
+    isActive: true,
+    createdAt: DateTime(2026, 3, 28),
+    updatedAt: DateTime(2026, 4, 1),
+    deletedAt: null,
+  );
+
+  final tResponse = CheckPromoResponse(
+    success: true,
+    message: 'Promo code is valid',
+    data: tPromoData,
+  );
+
+  final tFailure = Failure(message: 'Invalid promo code');
+
+  setUpAll(() {
+    registerFallbackValue(const AsyncLoading<CheckPromoResponse?>());
+    registerFallbackValue(AsyncData<CheckPromoResponse?>(tResponse));
+  });
 
   setUp(() {
     mockUsecase = MockCheckPromoUsecase();
@@ -24,61 +54,93 @@ void main() {
     );
   });
 
-  test('should emit loading and then data on success', () async {
-    final tResponse = CheckPromoResponse(
-      success: true,
-      message: 'ok',
-      data: PromoDataEntity(
-        id: "PROMO-${DateTime.now().millisecondsSinceEpoch}", // ID unik dummy
-        slug: "promo-dummy", // slug kosong
-        title: "Promo Dummy", // judul dummy
-        minimumTransaction: 0, // nilai minimal transaksi kosong
-        maxDiscount: 0, // diskon maksimal kosong
-        promoCode: "DUMMYCODE", // kode promo dummy
-        startAt: DateTime.now(), // mulai sekarang
-        endAt: DateTime.now().add(
-          const Duration(days: 7),
-        ), // berakhir 7 hari dari sekarang
-        isActive: false, // status tidak aktif
-        createdAt: DateTime.now(), // waktu dibuat sekarang
-        updatedAt: DateTime.now(), // waktu update sekarang
-        deletedAt: null, // belum dihapus
-      ),
-    );
-    when(
-      () => mockUsecase(dataPlanId: 'Q-1', promoCode: 'PROMO'),
-    ).thenAnswer((_) async => Right(tResponse));
-    final notifier = container.read(checkPromoProvider.notifier);
-    final future = notifier.checkPromoCode(
-      dataPlanId: 'Q-1',
-      promoCode: 'PROMO',
-    );
-    expect(container.read(checkPromoProvider), isA<AsyncLoading>());
-    await future;
-    CheckPromoResponse? value;
-    for (var i = 0; i < 100; i++) {
-      final state = container.read(checkPromoProvider);
-      if (!state.isLoading) {
-        value = state.value;
-        break;
-      }
-      await Future.delayed(const Duration(milliseconds: 10));
-    }
-    expect(value, isNotNull);
-    expect(value, tResponse);
+  tearDown(() {
+    container.dispose();
   });
 
-  test('should emit loading and then error on failure', () async {
-    when(
-      () => mockUsecase(dataPlanId: 'Q-1', promoCode: 'PROMO'),
-    ).thenAnswer((_) async => Left(Failure(message: 'error')));
-    final notifier = container.read(checkPromoProvider.notifier);
-    final future = notifier.checkPromoCode(
-      dataPlanId: 'Q-1',
-      promoCode: 'PROMO',
-    );
-    expect(container.read(checkPromoProvider), isA<AsyncLoading>());
-    await future;
-    expect(container.read(checkPromoProvider).hasError, true);
+  group('CheckPromoProvider', () {
+    test('initial state should eventually be AsyncData(null)', () async {
+      final state = await container.read(checkPromoProvider.future);
+      expect(state, null);
+    });
+
+    test('should emit AsyncLoading and then AsyncData on success', () async {
+      // arrange
+      when(
+        () => mockUsecase.call(
+          promoCode: any(named: 'promoCode'),
+          dataPlanId: any(named: 'dataPlanId'),
+        ),
+      ).thenAnswer((_) async => Right(tResponse));
+
+      // Wait for build
+      await container.read(checkPromoProvider.future);
+
+      final listener = Listener<AsyncValue<CheckPromoResponse?>>();
+      container.listen(
+        checkPromoProvider,
+        listener.call,
+        fireImmediately: true,
+      );
+
+      final notifier = container.read(checkPromoProvider.notifier);
+
+      // act
+      await notifier.checkPromoCode(
+        promoCode: 'WELCOME2026',
+        dataPlanId: 'PLAN-001',
+      );
+
+      // assert
+      verifyInOrder([
+        () => listener(any(), const AsyncData<CheckPromoResponse?>(null)),
+        () => listener(any(), any(that: isA<AsyncLoading>())),
+        () => listener(any(), AsyncData<CheckPromoResponse?>(tResponse)),
+      ]);
+
+      verify(
+        () =>
+            mockUsecase.call(promoCode: 'WELCOME2026', dataPlanId: 'PLAN-001'),
+      ).called(1);
+    });
+
+    test('should emit AsyncError on failure', () async {
+      // arrange
+      when(
+        () => mockUsecase.call(
+          promoCode: any(named: 'promoCode'),
+          dataPlanId: any(named: 'dataPlanId'),
+        ),
+      ).thenAnswer((_) async => Left(tFailure));
+
+      // Wait for build
+      await container.read(checkPromoProvider.future);
+
+      final listener = Listener<AsyncValue<CheckPromoResponse?>>();
+      container.listen(
+        checkPromoProvider,
+        listener.call,
+        fireImmediately: true,
+      );
+
+      final notifier = container.read(checkPromoProvider.notifier);
+
+      // act
+      await notifier.checkPromoCode(
+        promoCode: 'INVALID',
+        dataPlanId: 'PLAN-001',
+      );
+
+      // assert
+      verifyInOrder([
+        () => listener(any(), const AsyncData<CheckPromoResponse?>(null)),
+        () => listener(any(), any(that: isA<AsyncLoading>())),
+        () => listener(any(), any(that: isA<AsyncError>())),
+      ]);
+
+      final finalState = container.read(checkPromoProvider);
+      expect(finalState, isA<AsyncError>());
+      expect(finalState.error, tFailure);
+    });
   });
 }

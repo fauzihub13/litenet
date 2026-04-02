@@ -14,23 +14,55 @@ void main() {
     datasource = PromoDatasourceImpl(httpClient: mockDio);
   });
 
-  test('should return PromoResponse when response is successful', () async {
-    final responsePayload = {'success': true, 'message': 'ok', 'data': []};
-    when(() => mockDio.get(any())).thenAnswer(
-      (_) async => Response(
-        data: responsePayload,
-        statusCode: 200,
-        requestOptions: RequestOptions(path: ''),
-      ),
-    );
+  group('PromoDatasourceImpl', () {
+    group('getPromo', () {
+      final tResponsePayload = {
+        'success': true,
+        'message': 'Promos fetched',
+        'data': [
+          {
+            'id': 'PROMO-001',
+            'title': 'Ramadan Sale',
+            'description': 'Get 50% discount',
+            'image_url': 'https://example.com/promo.png',
+            'code': 'RAMADAN50',
+            'discount': 50,
+            'discount_type': 'percentage',
+            'expired_at': '2026-04-30T00:00:00Z',
+          }
+        ]
+      };
 
-    final result = await datasource.getPromo();
-    expect(result.success, true);
-    expect(result.message, 'ok');
-  });
+      test('should return PromoResponse when response is successful (200)', () async {
+        // arrange
+        when(() => mockDio.get(any())).thenAnswer(
+          (_) async => Response(
+            data: tResponsePayload,
+            statusCode: 200,
+            requestOptions: RequestOptions(path: ''),
+          ),
+        );
 
-  test('should throw Exception on error', () async {
-    when(() => mockDio.get(any())).thenThrow(Exception('error'));
-    expect(() => datasource.getPromo(), throwsException);
+        // act
+        final result = await datasource.getPromo();
+
+        // assert
+        expect(result.success, true);
+        expect(result.data.first.id, 'PROMO-001');
+        verify(() => mockDio.get(any())).called(1);
+      });
+
+      test('should throw Exception when dio throws', () async {
+        // arrange
+        when(() => mockDio.get(any()))
+            .thenThrow(DioException(requestOptions: RequestOptions(path: '')));
+
+        // act
+        final call = datasource.getPromo;
+
+        // assert
+        expect(() => call(), throwsA(isA<DioException>()));
+      });
+    });
   });
 }

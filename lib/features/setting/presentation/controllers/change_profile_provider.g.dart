@@ -33,7 +33,7 @@ final class ChangeProfileProvider
   ChangeProfile create() => ChangeProfile();
 }
 
-String _$changeProfileHash() => r'9589f41fc3ff9f8e658950177e60e65eefeed84b';
+String _$changeProfileHash() => r'd158347324c1645f7f7672292412d6d898d4acc3';
 
 abstract class _$ChangeProfile extends $AsyncNotifier<ProfileResponse?> {
   FutureOr<ProfileResponse?> build();

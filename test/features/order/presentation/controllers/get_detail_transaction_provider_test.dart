@@ -11,11 +11,39 @@ import 'package:mocktail/mocktail.dart';
 class MockGetDetailTransactionUsecase extends Mock
     implements GetDetailTransactionUsecase {}
 
-void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+class Listener<T> extends Mock {
+  void call(T? previous, T next);
+}
 
+void main() {
   late MockGetDetailTransactionUsecase mockUsecase;
   late ProviderContainer container;
+
+  final tDetailResponse = DetailTransactionResponse(
+    success: true,
+    message: 'Detail fetched successfully',
+    data: DetailTransactionDataEntity(
+      id: "TX-001",
+      orderId: "ORD-001",
+      packageName: "Unlimited 100GB",
+      capacity: "100GB",
+      transactionStatus: "SETTLEMENT",
+      grossAmount: 150000,
+      bankCode: "BCA",
+      bankName: "BCA Virtual Account",
+      bankImageUrl: "https://example.com/bca.png",
+      vaNumber: "1234567890123456",
+      createdAt: DateTime(2026, 4, 2, 10, 0, 0),
+      expiredAt: DateTime(2026, 4, 3, 10, 0, 0),
+    ),
+  );
+
+  final tFailure = Failure(message: 'Transaction not found');
+
+  setUpAll(() {
+    registerFallbackValue(const AsyncLoading<DetailTransactionResponse>());
+    registerFallbackValue(AsyncData<DetailTransactionResponse>(tDetailResponse));
+  });
 
   setUp(() {
     mockUsecase = MockGetDetailTransactionUsecase();
@@ -26,57 +54,60 @@ void main() {
     );
   });
 
-  test('should return DetailTransactionResponse on success', () async {
-    final tResponse = DetailTransactionResponse(
-      success: true,
-      message: 'ok',
-      data: DetailTransactionDataEntity(
-        id: "TX-${DateTime.now().millisecondsSinceEpoch}",
-        orderId: "ORD-${DateTime.now().microsecondsSinceEpoch}",
-        packageName: "Paket Internet Unlimited",
-        capacity: "10GB",
-        transactionStatus: [
-          "pending",
-          "settlement",
-          "cancel",
-        ].elementAt(DateTime.now().second % 3),
-        grossAmount: (10000 + DateTime.now().second * 1000),
-        bankCode: [
-          "BCA",
-          "BNI",
-          "BRI",
-          "MANDIRI",
-        ].elementAt(DateTime.now().millisecond % 4),
-        bankName: "Bank Dummy",
-        bankImageUrl: "https://dummyimage.com/100x100/000/fff.png",
-        vaNumber: "1234567890${DateTime.now().second}",
-        createdAt: DateTime.now(),
-        expiredAt: DateTime.now().add(const Duration(hours: 24)),
-      ),
-    );
-    when(
-      () => mockUsecase(orderId: 'ORD-1'),
-    ).thenAnswer((_) async => Right(tResponse));
-
-    final result = await container.read(
-      getDetailTransactionProvider(orderId: 'ORD-1').future,
-    );
-    expect(result, tResponse);
+  tearDown(() {
+    container.dispose();
   });
 
-  test(
-    'should throw StateError on error (provider disposed before emitting value)',
-    () async {
-      when(
-        () => mockUsecase(orderId: 'ORD-1'),
-      ).thenAnswer((_) async => Left(Failure(message: 'error')));
+  group('GetDetailTransactionProvider', () {
+    test('should fetch detail and emit AsyncData on success', () async {
+      // arrange
+      when(() => mockUsecase.call(orderId: any(named: 'orderId')))
+          .thenAnswer((_) async => Right(tDetailResponse));
 
-      expect(
-        () => container.read(
-          getDetailTransactionProvider(orderId: 'ORD-1').future,
-        ),
-        throwsA(isA<StateError>()),
+      final listener = Listener<AsyncValue<DetailTransactionResponse>>();
+      container.listen(
+        getDetailTransactionProvider(orderId: 'ORD-001'),
+        listener.call,
+        fireImmediately: true,
       );
-    },
-  );
+
+      // act
+      final state = await container.read(getDetailTransactionProvider(orderId: 'ORD-001').future);
+
+      // assert
+      expect(state, tDetailResponse);
+      verify(() => mockUsecase.call(orderId: 'ORD-001')).called(1);
+      
+      verifyInOrder([
+        () => listener(any(), any(that: isA<AsyncLoading>())),
+        () => listener(any(), AsyncData<DetailTransactionResponse>(tDetailResponse)),
+      ]);
+    });
+
+    test('should emit AsyncError when fetching fails', () async {
+      // arrange
+      when(() => mockUsecase.call(orderId: any(named: 'orderId')))
+          .thenAnswer((_) async => Left(tFailure));
+
+      final listener = Listener<AsyncValue<DetailTransactionResponse>>();
+      container.listen(
+        getDetailTransactionProvider(orderId: 'ORD-001'),
+        listener.call,
+        fireImmediately: true,
+      );
+
+      // act
+      try {
+        await container.read(getDetailTransactionProvider(orderId: 'ORD-001').future);
+      } catch (e) {
+        // expect the failure thrown from the fold
+        expect(e, tFailure);
+      }
+
+      // assert
+      final finalState = container.read(getDetailTransactionProvider(orderId: 'ORD-001'));
+      expect(finalState, isA<AsyncError>());
+      expect(finalState.error, tFailure);
+    });
+  });
 }

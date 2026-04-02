@@ -11,11 +11,34 @@ import 'package:mocktail/mocktail.dart';
 class MockCheckPaymentStatusUsecase extends Mock
     implements CheckPaymentStatusUsecase {}
 
-void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+class Listener<T> extends Mock {
+  void call(T? previous, T next);
+}
 
+void main() {
   late MockCheckPaymentStatusUsecase mockUsecase;
   late ProviderContainer container;
+
+  final tResponse = CheckPaymentStatusResponse(
+    success: true,
+    message: 'Payment status checked successfully',
+    data: CheckPaymentStatusDataEntity(
+      id: "PAY-20260402-001",
+      userId: "USR-001",
+      orderId: "ORD-001",
+      transactionStatus: "settlement",
+      fraudStatus: "accept",
+      bank: "BCA",
+      expiredAt: DateTime(2026, 4, 3, 10, 0, 0),
+    ),
+  );
+
+  final tFailure = Failure(message: 'Failed to check payment status');
+
+  setUpAll(() {
+    registerFallbackValue(const AsyncLoading<CheckPaymentStatusResponse?>());
+    registerFallbackValue(AsyncData<CheckPaymentStatusResponse?>(tResponse));
+  });
 
   setUp(() {
     mockUsecase = MockCheckPaymentStatusUsecase();
@@ -26,52 +49,68 @@ void main() {
     );
   });
 
-  test('should emit loading and then data on success', () async {
-    final tResponse = CheckPaymentStatusResponse(
-      success: true,
-      message: 'ok',
-      data: CheckPaymentStatusDataEntity(
-        id: "PAY-${DateTime.now().millisecondsSinceEpoch}", // ID unik berbasis timestamp
-        userId: "USR-12345", // user dummy
-        orderId: "ORD-98765", // order dummy
-        transactionStatus: "settlement", // contoh status transaksi
-        fraudStatus: "accept", // contoh status fraud
-        bank: "BNI", // bank dummy
-        expiredAt: DateTime.now().add(
-          const Duration(hours: 12),
-        ), // expired 12 jam dari sekarang
-      ),
-    );
-    when(
-      () => mockUsecase(orderId: 'ORD-1'),
-    ).thenAnswer((_) async => Right(tResponse));
-
-    final notifier = container.read(checkPaymentStatusProvider.notifier);
-    final future = notifier.checkPaymentStatus(orderId: 'ORD-1');
-    expect(container.read(checkPaymentStatusProvider), isA<AsyncLoading>());
-    await future;
-    CheckPaymentStatusResponse? value;
-    for (var i = 0; i < 100; i++) {
-      final state = container.read(checkPaymentStatusProvider);
-      if (!state.isLoading) {
-        value = state.value;
-        break;
-      }
-      await Future.delayed(const Duration(milliseconds: 10));
-    }
-    expect(value, isNotNull);
-    expect(value, tResponse);
+  tearDown(() {
+    container.dispose();
   });
 
-  test('should emit loading and then error on failure', () async {
-    when(
-      () => mockUsecase(orderId: 'ORD-1'),
-    ).thenAnswer((_) async => Left(Failure(message: 'error')));
+  group('CheckPaymentStatusProvider', () {
+    test('initial state should eventually be AsyncData(null)', () async {
+      final state = await container.read(checkPaymentStatusProvider.future);
+      expect(state, null);
+    });
 
-    final notifier = container.read(checkPaymentStatusProvider.notifier);
-    final future = notifier.checkPaymentStatus(orderId: 'ORD-1');
-    expect(container.read(checkPaymentStatusProvider), isA<AsyncLoading>());
-    await future;
-    expect(container.read(checkPaymentStatusProvider).hasError, true);
+    test('should emit AsyncLoading and then AsyncData on success', () async {
+      // arrange
+      when(() => mockUsecase.call(orderId: any(named: 'orderId')))
+          .thenAnswer((_) async => Right(tResponse));
+
+      // Wait for build
+      await container.read(checkPaymentStatusProvider.future);
+
+      final listener = Listener<AsyncValue<CheckPaymentStatusResponse?>>();
+      container.listen(checkPaymentStatusProvider, listener.call, fireImmediately: true);
+
+      final notifier = container.read(checkPaymentStatusProvider.notifier);
+
+      // act
+      await notifier.checkPaymentStatus(orderId: 'ORD-001');
+
+      // assert
+      verifyInOrder([
+        () => listener(any(), const AsyncData<CheckPaymentStatusResponse?>(null)),
+        () => listener(any(), any(that: isA<AsyncLoading>())),
+        () => listener(any(), AsyncData<CheckPaymentStatusResponse?>(tResponse)),
+      ]);
+
+      verify(() => mockUsecase.call(orderId: 'ORD-001')).called(1);
+    });
+
+    test('should emit AsyncError on failure', () async {
+      // arrange
+      when(() => mockUsecase.call(orderId: any(named: 'orderId')))
+          .thenAnswer((_) async => Left(tFailure));
+
+      // Wait for build
+      await container.read(checkPaymentStatusProvider.future);
+
+      final listener = Listener<AsyncValue<CheckPaymentStatusResponse?>>();
+      container.listen(checkPaymentStatusProvider, listener.call, fireImmediately: true);
+
+      final notifier = container.read(checkPaymentStatusProvider.notifier);
+
+      // act
+      await notifier.checkPaymentStatus(orderId: 'ORD-001');
+
+      // assert
+      verifyInOrder([
+        () => listener(any(), const AsyncData<CheckPaymentStatusResponse?>(null)),
+        () => listener(any(), any(that: isA<AsyncLoading>())),
+        () => listener(any(), any(that: isA<AsyncError>())),
+      ]);
+
+      final finalState = container.read(checkPaymentStatusProvider);
+      expect(finalState, isA<AsyncError>());
+      expect(finalState.error, tFailure);
+    });
   });
 }

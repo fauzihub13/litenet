@@ -12,44 +12,68 @@ void main() {
   late MockQuotaRepository mockRepository;
   late GetDetailQuotaUsecase usecase;
 
+  final tDetailQuotaData = DetailQuotaDataEntity(
+    id: "QUOTA-2026-APRIL",
+    code: "QAPR26",
+    slug: "paket-internet-hemat-april",
+    name: "Paket Internet Hemat April",
+    quota: 20,
+    monthDuration: 1,
+    description:
+        "Paket internet hemat dengan kuota 20GB berlaku selama 1 bulan.",
+    basePrice: 100000,
+    promoPrice: 80000,
+    discount: 20000,
+    capacity: "20GB",
+    isPromo: true,
+    terms: [],
+    devices: [],
+  );
+
+  final tResponse = DetailQuotaResponse(
+    success: true,
+    message: 'Quota detail fetched successfully',
+    data: tDetailQuotaData,
+  );
+
   setUp(() {
     mockRepository = MockQuotaRepository();
     usecase = GetDetailQuotaUsecase(mockRepository);
   });
 
-  test('should return DetailQuotaResponse on success', () async {
-    final tDetailQuotaResponse = DetailQuotaResponse(
-      success: true,
-      message: 'ok',
-      data: DetailQuotaDataEntity(
-        id: "QUOTA-0000", // ID dummy
-        code: "QCODE-0000", // kode dummy
-        slug: "quota-dummy", // slug dummy
-        name: "Paket Quota Dummy", // nama paket dummy
-        quota: 0, // kuota kosong
-        monthDuration: 0, // durasi kosong
-        description: "Deskripsi dummy", // deskripsi dummy
-        basePrice: 0, // harga dasar kosong
-        promoPrice: 0, // harga promo kosong
-        discount: 0, // diskon kosong
-        capacity: "0GB", // kapasitas kosong
-        isPromo: false, // status promo default
-        terms: [], // list kosong
-        devices: [], // list kosong
-      ),
-    );
-    when(
-      () => mockRepository.getDetailQuota(id: 'id1'),
-    ).thenAnswer((_) async => Right(tDetailQuotaResponse));
-    final result = await usecase(id: 'id1');
-    expect(result, Right(tDetailQuotaResponse));
-  });
+  group('GetDetailQuotaUsecase', () {
+    test(
+      'should call getDetailQuota from repository with correct id',
+      () async {
+        // arrange
+        when(
+          () => mockRepository.getDetailQuota(id: any(named: 'id')),
+        ).thenAnswer((_) async => Right(tResponse));
 
-  test('should return Failure on error', () async {
-    when(
-      () => mockRepository.getDetailQuota(id: 'id1'),
-    ).thenAnswer((_) async => Left(Failure(message: 'error')));
-    final result = await usecase(id: 'id1');
-    expect(result.isLeft(), true);
+        // act
+        final result = await usecase(id: 'PLAN-001');
+
+        // assert
+        expect(result, Right(tResponse));
+        verify(() => mockRepository.getDetailQuota(id: 'PLAN-001')).called(1);
+      },
+    );
+
+    test(
+      'should return Failure from repository when fetching detail fails',
+      () async {
+        // arrange
+        final tFailure = Failure(message: 'Quota not found');
+        when(
+          () => mockRepository.getDetailQuota(id: any(named: 'id')),
+        ).thenAnswer((_) async => Left(tFailure));
+
+        // act
+        final result = await usecase(id: 'PLAN-001');
+
+        // assert
+        expect(result, Left(tFailure));
+      },
+    );
   });
 }

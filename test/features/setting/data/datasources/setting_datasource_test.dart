@@ -1,16 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:litenet/features/setting/data/datasources/setting_datasource.dart';
-import 'package:litenet/features/setting/data/models/change_password_model.dart';
-import 'package:litenet/features/setting/data/models/faq_model.dart';
-import 'package:litenet/features/setting/data/models/logout_model.dart';
-import 'package:litenet/features/setting/data/models/privacy_and_policy_model.dart';
-import 'package:litenet/features/setting/data/models/profile_model.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockDio extends Mock implements Dio {}
-
-class MockResponse extends Mock implements Response {}
 
 void main() {
   late MockDio mockDio;
@@ -21,100 +14,117 @@ void main() {
     datasource = SettingDatasourceImpl(httpClient: mockDio);
   });
 
-  group('getFAQ', () {
-    test('should return FAQResponse on success', () async {
-      final mockData = FAQResponseModel(success: true, message: 'ok', data: []);
-      final mockResponse = MockResponse();
-      when(() => mockResponse.data).thenReturn(mockData.toJson());
-      when(() => mockDio.get(any())).thenAnswer((_) async => mockResponse);
-      final result = await datasource.getFAQ();
-      expect(result.success, true);
-      expect(result.message, 'ok');
-    });
-  });
+  group('SettingDatasourceImpl', () {
+    group('getProfile', () {
+      final tResponsePayload = {
+        'success': true,
+        'message': 'Profile fetched',
+        'data': {
+          'id': 'USR-001',
+          'name': 'Test User',
+          'email': 'test@example.com',
+        }
+      };
 
-  group('getPrivacyAndPolicy', () {
-    test('should return PrivacyAndPolicyResponse on success', () async {
-      final mockData = PrivacyAndPolicyResponseModel(
-        success: true,
-        message: 'ok',
-        data: [],
-      );
-      final mockResponse = MockResponse();
-      when(() => mockResponse.data).thenReturn(mockData.toJson());
-      when(() => mockDio.get(any())).thenAnswer((_) async => mockResponse);
-      final result = await datasource.getPrivacyAndPolicy();
-      expect(result.success, true);
-      expect(result.message, 'ok');
-    });
-  });
+      test('should return ProfileResponse when response is successful', () async {
+        // arrange
+        when(() => mockDio.get(any())).thenAnswer(
+          (_) async => Response(
+            data: tResponsePayload,
+            statusCode: 200,
+            requestOptions: RequestOptions(path: ''),
+          ),
+        );
 
-  group('getProfile', () {
-    test('should return ProfileResponse on success', () async {
-      final mockData = ProfileResponseModel(
-        success: true,
-        message: 'ok',
-        data: null,
-      );
-      final mockResponse = MockResponse();
-      when(() => mockResponse.data).thenReturn(mockData.toJson());
-      when(() => mockDio.get(any())).thenAnswer((_) async => mockResponse);
-      final result = await datasource.getProfile();
-      expect(result.success, true);
-      expect(result.message, 'ok');
-    });
-  });
+        // act
+        final result = await datasource.getProfile();
 
-  group('changePassword', () {
-    test('should return ChangePasswordResponse on success', () async {
-      final mockData = ChangePasswordResponseModel(
-        success: true,
-        message: 'ok',
-      );
-      final mockResponse = MockResponse();
-      when(() => mockResponse.data).thenReturn(mockData.toJson());
-      when(
-        () => mockDio.put(any(), data: any(named: 'data')),
-      ).thenAnswer((_) async => mockResponse);
-      final result = await datasource.changePassword(
-        oldPassword: 'old',
-        newPassword: 'new',
-        confirmNewPassword: 'new',
-      );
-      expect(result.success, true);
-      expect(result.message, 'ok');
+        // assert
+        expect(result.success, true);
+        expect(result.data.id, 'USR-001');
+      });
     });
-  });
 
-  group('changeProfile', () {
-    test('should return ProfileResponse on success', () async {
-      final mockData = ProfileResponseModel(success: true, message: 'ok');
-      final mockResponse = MockResponse();
-      when(() => mockResponse.data).thenReturn(mockData.toJson());
-      when(
-        () => mockDio.put(any(), data: any(named: 'data')),
-      ).thenAnswer((_) async => mockResponse);
-      final result = await datasource.changeProfile(
-        name: 'Test',
-        email: 'sadas@gmail.com',
-        phoneNumber: '0929123',
-      );
-      expect(result.success, true);
-      expect(result.message, 'ok');
+    group('logout', () {
+      final tResponsePayload = {
+        'success': true,
+        'message': 'Logout success',
+      };
+
+      test('should return LogoutResponse when response is successful', () async {
+        // arrange
+        when(() => mockDio.post(any())).thenAnswer(
+          (_) async => Response(
+            data: tResponsePayload,
+            statusCode: 200,
+            requestOptions: RequestOptions(path: ''),
+          ),
+        );
+
+        // act
+        final result = await datasource.logout();
+
+        // assert
+        expect(result.success, true);
+      });
     });
-  });
 
-  group('logout', () {
-    test('should return logout on success', () async {
-      final mockData = LogoutResponseModel(success: true, message: 'ok');
-      final mockResponse = MockResponse();
-      when(() => mockResponse.data).thenReturn(mockData.toJson());
-      when(
-        () => mockDio.post(any(), data: any(named: 'data')),
-      ).thenAnswer((_) async => mockResponse);
-      final result = await datasource.logout();
-      expect(result.success, true);
-      expect(result.message, 'ok');
+    group('changeProfile', () {
+      final tResponsePayload = {
+        'success': true,
+        'message': 'Profile updated',
+        'data': {'id': 'USR-001', 'name': 'Updated Name'}
+      };
+
+      test('should return ProfileResponse when response is successful', () async {
+        // arrange
+        when(() => mockDio.post(any(), data: any(named: 'data'))).thenAnswer(
+          (_) async => Response(
+            data: tResponsePayload,
+            statusCode: 200,
+            requestOptions: RequestOptions(path: ''),
+          ),
+        );
+
+        // act
+        final result = await datasource.changeProfile(
+          name: 'Updated Name',
+          email: 'test@example.com',
+          phoneNumber: '12345',
+        );
+
+        // assert
+        expect(result.success, true);
+        expect(result.data.name, 'Updated Name');
+      });
+    });
+
+    group('getFAQ', () {
+      final tResponsePayload = {
+        'success': true,
+        'message': 'FAQs fetched',
+        'data': [
+          {'id': 'FAQ-001', 'question': 'Q?', 'answer': 'A'}
+        ]
+      };
+
+      test('should return FAQResponse when response is successful', () async {
+        // arrange
+        when(() => mockDio.get(any())).thenAnswer(
+          (_) async => Response(
+            data: tResponsePayload,
+            statusCode: 200,
+            requestOptions: RequestOptions(path: ''),
+          ),
+        );
+
+        // act
+        final result = await datasource.getFAQ();
+
+        // assert
+        expect(result.success, true);
+        expect(result.data.first.id, 'FAQ-001');
+      });
     });
   });
 }

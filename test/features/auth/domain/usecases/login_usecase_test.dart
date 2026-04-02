@@ -12,51 +12,80 @@ void main() {
   late MockAuthRepository mockAuthRepository;
   late LoginUsecase usecase;
 
+  final tUser = User(
+    id: '1',
+    name: 'Test User',
+    avatar: 'avatar.png',
+    email: 'test@example.com',
+    phoneNumber: '08123456789',
+    role: 'user',
+    emailOtp: '123456',
+    emailOtpExpiredAt: DateTime(2026, 1, 1),
+    emailVerifiedAt: DateTime(2026, 1, 1),
+    createdAt: DateTime(2026, 1, 1),
+    updatedAt: DateTime(2026, 1, 1),
+    deletedAt: DateTime(2026, 1, 1),
+  );
+
+  final tLoginResponse = LoginResponse(
+    success: true,
+    message: 'Login success',
+    data: LoginDataEntity(
+      user: tUser,
+      isVerified: true,
+      token: 'valid_token',
+    ),
+  );
+
   setUp(() {
     mockAuthRepository = MockAuthRepository();
     usecase = LoginUsecase(mockAuthRepository);
   });
 
-  test('should return LoginResponse when repository returns success', () async {
-    final tLoginResponse = LoginResponse(
-      success: true,
-      message: 'ok',
-      data: LoginDataEntity(
-        user: User(
-          id: '1',
-          name: 'Test',
-          avatar: '',
-          email: 'a',
-          phoneNumber: '',
-          role: '',
-          emailOtp: '',
-          emailOtpExpiredAt: DateTime.now(),
-          emailVerifiedAt: DateTime.now(),
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-          deletedAt: DateTime.now(),
+  group('LoginUsecase', () {
+    test('should call login from repository with correct parameters', () async {
+      // arrange
+      when(
+        () => mockAuthRepository.login(
+          email: any(named: 'email'),
+          password: any(named: 'password'),
         ),
-        isVerified: true,
-        token: 'token',
-      ),
-    );
-    when(
-      () => mockAuthRepository.login(email: 'a', password: 'b'),
-    ).thenAnswer((_) async => Right(tLoginResponse));
+      ).thenAnswer((_) async => Right(tLoginResponse));
 
-    final result = await usecase(email: 'a', password: 'b');
-    expect(result, Right(tLoginResponse));
-  });
+      // act
+      final result = await usecase(email: 'test@example.com', password: 'password123');
 
-  test('should return Failure when repository returns failure', () async {
-    when(
-      () => mockAuthRepository.login(email: 'a', password: 'b'),
-    ).thenAnswer((_) async => Left(Failure(message: 'error')));
+      // assert
+      expect(result, Right(tLoginResponse));
+      verify(
+        () => mockAuthRepository.login(
+          email: 'test@example.com',
+          password: 'password123',
+        ),
+      ).called(1);
+    });
 
-    final result = await usecase(email: 'a', password: 'b');
-   result.fold((failure) {
-      expect(failure, isA<Failure>());
-      expect(failure.message, 'error'); // atau 'Failed' sesuai test
-    }, (_) => fail('Should not be success'));
+    test('should return Failure from repository when login fails', () async {
+      // arrange
+      final tFailure = Failure(message: 'Invalid credentials');
+      when(
+        () => mockAuthRepository.login(
+          email: any(named: 'email'),
+          password: any(named: 'password'),
+        ),
+      ).thenAnswer((_) async => Left(tFailure));
+
+      // act
+      final result = await usecase(email: 'test@example.com', password: 'password123');
+
+      // assert
+      expect(result, Left(tFailure));
+      verify(
+        () => mockAuthRepository.login(
+          email: 'test@example.com',
+          password: 'password123',
+        ),
+      ).called(1);
+    });
   });
 }

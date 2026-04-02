@@ -12,52 +12,55 @@ void main() {
   late MockTransactionRepository mockRepository;
   late GetDetailTransactionUsecase usecase;
 
+  final tDetailResponse = DetailTransactionResponse(
+    success: true,
+    message: 'Detail fetched successfully',
+    data: DetailTransactionDataEntity(
+      id: "TX-001",
+      orderId: "ORD-001",
+      packageName: "Unlimited 100GB",
+      capacity: "100GB",
+      transactionStatus: "SETTLEMENT",
+      grossAmount: 150000,
+      bankCode: "BCA",
+      bankName: "BCA Virtual Account",
+      bankImageUrl: "https://example.com/bca.png",
+      vaNumber: "1234567890123456",
+      createdAt: DateTime(2026, 4, 2, 10, 0, 0),
+      expiredAt: DateTime(2026, 4, 3, 10, 0, 0),
+    ),
+  );
+
   setUp(() {
     mockRepository = MockTransactionRepository();
     usecase = GetDetailTransactionUsecase(mockRepository);
   });
 
-  test('should return DetailTransactionResponse on success', () async {
-    final tResponse = DetailTransactionResponse(
-      success: true,
-      message: 'ok',
-      data: DetailTransactionDataEntity(
-        id: "TX-${DateTime.now().millisecondsSinceEpoch}",
-        orderId: "ORD-${DateTime.now().microsecondsSinceEpoch}",
-        packageName: "Paket Internet Unlimited",
-        capacity: "10GB",
-        transactionStatus: [
-          "pending",
-          "settlement",
-          "cancel",
-        ].elementAt(DateTime.now().second % 3),
-        grossAmount: (10000 + DateTime.now().second * 1000),
-        bankCode: [
-          "BCA",
-          "BNI",
-          "BRI",
-          "MANDIRI",
-        ].elementAt(DateTime.now().millisecond % 4),
-        bankName: "Bank Dummy",
-        bankImageUrl: "https://dummyimage.com/100x100/000/fff.png",
-        vaNumber: "1234567890${DateTime.now().second}",
-        createdAt: DateTime.now(),
-        expiredAt: DateTime.now().add(const Duration(hours: 24)),
-      ),
-    );
-    when(
-      () => mockRepository.getDetailTransaction(orderId: 'ORD-1'),
-    ).thenAnswer((_) async => Right(tResponse));
-    final result = await usecase(orderId: 'ORD-1');
-    expect(result, Right(tResponse));
-  });
+  group('GetDetailTransactionUsecase', () {
+    test('should call getDetailTransaction from repository with correct orderId', () async {
+      // arrange
+      when(() => mockRepository.getDetailTransaction(orderId: any(named: 'orderId')))
+          .thenAnswer((_) async => Right(tDetailResponse));
 
-  test('should return Failure on error', () async {
-    final failure = Failure(message: 'error');
-    when(
-      () => mockRepository.getDetailTransaction(orderId: 'ORD-1'),
-    ).thenAnswer((_) async => Left(failure));
-    final result = await usecase(orderId: 'ORD-1');
-    expect(result, Left(failure));
+      // act
+      final result = await usecase(orderId: 'ORD-001');
+
+      // assert
+      expect(result, Right(tDetailResponse));
+      verify(() => mockRepository.getDetailTransaction(orderId: 'ORD-001')).called(1);
+    });
+
+    test('should return Failure from repository when fetching fails', () async {
+      // arrange
+      final tFailure = Failure(message: 'Transaction not found');
+      when(() => mockRepository.getDetailTransaction(orderId: any(named: 'orderId')))
+          .thenAnswer((_) async => Left(tFailure));
+
+      // act
+      final result = await usecase(orderId: 'ORD-001');
+
+      // assert
+      expect(result, Left(tFailure));
+    });
   });
 }

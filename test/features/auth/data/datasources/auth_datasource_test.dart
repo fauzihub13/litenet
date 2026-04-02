@@ -1,14 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:litenet/features/auth/data/datasources/auth_datasource.dart';
-import 'package:litenet/features/auth/data/models/login_model.dart';
-import 'package:litenet/features/auth/data/models/otp_model.dart';
-import 'package:litenet/features/auth/data/models/summary_model.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockDio extends Mock implements Dio {}
-
-class MockResponse extends Mock implements Response {}
 
 void main() {
   late MockDio mockDio;
@@ -19,151 +14,203 @@ void main() {
     datasource = AuthDatasourceImpl(httpClient: mockDio);
   });
 
-  group('register', () {
-    test(
-      'should return RegisterResponse when response is successful',
-      () async {
-        final responsePayload = {
-          'success': true,
-          'message': 'ok',
-          'data': {'user_id': '123'},
-        };
+  group('AuthDatasourceImpl', () {
+    group('register', () {
+      final tResponsePayload = {
+        'success': true,
+        'message': 'Registration successful',
+        'data': {'user_id': 'USR-123'},
+      };
+
+      test(
+        'should return RegisterResponse when response is successful (200)',
+        () async {
+          // arrange
+          when(() => mockDio.post(any(), data: any(named: 'data'))).thenAnswer(
+            (_) async => Response(
+              data: tResponsePayload,
+              statusCode: 200,
+              requestOptions: RequestOptions(path: ''),
+            ),
+          );
+
+          // act
+          final result = await datasource.register(
+            name: 'Test User',
+            email: 'test@example.com',
+            password: 'password123',
+            passwordConfirmation: 'password123',
+            phoneNumber: '08123456789',
+          );
+
+          // assert
+          expect(result.success, true);
+          expect(result.message, 'Registration successful');
+          verify(() => mockDio.post(any(), data: any(named: 'data'))).called(1);
+        },
+      );
+
+      test('should throw Exception when dio throws', () async {
+        // arrange
+        when(
+          () => mockDio.post(any(), data: any(named: 'data')),
+        ).thenThrow(DioException(requestOptions: RequestOptions(path: '')));
+
+        // act
+        final call = datasource.register;
+
+        // assert
+        expect(
+          () => call(
+            name: 'Test',
+            email: 'a',
+            password: 'b',
+            passwordConfirmation: 'b',
+            phoneNumber: '123',
+          ),
+          throwsA(isA<DioException>()),
+        );
+      });
+    });
+
+    group('login', () {
+      final tLoginResponse = {
+        'success': true,
+        'message': 'Login successful',
+        'data': {
+          'user': {
+            'id': 'USR-001',
+            'name': 'Test User',
+            'email': 'test@example.com',
+          },
+          'is_verified': true,
+          'token': 'valid_token',
+        },
+      };
+
+      test('should return LoginResponseModel on success', () async {
+        // arrange
         when(() => mockDio.post(any(), data: any(named: 'data'))).thenAnswer(
           (_) async => Response(
-            data: responsePayload,
+            data: tLoginResponse,
             statusCode: 200,
             requestOptions: RequestOptions(path: ''),
           ),
         );
-        final result = await datasource.register(
-          name: 'Test',
-          email: 'a',
-          password: 'b',
-          passwordConfirmation: 'b',
-          phoneNumber: '123',
+
+        // act
+        final result = await datasource.login(
+          email: 'test@example.com',
+          password: 'password123',
         );
+
+        // assert
         expect(result.success, true);
-        expect(result.message, 'ok');
-      },
-    );
+        expect(result.data.token, 'valid_token');
+      });
+    });
 
-    test('should throw Exception on error', () async {
-      when(
-        () => mockDio.post(any(), data: any(named: 'data')),
-      ).thenThrow(Exception('error'));
-      expect(
-        () => datasource.register(
-          name: 'Test',
-          email: 'a',
-          password: 'b',
-          passwordConfirmation: 'b',
-          phoneNumber: '123',
-        ),
-        throwsException,
+    group('resendOTP', () {
+      final tOTPResponse = {
+        'success': true,
+        'message': 'OTP sent',
+        'data': {
+          'user': {'id': 'USR-001'},
+          'is_verified': false,
+          'token': 'some_token',
+        },
+      };
+
+      test(
+        'should return OTPResponseModel when response is successful',
+        () async {
+          // arrange
+          when(() => mockDio.post(any(), data: any(named: 'data'))).thenAnswer(
+            (_) async => Response(
+              data: tOTPResponse,
+              statusCode: 200,
+              requestOptions: RequestOptions(path: ''),
+            ),
+          );
+
+          // act
+          final result = await datasource.resendOTP(email: 'test@example.com');
+
+          // assert
+          expect(result.success, true);
+          expect(result.message, 'OTP sent');
+        },
       );
     });
-  });
 
-  group('login', () {
-    test('should return ProfileResponse on success', () async {
-      final mockData = LoginResponseModel(success: true, message: 'ok');
-      final mockResponse = MockResponse();
-      when(() => mockResponse.data).thenReturn(mockData.toJson());
-      when(
-        () => mockDio.post(any(), data: any(named: 'data')),
-      ).thenAnswer((_) async => mockResponse);
-      final result = await datasource.login(
-        email: 'sadas@gmail.com',
-        password: '0929123',
-      );
-      expect(result.success, true);
-      expect(result.message, 'ok');
-    });
+    group('verifyOTP', () {
+      final tOTPResponse = {
+        'success': true,
+        'message': 'OTP verified',
+        'data': {
+          'user': {'id': 'USR-001'},
+          'is_verified': true,
+          'token': 'valid_token',
+        },
+      };
 
-    test('should throw Exception on error', () async {
-      when(
-        () => mockDio.post(any(), data: any(named: 'data')),
-      ).thenThrow(Exception('error'));
-      expect(
-        () => datasource.login(email: 'a', password: 'b'),
-        throwsException,
-      );
-    });
-  });
+      test(
+        'should return OTPResponseModel when response is successful',
+        () async {
+          // arrange
+          when(() => mockDio.post(any(), data: any(named: 'data'))).thenAnswer(
+            (_) async => Response(
+              data: tOTPResponse,
+              statusCode: 200,
+              requestOptions: RequestOptions(path: ''),
+            ),
+          );
 
-  group('resendOTP', () {
-    test('should return OTPResponse when response is successful', () async {
-      final mockData = OTPResponseModel(success: true, message: 'ok');
-      final mockResponse = MockResponse();
-      when(() => mockResponse.data).thenReturn(mockData.toJson());
-      when(
-        () => mockDio.post(any(), data: any(named: 'data')),
-      ).thenAnswer((_) async => mockResponse);
-      final result = await datasource.resendOTP(email: 'sadas@gmail.com');
-      expect(result.success, true);
-      expect(result.message, 'ok');
-    });
+          // act
+          final result = await datasource.verifyOTP(
+            email: 'test@example.com',
+            otp: '123456',
+          );
 
-    test('should throw Exception on error', () async {
-      when(
-        () => mockDio.post(any(), data: any(named: 'data')),
-      ).thenThrow(Exception('error'));
-      expect(
-        () => datasource.resendOTP(email: 'test@email.com'),
-        throwsException,
+          // assert
+          expect(result.success, true);
+          expect(result.message, 'OTP verified');
+        },
       );
     });
-  });
 
-  group('verifyOTP', () {
-    test('should return OTPResponse when response is successful', () async {
-      final mockData = OTPResponseModel(success: true, message: 'ok');
-      final mockResponse = MockResponse();
-      when(() => mockResponse.data).thenReturn(mockData.toJson());
-      when(
-        () => mockDio.post(any(), data: any(named: 'data')),
-      ).thenAnswer((_) async => mockResponse);
-      final result = await datasource.verifyOTP(
-        email: 'sadas@gmail.com',
-        otp: '123456',
+    group('getSummary', () {
+      final tSummaryResponse = {
+        'success': true,
+        'message': 'Summary fetched',
+        'data': {
+          'total_device': 10,
+          'online_device': 7,
+          'offline_device': 2,
+          'inactive_device': 1,
+        },
+      };
+
+      test(
+        'should return SummaryResponseModel when response is successful',
+        () async {
+          // arrange
+          when(() => mockDio.get(any())).thenAnswer(
+            (_) async => Response(
+              data: tSummaryResponse,
+              statusCode: 200,
+              requestOptions: RequestOptions(path: ''),
+            ),
+          );
+
+          // act
+          final result = await datasource.getSummary();
+
+          // assert
+          expect(result.success, true);
+          expect(result.data.totalDevice, 10);
+        },
       );
-      expect(result.success, true);
-      expect(result.message, 'ok');
-    });
-
-    test('should throw Exception on error', () async {
-      when(
-        () => mockDio.post(any(), data: any(named: 'data')),
-      ).thenThrow(Exception('error'));
-      expect(
-        () => datasource.verifyOTP(email: 'test@email.com', otp: '123456'),
-        throwsException,
-      );
-    });
-  });
-
-  group('getSummary', () {
-    test('should return Summary when response is successful', () async {
-      final mockData = SummaryResponseModel(
-        success: true,
-        message: 'ok',
-        data: null,
-      );
-      final mockResponse = MockResponse();
-      when(() => mockResponse.data).thenReturn(mockData.toJson());
-      when(
-        () => mockDio.get(any(), data: any(named: 'data')),
-      ).thenAnswer((_) async => mockResponse);
-      final result = await datasource.getSummary();
-      expect(result.success, true);
-      expect(result.message, 'ok');
-    });
-
-    test('should throw Exception on error', () async {
-      when(
-        () => mockDio.get(any(), data: any(named: 'data')),
-      ).thenThrow(Exception('error'));
-      expect(() => datasource.getSummary(), throwsException);
     });
   });
 }

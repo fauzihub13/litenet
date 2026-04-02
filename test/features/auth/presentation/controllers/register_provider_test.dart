@@ -10,11 +10,25 @@ import 'package:mocktail/mocktail.dart';
 
 class MockRegisterUsecase extends Mock implements RegisterUsecase {}
 
-void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+class Listener<T> extends Mock {
+  void call(T? previous, T next);
+}
 
+void main() {
   late MockRegisterUsecase mockRegisterUsecase;
   late ProviderContainer container;
+
+  final tRegisterResponse = RegisterResponse(
+    success: true,
+    message: 'Registration successful',
+  );
+
+  final tFailure = Failure(message: 'Email already exists');
+
+  setUpAll(() {
+    registerFallbackValue(const AsyncLoading<RegisterResponse?>());
+    registerFallbackValue(AsyncData<RegisterResponse?>(tRegisterResponse));
+  });
 
   setUp(() {
     mockRegisterUsecase = MockRegisterUsecase();
@@ -25,65 +39,110 @@ void main() {
     );
   });
 
-  test('should emit loading and then data on success', () async {
-    final tRegisterResponse = RegisterResponse(
-      success: true,
-      message: 'ok',
-    );
-    when(
-      () => mockRegisterUsecase(
-        name: 'Test',
-        email: 'a',
-        password: 'b',
-        passwordConfirmation: 'b',
-        phoneNumber: '123',
-      ),
-    ).thenAnswer((_) async => Right(tRegisterResponse));
-
-    final notifier = container.read(registerProvider.notifier);
-    final future = notifier.register(
-      name: 'Test',
-      email: 'a',
-      password: 'b',
-      passwordConfirmation: 'b',
-      phoneNumber: '123',
-    );
-    expect(container.read(registerProvider), isA<AsyncLoading>());
-    await future;
-    RegisterResponse? value;
-    for (var i = 0; i < 100; i++) {
-      final state = container.read(registerProvider);
-      if (!state.isLoading) {
-        value = state.value;
-        break;
-      }
-      await Future.delayed(const Duration(milliseconds: 10));
-    }
-    expect(value, isNotNull);
-    expect(value, tRegisterResponse);
+  tearDown(() {
+    container.dispose();
   });
 
-  test('should emit loading and then error on failure', () async {
-    when(
-      () => mockRegisterUsecase(
-        name: 'Test',
-        email: 'a',
-        password: 'b',
-        passwordConfirmation: 'b',
-        phoneNumber: '123',
-      ),
-    ).thenAnswer((_) async => Left(Failure(message: 'error')));
+  group('RegisterProvider', () {
+    test('initial state should eventually be AsyncData(null)', () async {
+      final state = await container.read(registerProvider.future);
+      expect(state, null);
+    });
 
-    final notifier = container.read(registerProvider.notifier);
-    final future = notifier.register(
-      name: 'Test',
-      email: 'a',
-      password: 'b',
-      passwordConfirmation: 'b',
-      phoneNumber: '123',
-    );
-    expect(container.read(registerProvider), isA<AsyncLoading>());
-    await future;
-    expect(container.read(registerProvider).hasError, true);
+    test('should emit AsyncLoading and then AsyncData on successful registration', () async {
+      // arrange
+      when(
+        () => mockRegisterUsecase.call(
+          name: any(named: 'name'),
+          email: any(named: 'email'),
+          password: any(named: 'password'),
+          passwordConfirmation: any(named: 'passwordConfirmation'),
+          phoneNumber: any(named: 'phoneNumber'),
+        ),
+      ).thenAnswer((_) async => Right(tRegisterResponse));
+
+      // Wait for build to finish
+      await container.read(registerProvider.future);
+
+      final listener = Listener<AsyncValue<RegisterResponse?>>();
+      container.listen(
+        registerProvider,
+        listener.call,
+        fireImmediately: true,
+      );
+
+      final notifier = container.read(registerProvider.notifier);
+
+      // act
+      await notifier.register(
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'password123',
+        passwordConfirmation: 'password123',
+        phoneNumber: '08123456789',
+      );
+
+      // assert
+      verifyInOrder([
+        () => listener(any(), const AsyncData<RegisterResponse?>(null)),
+        () => listener(any(), any(that: isA<AsyncLoading>())),
+        () => listener(any(), AsyncData<RegisterResponse?>(tRegisterResponse)),
+      ]);
+
+      verify(
+        () => mockRegisterUsecase.call(
+          name: 'Test User',
+          email: 'test@example.com',
+          password: 'password123',
+          passwordConfirmation: 'password123',
+          phoneNumber: '08123456789',
+        ),
+      ).called(1);
+    });
+
+    test('should emit AsyncError on failed registration', () async {
+      // arrange
+      when(
+        () => mockRegisterUsecase.call(
+          name: any(named: 'name'),
+          email: any(named: 'email'),
+          password: any(named: 'password'),
+          passwordConfirmation: any(named: 'passwordConfirmation'),
+          phoneNumber: any(named: 'phoneNumber'),
+        ),
+      ).thenAnswer((_) async => Left(tFailure));
+
+      // Wait for build to finish
+      await container.read(registerProvider.future);
+
+      final listener = Listener<AsyncValue<RegisterResponse?>>();
+      container.listen(
+        registerProvider,
+        listener.call,
+        fireImmediately: true,
+      );
+
+      final notifier = container.read(registerProvider.notifier);
+
+      // act
+      await notifier.register(
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'password123',
+        passwordConfirmation: 'password123',
+        phoneNumber: '08123456789',
+      );
+
+      // assert
+      verifyInOrder([
+        () => listener(any(), const AsyncData<RegisterResponse?>(null)),
+        () => listener(any(), any(that: isA<AsyncLoading>())),
+        () => listener(any(), any(that: isA<AsyncError>())),
+      ]);
+
+      final finalState = container.read(registerProvider);
+      expect(finalState, isA<AsyncError>());
+      expect(finalState.error, tFailure);
+    });
   });
 }

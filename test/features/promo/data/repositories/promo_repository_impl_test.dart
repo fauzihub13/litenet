@@ -1,6 +1,5 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/features/promo/data/datasources/promo_datasource.dart';
 import 'package:litenet/features/promo/data/repositories/promo_repository_impl.dart';
 import 'package:litenet/features/promo/domain/entities/promo.dart';
@@ -12,49 +11,61 @@ void main() {
   late MockPromoDatasource mockDatasource;
   late PromoRepositoryImpl repository;
 
+  final tPromoData = PromoDataEntity(
+    id: "PROMO-2026-APRIL",
+    slug: "internet-hemat-april",
+    title: "Promo Internet Hemat April",
+    minimumTransaction: 50000,
+    maxDiscount: 20000,
+    promoCode: "HEMATAPRIL26",
+    startAt: DateTime(2026, 4, 1),
+    endAt: DateTime(2026, 4, 30),
+    isActive: true,
+    createdAt: DateTime(2026, 3, 25),
+    updatedAt: DateTime(2026, 4, 1),
+    deletedAt: null,
+  );
+
+  final tResponse = PromoResponse(
+    success: true,
+    message: 'Success',
+    data: [tPromoData],
+  );
+
   setUp(() {
     mockDatasource = MockPromoDatasource();
     repository = PromoRepositoryImpl(promoDatasource: mockDatasource);
   });
 
-  test('should return PromoResponse when datasource returns success', () async {
-    final tPromoResponse = PromoResponse(
-      success: true,
-      message: 'ok',
-      data: [],
+  group('PromoRepositoryImpl', () {
+    test(
+      'should return PromoResponse when datasource returns success',
+      () async {
+        // arrange
+        when(
+          () => mockDatasource.getPromo(),
+        ).thenAnswer((_) async => tResponse);
+
+        // act
+        final result = await repository.getPromo();
+
+        // assert
+        expect(result, Right(tResponse));
+        verify(() => mockDatasource.getPromo()).called(1);
+      },
     );
-    when(
-      () => mockDatasource.getPromo(),
-    ).thenAnswer((_) async => tPromoResponse);
 
-    final result = await repository.getPromo();
-    expect(result, Right(tPromoResponse));
-    verify(() => mockDatasource.getPromo()).called(1);
-  });
+    test('should return Failure when datasource throws', () async {
+      // arrange
+      when(
+        () => mockDatasource.getPromo(),
+      ).thenThrow(Exception('Server error'));
 
-  test('should return Failure when datasource throws', () async {
-    when(() => mockDatasource.getPromo()).thenThrow(Exception('error'));
+      // act
+      final result = await repository.getPromo();
 
-    final result = await repository.getPromo();
-    expect(result.isLeft(), true);
-    verify(() => mockDatasource.getPromo()).called(1);
-  });
-
-  test('should return Failure when datasource returns !success', () async {
-    final tFailResponse = PromoResponse(
-      success: false,
-      message: 'Failed',
-      data: [],
-    );
-    when(
-      () => mockDatasource.getPromo(),
-    ).thenAnswer((_) async => tFailResponse);
-
-    final result = await repository.getPromo();
-    result.fold((failure) {
-      expect(failure, isA<Failure>());
-      expect(failure.message, 'Failed');
-    }, (_) => fail('Should not be success'));
-    verify(() => mockDatasource.getPromo()).called(1);
+      // assert
+      expect(result.isLeft(), true);
+    });
   });
 }

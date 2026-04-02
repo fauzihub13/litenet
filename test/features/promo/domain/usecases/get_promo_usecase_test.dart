@@ -12,31 +12,57 @@ void main() {
   late MockPromoRepository mockRepository;
   late GetPromoUsecase usecase;
 
+  final tPromoData = PromoDataEntity(
+    id: "PROMO-2026-APRIL",
+    slug: "internet-hemat-april",
+    title: "Promo Internet Hemat April",
+    minimumTransaction: 50000,
+    maxDiscount: 20000,
+    promoCode: "HEMATAPRIL26",
+    startAt: DateTime(2026, 4, 1),
+    endAt: DateTime(2026, 4, 30),
+    isActive: true,
+    createdAt: DateTime(2026, 3, 25),
+    updatedAt: DateTime(2026, 4, 1),
+    deletedAt: null,
+  );
+
+  final tResponse = PromoResponse(
+    success: true,
+    message: 'Promos fetched successfully',
+    data: [tPromoData],
+  );
+
   setUp(() {
     mockRepository = MockPromoRepository();
     usecase = GetPromoUsecase(mockRepository);
   });
 
-  test('should return PromoResponse on success', () async {
-    final tPromoResponse = PromoResponse(
-      success: true,
-      message: 'ok',
-      data: [],
-    );
-    when(
-      () => mockRepository.getPromo(),
-    ).thenAnswer((_) async => Right(tPromoResponse));
+  group('GetPromoUsecase', () {
+    test('should call getPromo from repository', () async {
+      // arrange
+      when(() => mockRepository.getPromo())
+          .thenAnswer((_) async => Right(tResponse));
 
-    final result = await usecase();
-    expect(result, Right(tPromoResponse));
-  });
+      // act
+      final result = await usecase();
 
-  test('should return Failure on error', () async {
-    when(
-      () => mockRepository.getPromo(),
-    ).thenAnswer((_) async => Left(Failure(message: 'error')));
+      // assert
+      expect(result, Right(tResponse));
+      verify(() => mockRepository.getPromo()).called(1);
+    });
 
-    final result = await usecase();
-    expect(result.isLeft(), true);
+    test('should return Failure from repository when fetching fails', () async {
+      // arrange
+      final tFailure = Failure(message: 'Failed to fetch promos');
+      when(() => mockRepository.getPromo())
+          .thenAnswer((_) async => Left(tFailure));
+
+      // act
+      final result = await usecase();
+
+      // assert
+      expect(result, Left(tFailure));
+    });
   });
 }

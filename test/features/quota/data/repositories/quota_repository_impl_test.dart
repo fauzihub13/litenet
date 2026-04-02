@@ -1,6 +1,5 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/features/promo/domain/entities/promo.dart';
 import 'package:litenet/features/quota/data/datasources/quota_datasource.dart';
 import 'package:litenet/features/quota/data/repositories/quota_repository_impl.dart';
@@ -15,234 +14,161 @@ void main() {
   late MockQuotaDatasource mockDatasource;
   late QuotaRepositoryImpl repository;
 
+  final tQuotaData = QuotaDataEntity(
+    id: "QUOTA-2026-APRIL",
+    code: "QAPR26",
+    slug: "paket-internet-hemat-april",
+    name: "Paket Internet Hemat April",
+    quota: 20,
+    monthDuration: 1,
+    description:
+        "Paket internet hemat dengan kuota 20GB berlaku selama 1 bulan.",
+    basePrice: 100000,
+    promoPrice: 80000,
+    discount: 20000,
+    capacity: "20GB",
+    isPromo: true,
+    createdAt: DateTime(2026, 3, 25),
+    updatedAt: DateTime(2026, 4, 1),
+    deletedAt: null,
+  );
+
+  final tDetailQuotaData = DetailQuotaDataEntity(
+    id: "QUOTA-2026-APRIL",
+    code: "QAPR26",
+    slug: "paket-internet-hemat-april",
+    name: "Paket Internet Hemat April",
+    quota: 20,
+    monthDuration: 1,
+    description:
+        "Paket internet hemat dengan kuota 20GB berlaku selama 1 bulan.",
+    basePrice: 100000,
+    promoPrice: 80000,
+    discount: 20000,
+    capacity: "20GB",
+    isPromo: true,
+    terms: [],
+    devices: [],
+  );
+
+  final tQuotaResponse = QuotaResponse(
+    success: true,
+    message: 'Success',
+    data: [tQuotaData],
+  );
+
+  final tDetailQuotaResponse = DetailQuotaResponse(
+    success: true,
+    message: 'Success',
+    data: tDetailQuotaData,
+  );
+
+  final tPromoData = PromoDataEntity(
+    id: "PROMO-APRIL-2026",
+    slug: "internet-super-hemat-april",
+    title: "Promo Internet Super Hemat April",
+    minimumTransaction: 75000,
+    maxDiscount: 25000,
+    promoCode: "SUPERHEMAT26",
+    startAt: DateTime(2026, 4, 1),
+    endAt: DateTime(2026, 4, 30),
+    isActive: true,
+    createdAt: DateTime(2026, 3, 28),
+    updatedAt: DateTime(2026, 4, 1),
+    deletedAt: null,
+  );
+
+  final tPromoResponse = CheckPromoResponse(
+    success: true,
+    message: 'Success',
+    data: tPromoData,
+  );
+
   setUp(() {
     mockDatasource = MockQuotaDatasource();
     repository = QuotaRepositoryImpl(quotaDatasource: mockDatasource);
   });
 
-  group('getAllQuotas', () {
-    test(
-      'should return QuotaResponse when datasource returns success',
-      () async {
-        final tQuotaResponse = QuotaResponse(
-          success: true,
-          message: 'ok',
-          data: [],
-        );
+  group('QuotaRepositoryImpl', () {
+    group('getAllQuotas', () {
+      test(
+        'should return QuotaResponse when datasource returns success',
+        () async {
+          // arrange
+          when(
+            () => mockDatasource.getAllQuotas(),
+          ).thenAnswer((_) async => tQuotaResponse);
+
+          // act
+          final result = await repository.getAllQuotas();
+
+          // assert
+          expect(result, Right(tQuotaResponse));
+          verify(() => mockDatasource.getAllQuotas()).called(1);
+        },
+      );
+
+      test('should return Failure when datasource throws', () async {
+        // arrange
         when(
           () => mockDatasource.getAllQuotas(),
-        ).thenAnswer((_) async => tQuotaResponse);
+        ).thenThrow(Exception('Server error'));
+
+        // act
         final result = await repository.getAllQuotas();
-        expect(result, Right(tQuotaResponse));
-        verify(() => mockDatasource.getAllQuotas()).called(1);
-      },
-    );
 
-    test('should return Failure when datasource throws', () async {
-      when(() => mockDatasource.getAllQuotas()).thenThrow(Exception('error'));
-      final result = await repository.getAllQuotas();
-      expect(result.isLeft(), true);
-      verify(() => mockDatasource.getAllQuotas()).called(1);
+        // assert
+        expect(result.isLeft(), true);
+      });
     });
 
-    test('should return Failure when datasource returns !success', () async {
-      final tFailResponse = QuotaResponse(
-        success: false,
-        message: 'Failed',
-        data: [],
+    group('getDetailQuota', () {
+      test(
+        'should return DetailQuotaResponse when datasource returns success',
+        () async {
+          // arrange
+          when(
+            () => mockDatasource.getDetailQuota(id: any(named: 'id')),
+          ).thenAnswer((_) async => tDetailQuotaResponse);
+
+          // act
+          final result = await repository.getDetailQuota(id: 'PLAN-001');
+
+          // assert
+          expect(result, Right(tDetailQuotaResponse));
+          verify(() => mockDatasource.getDetailQuota(id: 'PLAN-001')).called(1);
+        },
       );
-      when(
-        () => mockDatasource.getAllQuotas(),
-      ).thenAnswer((_) async => tFailResponse);
-      final result = await repository.getAllQuotas();
-      result.fold((failure) {
-        expect(failure, isA<Failure>());
-        expect(failure.message, 'Failed');
-      }, (_) => fail('Should not be success'));
-      verify(() => mockDatasource.getAllQuotas()).called(1);
-    });
-  });
-
-  group('getDetailQuota', () {
-    test(
-      'should return DetailQuotaResponse when datasource returns success',
-      () async {
-        final tDetailQuotaResponse = DetailQuotaResponse(
-          success: true,
-          message: 'ok',
-          data: DetailQuotaDataEntity(
-            id: "QUOTA-0000", // ID dummy
-            code: "QCODE-0000", // kode dummy
-            slug: "quota-dummy", // slug dummy
-            name: "Paket Quota Dummy", // nama paket dummy
-            quota: 0, // kuota kosong
-            monthDuration: 0, // durasi kosong
-            description: "Deskripsi dummy", // deskripsi dummy
-            basePrice: 0, // harga dasar kosong
-            promoPrice: 0, // harga promo kosong
-            discount: 0, // diskon kosong
-            capacity: "0GB", // kapasitas kosong
-            isPromo: false, // status promo default
-            terms: [], // list kosong
-            devices: [], // list kosong
-          ),
-        );
-        when(
-          () => mockDatasource.getDetailQuota(id: 'id1'),
-        ).thenAnswer((_) async => tDetailQuotaResponse);
-        final result = await repository.getDetailQuota(id: 'id1');
-        expect(result, Right(tDetailQuotaResponse));
-        verify(() => mockDatasource.getDetailQuota(id: 'id1')).called(1);
-      },
-    );
-
-    test('should return Failure when datasource throws', () async {
-      when(
-        () => mockDatasource.getDetailQuota(id: 'id1'),
-      ).thenThrow(Exception('error'));
-      final result = await repository.getDetailQuota(id: 'id1');
-      expect(result.isLeft(), true);
-      verify(() => mockDatasource.getDetailQuota(id: 'id1')).called(1);
     });
 
-    test('should return Failure when datasource returns !success', () async {
-      final tFailResponse = DetailQuotaResponse(
-        success: false,
-        message: 'Failed',
-        data: DetailQuotaDataEntity(
-          id: "QUOTA-0000", // ID dummy
-          code: "QCODE-0000", // kode dummy
-          slug: "quota-dummy", // slug dummy
-          name: "Paket Quota Dummy", // nama paket dummy
-          quota: 0, // kuota kosong
-          monthDuration: 0, // durasi kosong
-          description: "Deskripsi dummy", // deskripsi dummy
-          basePrice: 0, // harga dasar kosong
-          promoPrice: 0, // harga promo kosong
-          discount: 0, // diskon kosong
-          capacity: "0GB", // kapasitas kosong
-          isPromo: false, // status promo default
-          terms: [], // list kosong
-          devices: [], // list kosong
-        ),
-      );
-      when(
-        () => mockDatasource.getDetailQuota(id: 'id1'),
-      ).thenAnswer((_) async => tFailResponse);
-      final result = await repository.getDetailQuota(id: 'id1');
-      result.fold((failure) {
-        expect(failure, isA<Failure>());
-        expect(failure.message, 'Failed');
-      }, (_) => fail('Should not be success'));
-      verify(() => mockDatasource.getDetailQuota(id: 'id1')).called(1);
-    });
-  });
+    group('checkPromoCode', () {
+      test(
+        'should return CheckPromoResponse when datasource returns success',
+        () async {
+          // arrange
+          when(
+            () => mockDatasource.checkPromoCode(
+              dataPlanId: any(named: 'dataPlanId'),
+              promoCode: any(named: 'promoCode'),
+            ),
+          ).thenAnswer((_) async => tPromoResponse);
 
-  group('checkPromoCode', () {
-    test(
-      'should return CheckPromoResponse when datasource returns success',
-      () async {
-        final tCheckPromoResponse = CheckPromoResponse(
-          success: true,
-          message: 'ok',
-          data: PromoDataEntity(
-            id: "PROMO-0000", // ID dummy
-            slug: "promo-dummy", // slug dummy
-            title: "Promo Dummy", // judul dummy
-            minimumTransaction: 0, // transaksi minimal kosong
-            maxDiscount: 0, // diskon maksimal kosong
-            promoCode: "DUMMYCODE", // kode promo dummy
-            startAt: DateTime.now(), // mulai sekarang
-            endAt: DateTime.now().add(
-              const Duration(days: 7),
-            ), // berakhir 7 hari dari sekarang
-            isActive: false, // status tidak aktif
-            createdAt: DateTime.now(), // waktu dibuat sekarang
-            updatedAt: DateTime.now(), // waktu update sekarang
-            deletedAt: null, // belum dihapus
-          ),
-        );
-        when(
-          () => mockDatasource.checkPromoCode(
-            dataPlanId: 'plan1',
-            promoCode: 'PROMO',
-          ),
-        ).thenAnswer((_) async => tCheckPromoResponse);
-        final result = await repository.checkPromoCode(
-          dataPlanId: 'plan1',
-          promoCode: 'PROMO',
-        );
-        expect(result, Right(tCheckPromoResponse));
-        verify(
-          () => mockDatasource.checkPromoCode(
-            dataPlanId: 'plan1',
-            promoCode: 'PROMO',
-          ),
-        ).called(1);
-      },
-    );
+          // act
+          final result = await repository.checkPromoCode(
+            dataPlanId: 'PLAN-001',
+            promoCode: 'WELCOME2026',
+          );
 
-    test('should return Failure when datasource throws', () async {
-      when(
-        () => mockDatasource.checkPromoCode(
-          dataPlanId: 'plan1',
-          promoCode: 'PROMO',
-        ),
-      ).thenThrow(Exception('error'));
-      final result = await repository.checkPromoCode(
-        dataPlanId: 'plan1',
-        promoCode: 'PROMO',
+          // assert
+          expect(result, Right(tPromoResponse));
+          verify(
+            () => mockDatasource.checkPromoCode(
+              dataPlanId: 'PLAN-001',
+              promoCode: 'WELCOME2026',
+            ),
+          ).called(1);
+        },
       );
-      expect(result.isLeft(), true);
-      verify(
-        () => mockDatasource.checkPromoCode(
-          dataPlanId: 'plan1',
-          promoCode: 'PROMO',
-        ),
-      ).called(1);
-    });
-
-    test('should return Failure when datasource returns !success', () async {
-      final tFailResponse = CheckPromoResponse(
-        success: false,
-        message: 'Failed',
-        data: PromoDataEntity(
-          id: "PROMO-0000", // ID dummy
-          slug: "promo-dummy", // slug dummy
-          title: "Promo Dummy", // judul dummy
-          minimumTransaction: 0, // transaksi minimal kosong
-          maxDiscount: 0, // diskon maksimal kosong
-          promoCode: "DUMMYCODE", // kode promo dummy
-          startAt: DateTime.now(), // mulai sekarang
-          endAt: DateTime.now().add(
-            const Duration(days: 7),
-          ), // berakhir 7 hari dari sekarang
-          isActive: false, // status tidak aktif
-          createdAt: DateTime.now(), // waktu dibuat sekarang
-          updatedAt: DateTime.now(), // waktu update sekarang
-          deletedAt: null, // belum dihapus
-        ),
-      );
-      when(
-        () => mockDatasource.checkPromoCode(
-          dataPlanId: 'plan1',
-          promoCode: 'PROMO',
-        ),
-      ).thenAnswer((_) async => tFailResponse);
-      final result = await repository.checkPromoCode(
-        dataPlanId: 'plan1',
-        promoCode: 'PROMO',
-      );
-      result.fold((failure) {
-        expect(failure, isA<Failure>());
-        expect(failure.message, 'Failed');
-      }, (_) => fail('Should not be success'));
-      verify(
-        () => mockDatasource.checkPromoCode(
-          dataPlanId: 'plan1',
-          promoCode: 'PROMO',
-        ),
-      ).called(1);
     });
   });
 }

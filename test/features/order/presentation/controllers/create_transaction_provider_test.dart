@@ -8,14 +8,36 @@ import 'package:litenet/features/order/domain/usecases/create_transaction_usecas
 import 'package:litenet/features/order/presentation/controllers/create_transaction_provider.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockCreateTransactionUsecase extends Mock
-    implements CreateTransactionUsecase {}
+class MockCreateTransactionUsecase extends Mock implements CreateTransactionUsecase {}
+
+class Listener<T> extends Mock {
+  void call(T? previous, T next);
+}
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-
   late MockCreateTransactionUsecase mockUsecase;
   late ProviderContainer container;
+
+  final tResponse = CreateTransactionResponse(
+    success: true,
+    message: 'Transaction created successfully',
+    data: CreateTransactionDataEntity(
+      orderId: "ORD-20260402-001",
+      amount: 150000,
+      paymentType: "bank_transfer",
+      bank: "BCA",
+      imageUrl: "https://example.com/payment_instructions.png",
+      vaNumber: "1234567890123456",
+      expiredAt: DateTime(2026, 4, 3, 10, 0, 0),
+    ),
+  );
+
+  final tFailure = Failure(message: 'Insufficient balance');
+
+  setUpAll(() {
+    registerFallbackValue(const AsyncLoading<CreateTransactionResponse?>());
+    registerFallbackValue(AsyncData<CreateTransactionResponse?>(tResponse));
+  });
 
   setUp(() {
     mockUsecase = MockCreateTransactionUsecase();
@@ -26,72 +48,91 @@ void main() {
     );
   });
 
-  test('should emit loading and then data on success', () async {
-    final tResponse = CreateTransactionResponse(
-      success: true,
-      message: 'ok',
-      data: CreateTransactionDataEntity(
-        orderId: "ORD-TEST12345", // random string ID
-        amount: 99999, // angka dummy
-        paymentType: "VA", // contoh tipe pembayaran
-        bank: "BCA", // nama bank dummy
-        imageUrl: "https://example.com/img.png", // link gambar dummy
-        vaNumber: "1234567890123456", // nomor VA dummy
-        expiredAt: DateTime.now().add(
-          const Duration(hours: 24), // expired 24 jam dari sekarang
-        ),
-      ),
-    );
-    when(
-      () => mockUsecase(
-        deviceId: 'dev1',
-        dataPlanId: 'plan1',
-        paymentMethod: 'method1',
-        promoCode: 'PROMO',
-      ),
-    ).thenAnswer((_) async => Right(tResponse));
-
-    final notifier = container.read(createTransactionProvider.notifier);
-    final future = notifier.createTransaction(
-      deviceId: 'dev1',
-      dataPlanId: 'plan1',
-      paymentMethod: 'method1',
-      promoCode: 'PROMO',
-    );
-    expect(container.read(createTransactionProvider), isA<AsyncLoading>());
-    await future;
-    CreateTransactionResponse? value;
-    for (var i = 0; i < 100; i++) {
-      final state = container.read(createTransactionProvider);
-      if (!state.isLoading) {
-        value = state.value;
-        break;
-      }
-      await Future.delayed(const Duration(milliseconds: 10));
-    }
-    expect(value, isNotNull);
-    expect(value, tResponse);
+  tearDown(() {
+    container.dispose();
   });
 
-  test('should emit loading and then error on failure', () async {
-    when(
-      () => mockUsecase(
-        deviceId: 'dev1',
-        dataPlanId: 'plan1',
-        paymentMethod: 'method1',
-        promoCode: 'PROMO',
-      ),
-    ).thenAnswer((_) async => Left(Failure(message: 'error')));
+  group('CreateTransactionProvider', () {
+    test('initial state should eventually be AsyncData(null)', () async {
+      final state = await container.read(createTransactionProvider.future);
+      expect(state, null);
+    });
 
-    final notifier = container.read(createTransactionProvider.notifier);
-    final future = notifier.createTransaction(
-      deviceId: 'dev1',
-      dataPlanId: 'plan1',
-      paymentMethod: 'method1',
-      promoCode: 'PROMO',
-    );
-    expect(container.read(createTransactionProvider), isA<AsyncLoading>());
-    await future;
-    expect(container.read(createTransactionProvider).hasError, true);
+    test('should emit AsyncLoading and then AsyncData on success', () async {
+      // arrange
+      when(() => mockUsecase.call(
+            deviceId: any(named: 'deviceId'),
+            dataPlanId: any(named: 'dataPlanId'),
+            paymentMethod: any(named: 'paymentMethod'),
+            promoCode: any(named: 'promoCode'),
+          )).thenAnswer((_) async => Right(tResponse));
+
+      // Wait for build
+      await container.read(createTransactionProvider.future);
+
+      final listener = Listener<AsyncValue<CreateTransactionResponse?>>();
+      container.listen(createTransactionProvider, listener.call, fireImmediately: true);
+
+      final notifier = container.read(createTransactionProvider.notifier);
+
+      // act
+      await notifier.createTransaction(
+        deviceId: 'DEV-001',
+        dataPlanId: 'PLAN-001',
+        paymentMethod: 'bca_va',
+        promoCode: 'WELCOME2026',
+      );
+
+      // assert
+      verifyInOrder([
+        () => listener(any(), const AsyncData<CreateTransactionResponse?>(null)),
+        () => listener(any(), any(that: isA<AsyncLoading>())),
+        () => listener(any(), AsyncData<CreateTransactionResponse?>(tResponse)),
+      ]);
+
+      verify(() => mockUsecase.call(
+            deviceId: 'DEV-001',
+            dataPlanId: 'PLAN-001',
+            paymentMethod: 'bca_va',
+            promoCode: 'WELCOME2026',
+          )).called(1);
+    });
+
+    test('should emit AsyncError on failure', () async {
+      // arrange
+      when(() => mockUsecase.call(
+            deviceId: any(named: 'deviceId'),
+            dataPlanId: any(named: 'dataPlanId'),
+            paymentMethod: any(named: 'paymentMethod'),
+            promoCode: any(named: 'promoCode'),
+          )).thenAnswer((_) async => Left(tFailure));
+
+      // Wait for build
+      await container.read(createTransactionProvider.future);
+
+      final listener = Listener<AsyncValue<CreateTransactionResponse?>>();
+      container.listen(createTransactionProvider, listener.call, fireImmediately: true);
+
+      final notifier = container.read(createTransactionProvider.notifier);
+
+      // act
+      await notifier.createTransaction(
+        deviceId: 'DEV-001',
+        dataPlanId: 'PLAN-001',
+        paymentMethod: 'bca_va',
+        promoCode: 'WELCOME2026',
+      );
+
+      // assert
+      verifyInOrder([
+        () => listener(any(), const AsyncData<CreateTransactionResponse?>(null)),
+        () => listener(any(), any(that: isA<AsyncLoading>())),
+        () => listener(any(), any(that: isA<AsyncError>())),
+      ]);
+
+      final finalState = container.read(createTransactionProvider);
+      expect(finalState, isA<AsyncError>());
+      expect(finalState.error, tFailure);
+    });
   });
 }

@@ -12,61 +12,80 @@ void main() {
   late MockTransactionRepository mockRepository;
   late CreateTransactionUsecase usecase;
 
+  final tResponse = CreateTransactionResponse(
+    success: true,
+    message: 'Transaction created successfully',
+    data: CreateTransactionDataEntity(
+      orderId: "ORD-20260402-001",
+      amount: 150000,
+      paymentType: "bank_transfer",
+      bank: "BCA",
+      imageUrl: "https://example.com/payment_instructions.png",
+      vaNumber: "1234567890123456",
+      expiredAt: DateTime(2026, 4, 3, 10, 0, 0),
+    ),
+  );
+
+  final tParams = {
+    'deviceId': 'DEV-001',
+    'dataPlanId': 'PLAN-001',
+    'paymentMethod': 'bca_va',
+    'promoCode': 'WELCOME2026',
+  };
+
   setUp(() {
     mockRepository = MockTransactionRepository();
     usecase = CreateTransactionUsecase(mockRepository);
   });
 
-  test('should return CreateTransactionResponse on success', () async {
-    final tResponse = CreateTransactionResponse(
-      success: true,
-      message: 'ok',
-      data: CreateTransactionDataEntity(
-        orderId: "ORD-TEST12345", // random string ID
-        amount: 99999, // angka dummy
-        paymentType: "VA", // contoh tipe pembayaran
-        bank: "BCA", // nama bank dummy
-        imageUrl: "https://example.com/img.png", // link gambar dummy
-        vaNumber: "1234567890123456", // nomor VA dummy
-        expiredAt: DateTime.now().add(
-          const Duration(hours: 24), // expired 24 jam dari sekarang
-        ),
-      ),
-    );
-    when(
-      () => mockRepository.createTransaction(
-        deviceId: 'dev1',
-        dataPlanId: 'plan1',
-        paymentMethod: 'method1',
-        promoCode: 'PROMO',
-      ),
-    ).thenAnswer((_) async => Right(tResponse));
+  group('CreateTransactionUsecase', () {
+    test('should call createTransaction from repository with correct parameters', () async {
+      // arrange
+      when(() => mockRepository.createTransaction(
+            deviceId: any(named: 'deviceId'),
+            dataPlanId: any(named: 'dataPlanId'),
+            paymentMethod: any(named: 'paymentMethod'),
+            promoCode: any(named: 'promoCode'),
+          )).thenAnswer((_) async => Right(tResponse));
 
-    final result = await usecase(
-      deviceId: 'dev1',
-      dataPlanId: 'plan1',
-      paymentMethod: 'method1',
-      promoCode: 'PROMO',
-    );
-    expect(result, Right(tResponse));
-  });
+      // act
+      final result = await usecase(
+        deviceId: tParams['deviceId']!,
+        dataPlanId: tParams['dataPlanId']!,
+        paymentMethod: tParams['paymentMethod']!,
+        promoCode: tParams['promoCode']!,
+      );
 
-  test('should return Failure on error', () async {
-    when(
-      () => mockRepository.createTransaction(
-        deviceId: 'dev1',
-        dataPlanId: 'plan1',
-        paymentMethod: 'method1',
-        promoCode: 'PROMO',
-      ),
-    ).thenAnswer((_) async => Left(Failure(message: 'error')));
+      // assert
+      expect(result, Right(tResponse));
+      verify(() => mockRepository.createTransaction(
+            deviceId: tParams['deviceId']!,
+            dataPlanId: tParams['dataPlanId']!,
+            paymentMethod: tParams['paymentMethod']!,
+            promoCode: tParams['promoCode']!,
+          )).called(1);
+    });
 
-    final result = await usecase(
-      deviceId: 'dev1',
-      dataPlanId: 'plan1',
-      paymentMethod: 'method1',
-      promoCode: 'PROMO',
-    );
-    expect(result.isLeft(), true);
+    test('should return Failure from repository when creation fails', () async {
+      // arrange
+      final tFailure = Failure(message: 'Insufficient balance');
+      when(() => mockRepository.createTransaction(
+            deviceId: any(named: 'deviceId'),
+            dataPlanId: any(named: 'dataPlanId'),
+            paymentMethod: any(named: 'paymentMethod'),
+            promoCode: any(named: 'promoCode'),
+          )).thenAnswer((_) async => Left(tFailure));
+
+      // act
+      final result = await usecase(
+        deviceId: tParams['deviceId']!,
+        dataPlanId: tParams['dataPlanId']!,
+        paymentMethod: tParams['paymentMethod']!,
+        promoCode: tParams['promoCode']!,
+      );
+
+      // assert
+      expect(result, Left(tFailure));
+    });
   });
 }

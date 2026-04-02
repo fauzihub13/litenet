@@ -14,12 +14,46 @@ class MockResendOTPUsecase extends Mock implements ResendOTPUsecase {}
 
 class MockVerifyOTPUsecase extends Mock implements VerifyOTPUsecase {}
 
-void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+class Listener<T> extends Mock {
+  void call(T? previous, T next);
+}
 
+void main() {
   late MockResendOTPUsecase mockResendOTPUsecase;
   late MockVerifyOTPUsecase mockVerifyOTPUsecase;
   late ProviderContainer container;
+
+  final tUser = User(
+    id: "USR-0001",
+    name: "Test User",
+    avatar: "https://example.com/avatar.png",
+    email: "test@example.com",
+    phoneNumber: "081234567890",
+    role: "user",
+    emailOtp: "123456",
+    emailOtpExpiredAt: DateTime(2026, 1, 1),
+    emailVerifiedAt: DateTime(2026, 1, 1),
+    createdAt: DateTime(2026, 1, 1),
+    updatedAt: DateTime(2026, 1, 1),
+    deletedAt: DateTime(1970, 1, 1),
+  );
+
+  final tOTPResponse = OTPResponse(
+    success: true,
+    message: 'OTP processed successfully',
+    data: OTPDataEntity(
+      user: tUser,
+      isVerified: true,
+      token: "valid_token",
+    ),
+  );
+
+  final tFailure = Failure(message: 'Invalid OTP');
+
+  setUpAll(() {
+    registerFallbackValue(const AsyncLoading<OTPResponse?>());
+    registerFallbackValue(AsyncData<OTPResponse?>(tOTPResponse));
+  });
 
   setUp(() {
     mockResendOTPUsecase = MockResendOTPUsecase();
@@ -32,119 +66,138 @@ void main() {
     );
   });
 
-  group('Resend OTP', () {
-    test('should emit loading and then data on success', () async {
-      final tResendOTPResponse = OTPResponse(
-        success: true,
-        message: 'ok',
-        data: OTPDataEntity(
-          user: User(
-            id: "USR-0000",
-            name: "Dummy User",
-            avatar: "https://dummyimage.com/100x100/000/fff.png",
-            email: "dummy@example.com",
-            phoneNumber: "081234567890",
-            role: "guest",
-            emailOtp: "000000",
-            emailOtpExpiredAt: DateTime.now().add(const Duration(minutes: 5)),
-            emailVerifiedAt: DateTime.now(),
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-            deletedAt: DateTime(1970, 1, 1),
-          ),
-          isVerified: false, // default belum terverifikasi
-          token: "DUMMYTOKEN", // token dummy
-        ),
-      );
-      when(
-        () => mockResendOTPUsecase(email: 'a'),
-      ).thenAnswer((_) async => Right(tResendOTPResponse));
-
-      final notifier = container.read(oTPProvider.notifier);
-      final future = notifier.resendOtp(email: 'a');
-      expect(container.read(oTPProvider), isA<AsyncLoading>());
-      await future;
-      OTPResponse? value;
-      for (var i = 0; i < 100; i++) {
-        final state = container.read(oTPProvider);
-        if (!state.isLoading) {
-          value = state.value;
-          break;
-        }
-        await Future.delayed(const Duration(milliseconds: 10));
-      }
-      expect(value, isNotNull);
-      expect(value, tResendOTPResponse);
-    });
-
-    test('should emit loading and then error on failure', () async {
-      when(
-        () => mockResendOTPUsecase(email: 'a'),
-      ).thenAnswer((_) async => Left(Failure(message: 'error')));
-
-      final notifier = container.read(oTPProvider.notifier);
-      final future = notifier.resendOtp(email: 'a');
-      expect(container.read(oTPProvider), isA<AsyncLoading>());
-      await future;
-      expect(container.read(oTPProvider).hasError, true);
-    });
+  tearDown(() {
+    container.dispose();
   });
 
-  group('Verify OTP', () {
-    test('should emit loading and then data on success', () async {
-      final tResendOTPResponse = OTPResponse(
-        success: true,
-        message: 'ok',
-        data: OTPDataEntity(
-          user: User(
-            id: "USR-0000",
-            name: "Dummy User",
-            avatar: "https://dummyimage.com/100x100/000/fff.png",
-            email: "dummy@example.com",
-            phoneNumber: "081234567890",
-            role: "guest",
-            emailOtp: "000000",
-            emailOtpExpiredAt: DateTime.now().add(const Duration(minutes: 5)),
-            emailVerifiedAt: DateTime.now(),
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-            deletedAt: DateTime(1970, 1, 1),
-          ),
-          isVerified: false, // default belum terverifikasi
-          token: "DUMMYTOKEN", // token dummy
-        ),
-      );
-      when(
-        () => mockVerifyOTPUsecase(email: 'a', otp: '000000'),
-      ).thenAnswer((_) async => Right(tResendOTPResponse));
-
-      final notifier = container.read(oTPProvider.notifier);
-      final future = notifier.verifyOtp(email: 'a', otp: '000000');
-      expect(container.read(oTPProvider), isA<AsyncLoading>());
-      await future;
-      OTPResponse? value;
-      for (var i = 0; i < 100; i++) {
-        final state = container.read(oTPProvider);
-        if (!state.isLoading) {
-          value = state.value;
-          break;
-        }
-        await Future.delayed(const Duration(milliseconds: 10));
-      }
-      expect(value, isNotNull);
-      expect(value, tResendOTPResponse);
+  group('OTPProvider', () {
+    test('initial state should eventually be AsyncData(null)', () async {
+      final state = await container.read(oTPProvider.future);
+      expect(state, null);
     });
 
-    test('should emit loading and then error on failure', () async {
-      when(
-        () => mockVerifyOTPUsecase(email: 'a', otp: '000000'),
-      ).thenAnswer((_) async => Left(Failure(message: 'error')));
+    group('resendOtp', () {
+      test('should emit AsyncLoading and then AsyncData on success', () async {
+        // arrange
+        when(
+          () => mockResendOTPUsecase.call(email: any(named: 'email')),
+        ).thenAnswer((_) async => Right(tOTPResponse));
 
-      final notifier = container.read(oTPProvider.notifier);
-      final future = notifier.verifyOtp(email: 'a', otp: '000000');
-      expect(container.read(oTPProvider), isA<AsyncLoading>());
-      await future;
-      expect(container.read(oTPProvider).hasError, true);
+        // Wait for build to finish
+        await container.read(oTPProvider.future);
+
+        final listener = Listener<AsyncValue<OTPResponse?>>();
+        container.listen(oTPProvider, listener.call, fireImmediately: true);
+
+        final notifier = container.read(oTPProvider.notifier);
+
+        // act
+        await notifier.resendOtp(email: 'test@example.com');
+
+        // assert
+        verifyInOrder([
+          () => listener(any(), const AsyncData<OTPResponse?>(null)),
+          () => listener(any(), any(that: isA<AsyncLoading>())),
+          () => listener(any(), AsyncData<OTPResponse?>(tOTPResponse)),
+        ]);
+
+        verify(() => mockResendOTPUsecase.call(email: 'test@example.com')).called(1);
+      });
+
+      test('should emit AsyncError on failure', () async {
+        // arrange
+        when(
+          () => mockResendOTPUsecase.call(email: any(named: 'email')),
+        ).thenAnswer((_) async => Left(tFailure));
+
+        // Wait for build to finish
+        await container.read(oTPProvider.future);
+
+        final listener = Listener<AsyncValue<OTPResponse?>>();
+        container.listen(oTPProvider, listener.call, fireImmediately: true);
+
+        final notifier = container.read(oTPProvider.notifier);
+
+        // act
+        await notifier.resendOtp(email: 'test@example.com');
+
+        // assert
+        verifyInOrder([
+          () => listener(any(), const AsyncData<OTPResponse?>(null)),
+          () => listener(any(), any(that: isA<AsyncLoading>())),
+          () => listener(any(), any(that: isA<AsyncError>())),
+        ]);
+
+        final finalState = container.read(oTPProvider);
+        expect(finalState, isA<AsyncError>());
+        expect(finalState.error, tFailure);
+      });
+    });
+
+    group('verifyOtp', () {
+      test('should emit AsyncLoading and then AsyncData on success', () async {
+        // arrange
+        when(
+          () => mockVerifyOTPUsecase.call(
+            email: any(named: 'email'),
+            otp: any(named: 'otp'),
+          ),
+        ).thenAnswer((_) async => Right(tOTPResponse));
+
+        // Wait for build to finish
+        await container.read(oTPProvider.future);
+
+        final listener = Listener<AsyncValue<OTPResponse?>>();
+        container.listen(oTPProvider, listener.call, fireImmediately: true);
+
+        final notifier = container.read(oTPProvider.notifier);
+
+        // act
+        await notifier.verifyOtp(email: 'test@example.com', otp: '123456');
+
+        // assert
+        verifyInOrder([
+          () => listener(any(), const AsyncData<OTPResponse?>(null)),
+          () => listener(any(), any(that: isA<AsyncLoading>())),
+          () => listener(any(), AsyncData<OTPResponse?>(tOTPResponse)),
+        ]);
+
+        verify(
+          () => mockVerifyOTPUsecase.call(email: 'test@example.com', otp: '123456'),
+        ).called(1);
+      });
+
+      test('should emit AsyncError on failure', () async {
+        // arrange
+        when(
+          () => mockVerifyOTPUsecase.call(
+            email: any(named: 'email'),
+            otp: any(named: 'otp'),
+          ),
+        ).thenAnswer((_) async => Left(tFailure));
+
+        // Wait for build to finish
+        await container.read(oTPProvider.future);
+
+        final listener = Listener<AsyncValue<OTPResponse?>>();
+        container.listen(oTPProvider, listener.call, fireImmediately: true);
+
+        final notifier = container.read(oTPProvider.notifier);
+
+        // act
+        await notifier.verifyOtp(email: 'test@example.com', otp: '123456');
+
+        // assert
+        verifyInOrder([
+          () => listener(any(), const AsyncData<OTPResponse?>(null)),
+          () => listener(any(), any(that: isA<AsyncLoading>())),
+          () => listener(any(), any(that: isA<AsyncError>())),
+        ]);
+
+        final finalState = container.read(oTPProvider);
+        expect(finalState, isA<AsyncError>());
+        expect(finalState.error, tFailure);
+      });
     });
   });
 }

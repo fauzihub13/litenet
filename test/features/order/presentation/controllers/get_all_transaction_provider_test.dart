@@ -11,11 +11,36 @@ import 'package:mocktail/mocktail.dart';
 class MockGetAllTransactionUsecase extends Mock
     implements GetAllTransactionUsecase {}
 
+class Listener<T> extends Mock {
+  void call(T? previous, T next);
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late MockGetAllTransactionUsecase mockUsecase;
   late ProviderContainer container;
+  late Listener<AsyncValue<TransactionResponse>> listener;
+
+  final tTransactionData = TransactionDataEntity(
+    id: 'tr-123',
+    orderId: 'ORD-20231027-001',
+    packageName: 'Super Fast 100GB',
+    capacity: '100GB',
+    transactionStatus: 'SETTLEMENT',
+    grossAmount: 150000,
+    createdAt: DateTime(2023, 10, 27, 10, 0, 0),
+  );
+
+  final tResponse = TransactionResponse(
+    success: true,
+    message: 'Transactions retrieved successfully',
+    data: [tTransactionData],
+  );
+
+  setUpAll(() {
+    registerFallbackValue(const AsyncValue<TransactionResponse>.loading());
+  });
 
   setUp(() {
     mockUsecase = MockGetAllTransactionUsecase();
@@ -24,27 +49,62 @@ void main() {
         getAllTransactionUsecaseProvider.overrideWithValue(mockUsecase),
       ],
     );
+    listener = Listener<AsyncValue<TransactionResponse>>();
   });
 
-  test('should return TransactionResponse on success', () async {
-    final tResponse = TransactionResponse(
-      success: true,
-      message: 'ok',
-      data: [],
-    );
-    when(() => mockUsecase()).thenAnswer((_) async => Right(tResponse));
-
-    final notifier = container.read(getAllTransactionProvider.notifier);
-    final result = await notifier.build();
-    expect(result, tResponse);
+  tearDown(() {
+    container.dispose();
   });
 
-  test('should throw Failure on error', () async {
-    when(
-      () => mockUsecase(),
-    ).thenAnswer((_) async => Left(Failure(message: 'error')));
+  group('getAllTransactionProvider', () {
+    test('should return TransactionResponse on success', () async {
+      // arrange
+      when(() => mockUsecase.call()).thenAnswer((_) async => Right(tResponse));
 
-    final notifier = container.read(getAllTransactionProvider.notifier);
-    expect(() => notifier.build(), throwsA(isA<Failure>()));
+      // listen to the provider
+      container.listen(
+        getAllTransactionProvider,
+        listener.call,
+        fireImmediately: true,
+      );
+
+      // wait for initialization
+      await container.read(getAllTransactionProvider.future);
+
+      // assert
+      verifyInOrder([
+        () => listener(any(), any(that: isA<AsyncLoading<TransactionResponse>>())),
+        () => listener(any(), AsyncValue.data(tResponse)),
+      ]);
+      verify(() => mockUsecase.call()).called(1);
+    });
+
+    test('should emit AsyncError when usecase returns Failure', () async {
+      // arrange
+      final tFailure = Failure(message: 'Internal Server Error');
+      when(() => mockUsecase.call()).thenAnswer((_) async => Left(tFailure));
+
+      // listen to the provider
+      container.listen(
+        getAllTransactionProvider,
+        listener.call,
+        fireImmediately: true,
+      );
+
+      // wait for initialization (it will throw but we catch it or ignore)
+      try {
+        await container.read(getAllTransactionProvider.future);
+      } catch (_) {}
+
+      // assert
+      verifyInOrder([
+        () => listener(any(), any(that: isA<AsyncLoading<TransactionResponse>>())),
+        () => listener(
+              any(),
+              any(that: isA<AsyncError<TransactionResponse>>()),
+            ),
+      ]);
+      verify(() => mockUsecase.call()).called(1);
+    });
   });
 }

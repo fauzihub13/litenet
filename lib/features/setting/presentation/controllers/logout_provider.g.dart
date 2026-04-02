@@ -33,7 +33,7 @@ final class LogoutProvider
   Logout create() => Logout();
 }
 
-String _$logoutHash() => r'6c159eb4cba8fa2af8072bf479900d58ffd46555';
+String _$logoutHash() => r'6b5d5b0982ee850c105ad18f56f926a5c6058955';
 
 abstract class _$Logout extends $AsyncNotifier<LogoutResponse?> {
   FutureOr<LogoutResponse?> build();

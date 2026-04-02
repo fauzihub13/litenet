@@ -13,45 +13,57 @@ void main() {
   late MockSettingRepository mockRepository;
   late GetProfileUsecase usecase;
 
+  final tUser = User(
+    id: 'USR-001',
+    name: 'Test User',
+    avatar: 'https://example.com/avatar.png',
+    email: 'test@example.com',
+    phoneNumber: '08123456789',
+    role: 'user',
+    emailOtp: '123456',
+    emailOtpExpiredAt: DateTime(2026, 1, 1),
+    emailVerifiedAt: DateTime(2026, 1, 1),
+    createdAt: DateTime(2026, 1, 1),
+    updatedAt: DateTime(2026, 1, 1),
+    deletedAt: DateTime(1970, 1, 1),
+  );
+
+  final tResponse = ProfileResponse(
+    success: true,
+    message: 'Profile fetched successfully',
+    data: tUser,
+  );
+
   setUp(() {
     mockRepository = MockSettingRepository();
     usecase = GetProfileUsecase(mockRepository);
   });
 
-  test('should return ProfileResponse on success', () async {
-    final tResponse = ProfileResponse(
-      success: true,
-      message: 'ok',
-      data: User(
-        id: "USR-${DateTime.now().millisecondsSinceEpoch}", // ID unik dummy
-        name: "Dummy User", // nama kosong
-        avatar: "https://dummyimage.com/100x100/000/fff.png", // avatar dummy
-        email: "dummy@example.com", // email dummy
-        phoneNumber: "081234567890", // nomor dummy
-        role: "guest", // role dummy
-        emailOtp: "000000", // OTP dummy
-        emailOtpExpiredAt: DateTime.now().add(
-          const Duration(minutes: 5),
-        ), // expired 5 menit
-        emailVerifiedAt: DateTime.now(), // dianggap sudah diverifikasi
-        createdAt: DateTime.now(), // waktu dibuat sekarang
-        updatedAt: DateTime.now(), // waktu update sekarang
-        deletedAt: DateTime(1970, 1, 1), // default kosong (epoch)
-      ),
-    );
-    when(
-      () => mockRepository.getProfile(),
-    ).thenAnswer((_) async => Right(tResponse));
-    final result = await usecase();
-    expect(result, Right(tResponse));
-  });
+  group('GetProfileUsecase', () {
+    test('should call getProfile from repository', () async {
+      // arrange
+      when(() => mockRepository.getProfile())
+          .thenAnswer((_) async => Right(tResponse));
 
-  test('should return Failure on error', () async {
-    final failure = Failure(message: 'error');
-    when(
-      () => mockRepository.getProfile(),
-    ).thenAnswer((_) async => Left(failure));
-    final result = await usecase();
-    expect(result, Left(failure));
+      // act
+      final result = await usecase();
+
+      // assert
+      expect(result, Right(tResponse));
+      verify(() => mockRepository.getProfile()).called(1);
+    });
+
+    test('should return Failure from repository when fetching profile fails', () async {
+      // arrange
+      final tFailure = Failure(message: 'Profile not found');
+      when(() => mockRepository.getProfile())
+          .thenAnswer((_) async => Left(tFailure));
+
+      // act
+      final result = await usecase();
+
+      // assert
+      expect(result, Left(tFailure));
+    });
   });
 }

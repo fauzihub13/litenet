@@ -10,11 +10,45 @@ import 'package:mocktail/mocktail.dart';
 
 class MockGetAllQuotaUsecase extends Mock implements GetAllQuotaUsecase {}
 
-void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+class Listener<T> extends Mock {
+  void call(T? previous, T next);
+}
 
+void main() {
   late MockGetAllQuotaUsecase mockUsecase;
   late ProviderContainer container;
+
+  final tQuotaData = QuotaDataEntity(
+    id: "QUOTA-2026-APRIL",
+    code: "QAPR26",
+    slug: "paket-internet-hemat-april",
+    name: "Paket Internet Hemat April",
+    quota: 20,
+    monthDuration: 1,
+    description:
+        "Paket internet hemat dengan kuota 20GB berlaku selama 1 bulan.",
+    basePrice: 100000,
+    promoPrice: 80000,
+    discount: 20000,
+    capacity: "20GB",
+    isPromo: true,
+    createdAt: DateTime(2026, 3, 25),
+    updatedAt: DateTime(2026, 4, 1),
+    deletedAt: null,
+  );
+
+  final tResponse = QuotaResponse(
+    success: true,
+    message: 'Quotas fetched successfully',
+    data: [tQuotaData],
+  );
+
+  final tFailure = Failure(message: 'Failed to fetch quotas');
+
+  setUpAll(() {
+    registerFallbackValue(const AsyncLoading<QuotaResponse>());
+    registerFallbackValue(AsyncData<QuotaResponse>(tResponse));
+  });
 
   setUp(() {
     mockUsecase = MockGetAllQuotaUsecase();
@@ -25,19 +59,58 @@ void main() {
     );
   });
 
-  test('should return QuotaResponse on success', () async {
-    final tQuotaResponse = QuotaResponse(success: true, message: 'ok', data: []);
-    when(() => mockUsecase()).thenAnswer((_) async => Right(tQuotaResponse));
-
-    final notifier = container.read(getAllQuotaProvider.notifier);
-    final result = await notifier.build();
-    expect(result, tQuotaResponse);
+  tearDown(() {
+    container.dispose();
   });
 
-  test('should throw Failure on error', () async {
-    when(() => mockUsecase()).thenAnswer((_) async => Left(Failure(message: 'error')));
+  group('GetAllQuotaProvider', () {
+    test('should fetch quotas and emit AsyncData on success', () async {
+      // arrange
+      when(() => mockUsecase.call()).thenAnswer((_) async => Right(tResponse));
 
-    final notifier = container.read(getAllQuotaProvider.notifier);
-    expect(() => notifier.build(), throwsA(isA<Failure>()));
+      final listener = Listener<AsyncValue<QuotaResponse>>();
+      container.listen(
+        getAllQuotaProvider,
+        listener.call,
+        fireImmediately: true,
+      );
+
+      // act
+      final state = await container.read(getAllQuotaProvider.future);
+
+      // assert
+      expect(state, tResponse);
+      verify(() => mockUsecase.call()).called(1);
+      
+      verifyInOrder([
+        () => listener(any(), any(that: isA<AsyncLoading>())),
+        () => listener(any(), AsyncData<QuotaResponse>(tResponse)),
+      ]);
+    });
+
+    test('should emit AsyncError when fetching fails', () async {
+      // arrange
+      when(() => mockUsecase.call()).thenAnswer((_) async => Left(tFailure));
+      
+
+      final listener = Listener<AsyncValue<QuotaResponse>>();
+      container.listen(
+        getAllQuotaProvider,
+        listener.call,
+        fireImmediately: true,
+      );
+
+      // act
+      try {
+        await container.read(getAllQuotaProvider.future);
+      } catch (e) {
+        expect(e, tFailure);
+      }
+
+      // assert
+      final finalState = container.read(getAllQuotaProvider);
+      expect(finalState, isA<AsyncError>());
+      expect(finalState.error, tFailure);
+    });
   });
 }

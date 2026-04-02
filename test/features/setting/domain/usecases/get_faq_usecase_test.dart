@@ -12,24 +12,52 @@ void main() {
   late MockSettingRepository mockRepository;
   late GetFAQUsecase usecase;
 
+  final tFAQ = FAQDataEntity(
+    id: 'FAQ-001',
+    slug: 'how-to-buy-quota',
+    title: 'How to buy quota?',
+    description: 'Go to Home and select Quota menu.',
+    createdAt: DateTime(2026, 4, 2, 10, 0, 0),
+    updatedAt: DateTime(2026, 4, 2, 10, 0, 0),
+    deletedAt: null,
+  );
+
+  final tResponse = FAQResponse(
+    success: true,
+    message: 'FAQs fetched successfully',
+    data: [tFAQ],
+  );
+
   setUp(() {
     mockRepository = MockSettingRepository();
     usecase = GetFAQUsecase(mockRepository);
   });
 
-  test('should return FAQResponse on success', () async {
-    final tResponse = FAQResponse(success: true, message: 'ok', data: []);
-    when(
-      () => mockRepository.getFAQ(),
-    ).thenAnswer((_) async => Right(tResponse));
-    final result = await usecase();
-    expect(result, Right(tResponse));
-  });
+  group('GetFAQUsecase', () {
+    test('should call getFAQ from repository', () async {
+      // arrange
+      when(() => mockRepository.getFAQ())
+          .thenAnswer((_) async => Right(tResponse));
 
-  test('should return Failure on error', () async {
-    final failure = Failure(message: 'error');
-    when(() => mockRepository.getFAQ()).thenAnswer((_) async => Left(failure));
-    final result = await usecase();
-    expect(result, Left(failure));
+      // act
+      final result = await usecase();
+
+      // assert
+      expect(result, Right(tResponse));
+      verify(() => mockRepository.getFAQ()).called(1);
+    });
+
+    test('should return Failure from repository when fetching FAQs fails', () async {
+      // arrange
+      final tFailure = Failure(message: 'Failed to fetch FAQs');
+      when(() => mockRepository.getFAQ())
+          .thenAnswer((_) async => Left(tFailure));
+
+      // act
+      final result = await usecase();
+
+      // assert
+      expect(result, Left(tFailure));
+    });
   });
 }

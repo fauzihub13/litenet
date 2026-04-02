@@ -12,34 +12,48 @@ void main() {
   late MockAuthRepository mockRepository;
   late GetSummaryUsecase usecase;
 
+  final tSummaryResponse = SummaryResponse(
+    success: true,
+    message: 'Summary fetched successfully',
+    data: SummaryDataEntity(
+      totalDevice: 10,
+      onlineDevice: 7,
+      offlineDevice: 2,
+      inactiveDevice: 1,
+    ),
+  );
+
   setUp(() {
     mockRepository = MockAuthRepository();
     usecase = GetSummaryUsecase(mockRepository);
   });
 
-  test('should return SummaryResponse on success', () async {
-    final tSummaryResponse = SummaryResponse(
-      success: true,
-      message: 'ok',
-      data: SummaryDataEntity(
-        totalDevice: 0, 
-        onlineDevice: 0, 
-        offlineDevice: 0, 
-        inactiveDevice: 0, 
-      ),
-    );
-    when(
-      () => mockRepository.getSummary(),
-    ).thenAnswer((_) async => Right(tSummaryResponse));
-    final result = await usecase();
-    expect(result, Right(tSummaryResponse));
-  });
+  group('GetSummaryUsecase', () {
+    test('should call getSummary from repository', () async {
+      // arrange
+      when(() => mockRepository.getSummary())
+          .thenAnswer((_) async => Right(tSummaryResponse));
 
-  test('should return Failure on error', () async {
-    when(
-      () => mockRepository.getSummary(),
-    ).thenAnswer((_) async => Left(Failure(message: 'error')));
-    final result = await usecase();
-    expect(result.isLeft(), true);
+      // act
+      final result = await usecase();
+
+      // assert
+      expect(result, Right(tSummaryResponse));
+      verify(() => mockRepository.getSummary()).called(1);
+    });
+
+    test('should return Failure from repository when fetching summary fails', () async {
+      // arrange
+      final tFailure = Failure(message: 'Failed to fetch summary');
+      when(() => mockRepository.getSummary())
+          .thenAnswer((_) async => Left(tFailure));
+
+      // act
+      final result = await usecase();
+
+      // assert
+      expect(result, Left(tFailure));
+      verify(() => mockRepository.getSummary()).called(1);
+    });
   });
 }
