@@ -7,10 +7,24 @@ part 'get_faq_provider.g.dart';
 @riverpod
 class GetFAQ extends _$GetFAQ {
   @override
-  FutureOr<FAQResponse> build() async {
+  FutureOr<FAQResponse?> build() async {
+    return null;
+  }
+
+  Future<void> fetchFAQ() async {
+    state = const AsyncValue.loading();
+
     final usecase = ref.read(getFAQUsecaseProvider);
     final result = await usecase.call();
 
-    return result.fold((failure) => throw failure, (data) => data);
+    result.fold(
+      (failure) {
+        state = AsyncValue.error(failure, StackTrace.current);
+      },
+      (data) {
+        state = AsyncValue.data(data);
+      },
+    );
   }
 }
+

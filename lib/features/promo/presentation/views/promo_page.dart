@@ -34,6 +34,13 @@ class PromoPage extends HookConsumerWidget {
 
     final searchQuery = useState<String>('');
 
+    useEffect((){
+      Future.microtask(() {
+        ref.read(getPromoProvider.notifier).fetchPromo();
+      });
+      return null;
+    }, []);
+    
     return Scaffold(
       appBar: CustomAppbar(title: 'Pilihan Promo'),
       body: Column(
@@ -55,6 +62,9 @@ class PromoPage extends HookConsumerWidget {
               },
               child: asyncPromo.when(
                 data: (data) {
+                  if (data == null) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
                   final filteredPromo = data.data.where((promo) {
                     final nameLower = promo.title.toLowerCase();
                     final queryLower = searchQuery.value.toLowerCase();

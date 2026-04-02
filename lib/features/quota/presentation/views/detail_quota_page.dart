@@ -37,6 +37,11 @@ class _DetailQuotaPageState extends ConsumerState<DetailQuotaPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    Future.microtask(() {
+      ref
+          .read(getDetailQuotaProvider(id: widget.id).notifier)
+          .fetchDetailQuota(widget.id);
+    });
 
     // listen perubahan tab
     _tabController.addListener(() {
@@ -84,6 +89,9 @@ class _DetailQuotaPageState extends ConsumerState<DetailQuotaPage>
               },
               child: asyncDetailQuota.when(
                 data: (data) {
+                  if (data == null) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
                   final quota = data.data;
                   return SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(
@@ -177,6 +185,7 @@ class _DetailQuotaPageState extends ConsumerState<DetailQuotaPage>
       ),
       bottomNavigationBar: asyncDetailQuota.when(
         data: (data) {
+          if (data == null) return const SizedBox();
           return _buildBottomSummary(context: context, quota: data.data);
         },
         error: (_, __) {

@@ -21,11 +21,21 @@ class OrderHistoryPage extends HookConsumerWidget {
     final List<String> categories = ["Semua", "Selesai", "Menunggu", "Gagal"];
     final searchQuery = useState('');
 
+    useEffect(() {
+      Future.microtask(() {
+        ref.read(getAllTransactionProvider.notifier).fetchAllTransaction();
+      });
+      return null;
+    }, []);
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
       appBar: const CustomAppbar(title: "Riwayat Pesanan", isLeading: false),
       body: asyncTransaction.when(
         data: (data) {
+          if (data == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
           final filteredTransaction = data.data.where((trx) {
             final nameMatch = trx.orderId.toLowerCase().contains(
               searchQuery.value.toLowerCase(),

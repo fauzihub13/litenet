@@ -21,9 +21,17 @@ import 'package:litenet/routes/route_name.dart';
 class DetailDevicePage extends HookConsumerWidget {
   final String deviceId;
   const DetailDevicePage({super.key, required this.deviceId});
+  
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    useEffect(() {
+      Future.microtask(() => ref
+          .read(getDetailDeviceProvider(deviceId: deviceId).notifier)
+          .fetchDetailDevice(deviceId));
+      return null;
+    }, []);
+
     final mapController = useMemoized(() => MapController());
     final currentLatLng = useState(const LatLng(0, 0));
     final asyncDetailDevice = ref.watch(
@@ -33,6 +41,7 @@ class DetailDevicePage extends HookConsumerWidget {
     ref.listen(getDetailDeviceProvider(deviceId: deviceId), (previous, next) {
       next.when(
         data: (data) {
+          if (data == null) return;
           currentLatLng.value = LatLng(data.data.latitude, data.data.longitude);
         },
         error: (_, __) {},
@@ -46,10 +55,15 @@ class DetailDevicePage extends HookConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: PaddingSize.horizontal),
         child: RefreshIndicator(
           onRefresh: () async {
-            ref.invalidate(getDetailDeviceProvider(deviceId: deviceId));
+            await ref
+                .read(getDetailDeviceProvider(deviceId: deviceId).notifier)
+                .fetchDetailDevice(deviceId);
           },
           child: asyncDetailDevice.when(
             data: (data) {
+              if (data == null) {
+                return const Center(child: CircularProgressIndicator());
+              }
               DeviceDataEntity device = data.data;
               return SingleChildScrollView(
                 child: Column(
@@ -247,6 +261,7 @@ class DetailDevicePage extends HookConsumerWidget {
       ),
       bottomNavigationBar: asyncDetailDevice.when(
         data: (data) {
+          if (data == null) return const SizedBox();
           return SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(

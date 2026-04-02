@@ -6,9 +6,9 @@ import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/custom_search_bar.dart';
 import 'package:litenet/core/widgets/empty_state.dart';
-import 'package:litenet/features/quota/presentation/widgets/quota_card.dart';
 import 'package:litenet/features/quota/domain/entities/quota.dart';
 import 'package:litenet/features/quota/presentation/controllers/get_all_quota_provider.dart';
+import 'package:litenet/features/quota/presentation/widgets/quota_card.dart';
 
 class QuotaPage extends HookConsumerWidget {
   const QuotaPage({super.key});
@@ -17,6 +17,13 @@ class QuotaPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncQuota = ref.watch(getAllQuotaProvider);
     final searchQuery = useState<String>('');
+
+    useEffect(() {
+      Future.microtask(() {
+        ref.read(getAllQuotaProvider.notifier).fetchAllQuota();
+      });
+      return null;
+    }, []);
 
     return Scaffold(
       appBar: CustomAppbar(title: 'Pilihan Kuota', isLeading: true),
@@ -39,6 +46,9 @@ class QuotaPage extends HookConsumerWidget {
               },
               child: asyncQuota.when(
                 data: (data) {
+                  if (data == null) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
                   final filteredQuota = data.data.where((quota) {
                     final nameLower = quota.name.toLowerCase();
                     final queryLower = searchQuery.value.toLowerCase();

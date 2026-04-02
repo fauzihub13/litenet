@@ -13,7 +13,7 @@ part of 'get_detail_device_provider.dart';
 const getDetailDeviceProvider = GetDetailDeviceFamily._();
 
 final class GetDetailDeviceProvider
-    extends $AsyncNotifierProvider<GetDetailDevice, DetailDeviceResponse> {
+    extends $AsyncNotifierProvider<GetDetailDevice, DetailDeviceResponse?> {
   const GetDetailDeviceProvider._({
     required GetDetailDeviceFamily super.from,
     required String super.argument,
@@ -50,15 +50,15 @@ final class GetDetailDeviceProvider
   }
 }
 
-String _$getDetailDeviceHash() => r'f559e40785a38563cd1e720348d08e59da993014';
+String _$getDetailDeviceHash() => r'93c728fc9caeb61a7ca5b297948e279cc43a7d9a';
 
 final class GetDetailDeviceFamily extends $Family
     with
         $ClassFamilyOverride<
           GetDetailDevice,
-          AsyncValue<DetailDeviceResponse>,
-          DetailDeviceResponse,
-          FutureOr<DetailDeviceResponse>,
+          AsyncValue<DetailDeviceResponse?>,
+          DetailDeviceResponse?,
+          FutureOr<DetailDeviceResponse?>,
           String
         > {
   const GetDetailDeviceFamily._()
@@ -77,26 +77,26 @@ final class GetDetailDeviceFamily extends $Family
   String toString() => r'getDetailDeviceProvider';
 }
 
-abstract class _$GetDetailDevice extends $AsyncNotifier<DetailDeviceResponse> {
+abstract class _$GetDetailDevice extends $AsyncNotifier<DetailDeviceResponse?> {
   late final _$args = ref.$arg as String;
   String get deviceId => _$args;
 
-  FutureOr<DetailDeviceResponse> build({required String deviceId});
+  FutureOr<DetailDeviceResponse?> build({required String deviceId});
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build(deviceId: _$args);
     final ref =
         this.ref
-            as $Ref<AsyncValue<DetailDeviceResponse>, DetailDeviceResponse>;
+            as $Ref<AsyncValue<DetailDeviceResponse?>, DetailDeviceResponse?>;
     final element =
         ref.element
             as $ClassProviderElement<
               AnyNotifier<
-                AsyncValue<DetailDeviceResponse>,
-                DetailDeviceResponse
+                AsyncValue<DetailDeviceResponse?>,
+                DetailDeviceResponse?
               >,
-              AsyncValue<DetailDeviceResponse>,
+              AsyncValue<DetailDeviceResponse?>,
               Object?,
               Object?
             >;

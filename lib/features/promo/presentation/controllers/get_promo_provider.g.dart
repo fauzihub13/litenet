@@ -13,7 +13,7 @@ part of 'get_promo_provider.dart';
 const getPromoProvider = GetPromoProvider._();
 
 final class GetPromoProvider
-    extends $AsyncNotifierProvider<GetPromo, PromoResponse> {
+    extends $AsyncNotifierProvider<GetPromo, PromoResponse?> {
   const GetPromoProvider._()
     : super(
         from: null,
@@ -33,20 +33,20 @@ final class GetPromoProvider
   GetPromo create() => GetPromo();
 }
 
-String _$getPromoHash() => r'5d8d0e3aafd91ff24fbbf42b8296071331bb1884';
+String _$getPromoHash() => r'c9e06604d958c7a76138aab1338ce8e9aab50a4b';
 
-abstract class _$GetPromo extends $AsyncNotifier<PromoResponse> {
-  FutureOr<PromoResponse> build();
+abstract class _$GetPromo extends $AsyncNotifier<PromoResponse?> {
+  FutureOr<PromoResponse?> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<AsyncValue<PromoResponse>, PromoResponse>;
+    final ref = this.ref as $Ref<AsyncValue<PromoResponse?>, PromoResponse?>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<PromoResponse>, PromoResponse>,
-              AsyncValue<PromoResponse>,
+              AnyNotifier<AsyncValue<PromoResponse?>, PromoResponse?>,
+              AsyncValue<PromoResponse?>,
               Object?,
               Object?
             >;

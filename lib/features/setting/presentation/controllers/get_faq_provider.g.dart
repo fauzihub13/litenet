@@ -12,7 +12,8 @@ part of 'get_faq_provider.dart';
 @ProviderFor(GetFAQ)
 const getFAQProvider = GetFAQProvider._();
 
-final class GetFAQProvider extends $AsyncNotifierProvider<GetFAQ, FAQResponse> {
+final class GetFAQProvider
+    extends $AsyncNotifierProvider<GetFAQ, FAQResponse?> {
   const GetFAQProvider._()
     : super(
         from: null,
@@ -32,20 +33,20 @@ final class GetFAQProvider extends $AsyncNotifierProvider<GetFAQ, FAQResponse> {
   GetFAQ create() => GetFAQ();
 }
 
-String _$getFAQHash() => r'ae9931b623f65020376fd4d4d8b28f8fa7ee391e';
+String _$getFAQHash() => r'88ec9016b0ae780317ba579fc2a5cff2995724f5';
 
-abstract class _$GetFAQ extends $AsyncNotifier<FAQResponse> {
-  FutureOr<FAQResponse> build();
+abstract class _$GetFAQ extends $AsyncNotifier<FAQResponse?> {
+  FutureOr<FAQResponse?> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<AsyncValue<FAQResponse>, FAQResponse>;
+    final ref = this.ref as $Ref<AsyncValue<FAQResponse?>, FAQResponse?>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<FAQResponse>, FAQResponse>,
-              AsyncValue<FAQResponse>,
+              AnyNotifier<AsyncValue<FAQResponse?>, FAQResponse?>,
+              AsyncValue<FAQResponse?>,
               Object?,
               Object?
             >;

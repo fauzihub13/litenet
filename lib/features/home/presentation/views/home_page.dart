@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -30,6 +31,11 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   void initState() {
     super.initState();
+    Future.microtask(() {
+      ref.read(getPromoProvider.notifier).fetchPromo();
+      ref.read(getAllQuotaProvider.notifier).fetchAllQuota();
+      ref.read(getSummaryProvider.notifier).fetchSummary();
+    });
     _loadLocation();
   }
 
@@ -46,6 +52,15 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget build(BuildContext context) {
     final userAsync = ref.watch(getCurrentUserProvider);
     final asyncSummary = ref.watch(getSummaryProvider);
+    final asyncQuota = ref.watch(getAllQuotaProvider);
+    final asyncPromo = ref.watch(getPromoProvider);
+
+    // useEffect(() {
+    //   ref.read(getPromoProvider.notifier).fetchPromo();
+    //   ref.read(getAllQuotaProvider.notifier).fetchAllQuota();
+    //   ref.read(getSummaryProvider.notifier).fetchSummary();
+    //   return null;
+    // }, []);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
@@ -146,12 +161,23 @@ class _HomePageState extends ConsumerState<HomePage> {
                   child: Column(
                     children: [
                       asyncSummary.when(
-                        data: (data) => _buildAccountCard(
-                          totalDevice: data.data.totalDevice,
-                          onlineDevice: data.data.onlineDevice,
-                          offlineDevice: data.data.offlineDevice,
-                          inactiveDevice: data.data.inactiveDevice,
-                        ),
+                        data: (data) {
+                          if (data == null) {
+                            return _buildAccountCard(
+                              totalDevice: 0,
+                              onlineDevice: 0,
+                              offlineDevice: 0,
+                              inactiveDevice: 0,
+                            );
+                          }
+
+                          return _buildAccountCard(
+                            totalDevice: data.data.totalDevice,
+                            onlineDevice: data.data.onlineDevice,
+                            offlineDevice: data.data.offlineDevice,
+                            inactiveDevice: data.data.inactiveDevice,
+                          );
+                        },
                         loading: () => _buildAccountCard(
                           totalDevice: 0,
                           onlineDevice: 0,
@@ -172,7 +198,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           context.pushNamed(RouteName.promoPage);
                         },
                       ),
-                      _buildPromoSlider(),
+                      _buildPromoSlider(asyncPromo: asyncPromo),
                       const SizedBox(height: 16),
                       _buildSectionHeader(
                         title: "Kuota",
@@ -180,7 +206,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           context.pushNamed(RouteName.productPage);
                         },
                       ),
-                      _buildQuotaList(),
+                      _buildQuotaList(asyncQuota: asyncQuota),
                       const SizedBox(
                         height: 30,
                       ), // Spasi bawah agar tidak tertutup Navbar
@@ -395,8 +421,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   // }
 
   // Build Promo Slider
-  Widget _buildPromoSlider() {
-    final asyncPromo = ref.watch(getPromoProvider);
+  Widget _buildPromoSlider({required AsyncValue<PromoResponse?> asyncPromo}) {
     final List colors = [
       [Color(0xFF5F45FD), Color(0xFF7D68FF)],
       [Color(0xFFFF4801), Color(0xFFFF8701)],
@@ -415,6 +440,9 @@ class _HomePageState extends ConsumerState<HomePage> {
       height: 130,
       child: asyncPromo.when(
         data: (data) {
+          if (data == null) {
+            return Center(child: const CircularProgressIndicator());
+          }
           List<PromoDataEntity> promoData = data.data;
           return ListView.builder(
             scrollDirection: Axis.horizontal,
@@ -449,13 +477,14 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   // Build Promo Slider
-  Widget _buildQuotaList() {
-    final asyncQuota = ref.watch(getAllQuotaProvider);
-
+  Widget _buildQuotaList({required AsyncValue<QuotaResponse?> asyncQuota}) {
     return SizedBox(
       height: 210,
       child: asyncQuota.when(
         data: (data) {
+          if (data == null) {
+            return Center(child: const CircularProgressIndicator());
+          }
           List<QuotaDataEntity> quotaData = data.data;
           return ListView.builder(
             scrollDirection: Axis.horizontal,

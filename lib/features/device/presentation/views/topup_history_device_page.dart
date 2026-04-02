@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
@@ -9,7 +10,7 @@ import 'package:litenet/features/device/presentation/controllers/get_topup_histo
 import 'package:litenet/features/device/presentation/widgets/topup_history_device_card.dart';
 import 'package:litenet/features/promo/presentation/controllers/get_promo_provider.dart';
 
-class TopupHistoryDevicePage extends ConsumerWidget {
+class TopupHistoryDevicePage extends HookConsumerWidget {
   final String deviceId;
   const TopupHistoryDevicePage({super.key, required this.deviceId});
 
@@ -18,6 +19,15 @@ class TopupHistoryDevicePage extends ConsumerWidget {
     final asyncHistory = ref.watch(
       getTopupHistoryDeviceProvider(deviceId: deviceId),
     );
+
+    useEffect(() {
+      Future.microtask(() {
+        ref
+            .read(getTopupHistoryDeviceProvider(deviceId: deviceId).notifier)
+            .fetchTopupHistoryDevice(deviceId);
+      });
+      return null;
+    }, [deviceId]);
 
     return Scaffold(
       appBar: CustomAppbar(title: 'Riwayat Topup'),
@@ -29,8 +39,11 @@ class TopupHistoryDevicePage extends ConsumerWidget {
           },
           child: asyncHistory.when(
             data: (data) {
+              if (data == null) {
+                return const Center(child: CircularProgressIndicator());
+              }
               List<TopupHistoryDeviceDataEntity> historyData = data.data;
-              data.data;
+              // data.data;
               if (historyData.isEmpty) {
                 return EmptyState(
                   message: 'Tidak ditemukan data',

@@ -13,7 +13,7 @@ part of 'get_detail_quota_provider.dart';
 const getDetailQuotaProvider = GetDetailQuotaFamily._();
 
 final class GetDetailQuotaProvider
-    extends $AsyncNotifierProvider<GetDetailQuota, DetailQuotaResponse> {
+    extends $AsyncNotifierProvider<GetDetailQuota, DetailQuotaResponse?> {
   const GetDetailQuotaProvider._({
     required GetDetailQuotaFamily super.from,
     required String super.argument,
@@ -50,15 +50,15 @@ final class GetDetailQuotaProvider
   }
 }
 
-String _$getDetailQuotaHash() => r'e6b924f0a08f1a6187f7e6f0af523de456412ed3';
+String _$getDetailQuotaHash() => r'0a08f4e5240f5d4deeac3f0ec5109605db35a0d2';
 
 final class GetDetailQuotaFamily extends $Family
     with
         $ClassFamilyOverride<
           GetDetailQuota,
-          AsyncValue<DetailQuotaResponse>,
-          DetailQuotaResponse,
-          FutureOr<DetailQuotaResponse>,
+          AsyncValue<DetailQuotaResponse?>,
+          DetailQuotaResponse?,
+          FutureOr<DetailQuotaResponse?>,
           String
         > {
   const GetDetailQuotaFamily._()
@@ -77,22 +77,26 @@ final class GetDetailQuotaFamily extends $Family
   String toString() => r'getDetailQuotaProvider';
 }
 
-abstract class _$GetDetailQuota extends $AsyncNotifier<DetailQuotaResponse> {
+abstract class _$GetDetailQuota extends $AsyncNotifier<DetailQuotaResponse?> {
   late final _$args = ref.$arg as String;
   String get id => _$args;
 
-  FutureOr<DetailQuotaResponse> build({required String id});
+  FutureOr<DetailQuotaResponse?> build({required String id});
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build(id: _$args);
     final ref =
-        this.ref as $Ref<AsyncValue<DetailQuotaResponse>, DetailQuotaResponse>;
+        this.ref
+            as $Ref<AsyncValue<DetailQuotaResponse?>, DetailQuotaResponse?>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<DetailQuotaResponse>, DetailQuotaResponse>,
-              AsyncValue<DetailQuotaResponse>,
+              AnyNotifier<
+                AsyncValue<DetailQuotaResponse?>,
+                DetailQuotaResponse?
+              >,
+              AsyncValue<DetailQuotaResponse?>,
               Object?,
               Object?
             >;

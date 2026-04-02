@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/core/extensions/datetime_context.ext.dart';
@@ -17,7 +18,7 @@ import 'package:litenet/gen/assets.gen.dart';
 import 'package:litenet/routes/route_name.dart';
 import 'package:open_filex/open_filex.dart';
 
-class DetailOrderHistoryPage extends ConsumerWidget {
+class DetailOrderHistoryPage extends HookConsumerWidget {
   final String orderId;
   const DetailOrderHistoryPage({super.key, required this.orderId});
 
@@ -28,6 +29,15 @@ class DetailOrderHistoryPage extends ConsumerWidget {
       getDetailTransactionProvider(orderId: orderId),
     );
     final downloadState = ref.watch(downloadInvoiceProvider);
+
+    useEffect(() {
+      Future.microtask(() {
+        ref
+            .read(getDetailTransactionProvider(orderId: orderId).notifier)
+            .fetchDetailTransaction(orderId);
+      });
+      return null;
+    }, [orderId]);
 
     ref.listen(downloadInvoiceProvider, (previous, next) {
       next.whenData((savePath) {
@@ -48,6 +58,9 @@ class DetailOrderHistoryPage extends ConsumerWidget {
       appBar: const CustomAppbar(title: 'Detail Pesanan', isRounded: false),
       body: asyncDetail.when(
         data: (data) {
+          if (data == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
           final detail = data.data;
           String statusTitle = 'Transaksi';
           String statusDescription = '';

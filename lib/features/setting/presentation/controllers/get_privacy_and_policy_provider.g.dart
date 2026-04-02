@@ -14,7 +14,7 @@ const getPrivacyAndPolicyProvider = GetPrivacyAndPolicyProvider._();
 
 final class GetPrivacyAndPolicyProvider
     extends
-        $AsyncNotifierProvider<GetPrivacyAndPolicy, PrivacyAndPolicyResponse> {
+        $AsyncNotifierProvider<GetPrivacyAndPolicy, PrivacyAndPolicyResponse?> {
   const GetPrivacyAndPolicyProvider._()
     : super(
         from: null,
@@ -35,11 +35,11 @@ final class GetPrivacyAndPolicyProvider
 }
 
 String _$getPrivacyAndPolicyHash() =>
-    r'dfe3393f3ce124d14f87b994721c83fc9d628dee';
+    r'3a1adee8d3f36466717020fb216278ea3a5a1359';
 
 abstract class _$GetPrivacyAndPolicy
-    extends $AsyncNotifier<PrivacyAndPolicyResponse> {
-  FutureOr<PrivacyAndPolicyResponse> build();
+    extends $AsyncNotifier<PrivacyAndPolicyResponse?> {
+  FutureOr<PrivacyAndPolicyResponse?> build();
   @$mustCallSuper
   @override
   void runBuild() {
@@ -47,17 +47,17 @@ abstract class _$GetPrivacyAndPolicy
     final ref =
         this.ref
             as $Ref<
-              AsyncValue<PrivacyAndPolicyResponse>,
-              PrivacyAndPolicyResponse
+              AsyncValue<PrivacyAndPolicyResponse?>,
+              PrivacyAndPolicyResponse?
             >;
     final element =
         ref.element
             as $ClassProviderElement<
               AnyNotifier<
-                AsyncValue<PrivacyAndPolicyResponse>,
-                PrivacyAndPolicyResponse
+                AsyncValue<PrivacyAndPolicyResponse?>,
+                PrivacyAndPolicyResponse?
               >,
-              AsyncValue<PrivacyAndPolicyResponse>,
+              AsyncValue<PrivacyAndPolicyResponse?>,
               Object?,
               Object?
             >;

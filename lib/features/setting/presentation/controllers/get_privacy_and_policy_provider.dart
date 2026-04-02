@@ -7,10 +7,24 @@ part 'get_privacy_and_policy_provider.g.dart';
 @riverpod
 class GetPrivacyAndPolicy extends _$GetPrivacyAndPolicy {
   @override
-  FutureOr<PrivacyAndPolicyResponse> build() async {
+  FutureOr<PrivacyAndPolicyResponse?> build() async {
+    return null;
+  }
+
+  Future<void> fetchPrivacyAndPolicy() async {
+    state = const AsyncValue.loading();
+
     final usecase = ref.read(getPrivacyAndPolicyUsecaseProvider);
     final result = await usecase.call();
 
-    return result.fold((failure) => throw failure, (data) => data);
+    result.fold(
+      (failure) {
+        state = AsyncValue.error(failure, StackTrace.current);
+      },
+      (data) {
+        state = AsyncValue.data(data);
+      },
+    );
   }
 }
+

@@ -16,7 +16,7 @@ final class GetTopupHistoryDeviceProvider
     extends
         $AsyncNotifierProvider<
           GetTopupHistoryDevice,
-          TopupHistoryDeviceResponse
+          TopupHistoryDeviceResponse?
         > {
   const GetTopupHistoryDeviceProvider._({
     required GetTopupHistoryDeviceFamily super.from,
@@ -55,15 +55,15 @@ final class GetTopupHistoryDeviceProvider
 }
 
 String _$getTopupHistoryDeviceHash() =>
-    r'867fae48652e924bdfd9be4279b5935ae5255107';
+    r'92fcd607a4a6023307ce3b5ac23db0a788902b18';
 
 final class GetTopupHistoryDeviceFamily extends $Family
     with
         $ClassFamilyOverride<
           GetTopupHistoryDevice,
-          AsyncValue<TopupHistoryDeviceResponse>,
-          TopupHistoryDeviceResponse,
-          FutureOr<TopupHistoryDeviceResponse>,
+          AsyncValue<TopupHistoryDeviceResponse?>,
+          TopupHistoryDeviceResponse?,
+          FutureOr<TopupHistoryDeviceResponse?>,
           String
         > {
   const GetTopupHistoryDeviceFamily._()
@@ -83,11 +83,11 @@ final class GetTopupHistoryDeviceFamily extends $Family
 }
 
 abstract class _$GetTopupHistoryDevice
-    extends $AsyncNotifier<TopupHistoryDeviceResponse> {
+    extends $AsyncNotifier<TopupHistoryDeviceResponse?> {
   late final _$args = ref.$arg as String;
   String get deviceId => _$args;
 
-  FutureOr<TopupHistoryDeviceResponse> build({required String deviceId});
+  FutureOr<TopupHistoryDeviceResponse?> build({required String deviceId});
   @$mustCallSuper
   @override
   void runBuild() {
@@ -95,17 +95,17 @@ abstract class _$GetTopupHistoryDevice
     final ref =
         this.ref
             as $Ref<
-              AsyncValue<TopupHistoryDeviceResponse>,
-              TopupHistoryDeviceResponse
+              AsyncValue<TopupHistoryDeviceResponse?>,
+              TopupHistoryDeviceResponse?
             >;
     final element =
         ref.element
             as $ClassProviderElement<
               AnyNotifier<
-                AsyncValue<TopupHistoryDeviceResponse>,
-                TopupHistoryDeviceResponse
+                AsyncValue<TopupHistoryDeviceResponse?>,
+                TopupHistoryDeviceResponse?
               >,
-              AsyncValue<TopupHistoryDeviceResponse>,
+              AsyncValue<TopupHistoryDeviceResponse?>,
               Object?,
               Object?
             >;

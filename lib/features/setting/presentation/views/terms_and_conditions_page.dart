@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
@@ -7,12 +8,20 @@ import 'package:litenet/core/widgets/empty_state.dart';
 import 'package:litenet/features/setting/domain/entities/privacy_and_policy.dart';
 import 'package:litenet/features/setting/presentation/controllers/get_privacy_and_policy_provider.dart';
 
-class TermsAndConditionsPage extends ConsumerWidget {
+class TermsAndConditionsPage extends HookConsumerWidget {
   const TermsAndConditionsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncPrivacyAndPolicy = ref.watch(getPrivacyAndPolicyProvider);
+
+    useEffect(() {
+      Future.microtask(() {
+        ref.read(getPrivacyAndPolicyProvider.notifier).fetchPrivacyAndPolicy();
+      });
+      return null;
+    }, []);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const CustomAppbar(title: 'Syarat dan Ketentuan'),
@@ -22,6 +31,9 @@ class TermsAndConditionsPage extends ConsumerWidget {
         },
         child: asyncPrivacyAndPolicy.when(
           data: (data) {
+            if (data == null) {
+              return const Center(child: CircularProgressIndicator());
+            }
             List<PrivacyAndPolicyDataEntity> privacyAndPolicyData = data.data;
             if (privacyAndPolicyData.isEmpty) {
               return EmptyState(

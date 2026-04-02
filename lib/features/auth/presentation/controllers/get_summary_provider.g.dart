@@ -13,7 +13,7 @@ part of 'get_summary_provider.dart';
 const getSummaryProvider = GetSummaryProvider._();
 
 final class GetSummaryProvider
-    extends $AsyncNotifierProvider<GetSummary, SummaryResponse> {
+    extends $AsyncNotifierProvider<GetSummary, SummaryResponse?> {
   const GetSummaryProvider._()
     : super(
         from: null,
@@ -33,20 +33,21 @@ final class GetSummaryProvider
   GetSummary create() => GetSummary();
 }
 
-String _$getSummaryHash() => r'ed2790b1f02713277982cbe33bae5f0e41a32a7b';
+String _$getSummaryHash() => r'988ff93c68879c7059ac543867e8e210005718fb';
 
-abstract class _$GetSummary extends $AsyncNotifier<SummaryResponse> {
-  FutureOr<SummaryResponse> build();
+abstract class _$GetSummary extends $AsyncNotifier<SummaryResponse?> {
+  FutureOr<SummaryResponse?> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<AsyncValue<SummaryResponse>, SummaryResponse>;
+    final ref =
+        this.ref as $Ref<AsyncValue<SummaryResponse?>, SummaryResponse?>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<SummaryResponse>, SummaryResponse>,
-              AsyncValue<SummaryResponse>,
+              AnyNotifier<AsyncValue<SummaryResponse?>, SummaryResponse?>,
+              AsyncValue<SummaryResponse?>,
               Object?,
               Object?
             >;

@@ -13,7 +13,8 @@ part of 'get_all_payment_method_provider.dart';
 const getAllPaymentMethodProvider = GetAllPaymentMethodProvider._();
 
 final class GetAllPaymentMethodProvider
-    extends $AsyncNotifierProvider<GetAllPaymentMethod, PaymentMethodResponse> {
+    extends
+        $AsyncNotifierProvider<GetAllPaymentMethod, PaymentMethodResponse?> {
   const GetAllPaymentMethodProvider._()
     : super(
         from: null,
@@ -34,26 +35,26 @@ final class GetAllPaymentMethodProvider
 }
 
 String _$getAllPaymentMethodHash() =>
-    r'ed7ead4261b49a7737a6cf7efeb524a13b52a140';
+    r'c01b7256b0e05fe2fea9b901402acd90d97f0e4b';
 
 abstract class _$GetAllPaymentMethod
-    extends $AsyncNotifier<PaymentMethodResponse> {
-  FutureOr<PaymentMethodResponse> build();
+    extends $AsyncNotifier<PaymentMethodResponse?> {
+  FutureOr<PaymentMethodResponse?> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
     final ref =
         this.ref
-            as $Ref<AsyncValue<PaymentMethodResponse>, PaymentMethodResponse>;
+            as $Ref<AsyncValue<PaymentMethodResponse?>, PaymentMethodResponse?>;
     final element =
         ref.element
             as $ClassProviderElement<
               AnyNotifier<
-                AsyncValue<PaymentMethodResponse>,
-                PaymentMethodResponse
+                AsyncValue<PaymentMethodResponse?>,
+                PaymentMethodResponse?
               >,
-              AsyncValue<PaymentMethodResponse>,
+              AsyncValue<PaymentMethodResponse?>,
               Object?,
               Object?
             >;

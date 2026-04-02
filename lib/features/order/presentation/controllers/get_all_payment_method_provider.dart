@@ -7,10 +7,23 @@ part 'get_all_payment_method_provider.g.dart';
 @riverpod
 class GetAllPaymentMethod extends _$GetAllPaymentMethod {
   @override
-  FutureOr<PaymentMethodResponse> build() async {
+  FutureOr<PaymentMethodResponse?> build() async {
+    return null;
+  }
+
+  Future<void> fetchAllPaymentMethod() async {
+    state = const AsyncValue.loading();
+
     final usecase = ref.read(getAllPaymentMethodUsecaseProvider);
     final result = await usecase.call();
 
-    return result.fold((failure) => throw failure, (data) => data);
+    result.fold(
+      (failure) {
+        state = AsyncValue.error(failure, StackTrace.current);
+      },
+      (data) {
+        state = AsyncValue.data(data);
+      },
+    );
   }
 }

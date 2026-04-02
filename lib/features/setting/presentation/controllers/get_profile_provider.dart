@@ -7,10 +7,24 @@ part 'get_profile_provider.g.dart';
 @riverpod
 class GetProfile extends _$GetProfile {
   @override
-  FutureOr<ProfileResponse> build() async {
+  FutureOr<ProfileResponse?> build() async {
+    return null;
+  }
+
+  Future<void> fetchProfile() async {
+    state = const AsyncValue.loading();
+
     final usecase = ref.read(getProfileUsecaseProvider);
     final result = await usecase.call();
 
-    return result.fold((failure) => throw failure, (data) => data);
+    result.fold(
+      (failure) {
+        state = AsyncValue.error(failure, StackTrace.current);
+      },
+      (data) {
+        state = AsyncValue.data(data);
+      },
+    );
   }
 }
+

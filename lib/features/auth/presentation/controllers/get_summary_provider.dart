@@ -7,10 +7,23 @@ part 'get_summary_provider.g.dart';
 @riverpod
 class GetSummary extends _$GetSummary {
   @override
-  FutureOr<SummaryResponse> build() async {
+  FutureOr<SummaryResponse?> build() async {
+    return null;
+  }
+
+  Future<void> fetchSummary() async {
+    state = const AsyncValue.loading();
+
     final usecase = ref.read(getSummaryUsecaseProvider);
     final result = await usecase.call();
 
-    return result.fold((failure) => throw failure, (data) => data);
+    result.fold(
+      (failure) {
+        state = AsyncValue.error(failure, StackTrace.current);
+      },
+      (data) {
+        state = AsyncValue.data(data);
+      },
+    );
   }
 }

@@ -13,7 +13,7 @@ part of 'get_all_device_provider.dart';
 const getAllDeviceProvider = GetAllDeviceProvider._();
 
 final class GetAllDeviceProvider
-    extends $AsyncNotifierProvider<GetAllDevice, DeviceResponse> {
+    extends $AsyncNotifierProvider<GetAllDevice, DeviceResponse?> {
   const GetAllDeviceProvider._()
     : super(
         from: null,
@@ -33,20 +33,20 @@ final class GetAllDeviceProvider
   GetAllDevice create() => GetAllDevice();
 }
 
-String _$getAllDeviceHash() => r'fb020e9865fae4a7de0379e06cea5ee4686c0a0d';
+String _$getAllDeviceHash() => r'dbd1a2e648be97620f52b169ea7050c678bf13c0';
 
-abstract class _$GetAllDevice extends $AsyncNotifier<DeviceResponse> {
-  FutureOr<DeviceResponse> build();
+abstract class _$GetAllDevice extends $AsyncNotifier<DeviceResponse?> {
+  FutureOr<DeviceResponse?> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<AsyncValue<DeviceResponse>, DeviceResponse>;
+    final ref = this.ref as $Ref<AsyncValue<DeviceResponse?>, DeviceResponse?>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<DeviceResponse>, DeviceResponse>,
-              AsyncValue<DeviceResponse>,
+              AnyNotifier<AsyncValue<DeviceResponse?>, DeviceResponse?>,
+              AsyncValue<DeviceResponse?>,
               Object?,
               Object?
             >;

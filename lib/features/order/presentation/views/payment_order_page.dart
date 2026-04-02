@@ -34,12 +34,22 @@ class PaymentOrderPage extends HookConsumerWidget {
       expiredAt.value.difference(DateTime.now().toUtc()),
     );
 
+    useEffect(() {
+      Future.microtask(() {
+        ref
+            .read(getDetailTransactionProvider(orderId: orderId).notifier)
+            .fetchDetailTransaction(orderId);
+      });
+      return null;
+    }, [orderId]);
+
     ref.listen(getDetailTransactionProvider(orderId: orderId), (
       previous,
       next,
     ) {
       next.when(
         data: (data) {
+          if (data == null) return;
           expiredAt.value = data.data.expiredAt.toUtc();
           // print("Data baru diterima, expiredAt diperbarui: ${expiredAt.value}");
           Duration diff = expiredAt.value.difference(DateTime.now().toUtc());
@@ -124,6 +134,9 @@ class PaymentOrderPage extends HookConsumerWidget {
       appBar: CustomAppbar(title: 'Pembayaran'),
       body: asyncDetail.when(
         data: (data) {
+          if (data == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
           expiredAt.value = data.data.expiredAt.toUtc();
           Duration diff = expiredAt.value.difference(DateTime.now().toUtc());
           Duration capped = diff > const Duration(hours: 24)
@@ -329,6 +342,7 @@ class PaymentOrderPage extends HookConsumerWidget {
       ),
       bottomNavigationBar: asyncDetail.when(
         data: (data) {
+          if (data == null) return const SizedBox();
           return Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: PaddingSize.horizontal,

@@ -7,10 +7,23 @@ part 'get_detail_transaction_provider.g.dart';
 @riverpod
 class GetDetailTransaction extends _$GetDetailTransaction {
   @override
-  FutureOr<DetailTransactionResponse> build({required String orderId}) async {
+  FutureOr<DetailTransactionResponse?> build({required String orderId}) async {
+    return null;
+  }
+
+  Future<void> fetchDetailTransaction(String orderId) async {
+    state = const AsyncValue.loading();
+
     final usecase = ref.read(getDetailTransactionUsecaseProvider);
     final result = await usecase.call(orderId: orderId);
 
-    return result.fold((failure) => throw failure, (data) => data);
+    result.fold(
+      (failure) {
+        state = AsyncValue.error(failure, StackTrace.current);
+      },
+      (data) {
+        state = AsyncValue.data(data);
+      },
+    );
   }
 }

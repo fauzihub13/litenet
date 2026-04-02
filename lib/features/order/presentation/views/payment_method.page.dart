@@ -32,10 +32,19 @@ class PaymentMethodPage extends HookConsumerWidget {
     final asyncPaymentMethod = ref.watch(getAllPaymentMethodProvider);
     final asyncCreateTransaction = ref.watch(createTransactionProvider);
 
+    useEffect(() {
+      Future.microtask(() {
+        ref.read(getAllPaymentMethodProvider.notifier).fetchAllPaymentMethod();
+      });
+      return null;
+    }, []);
+
     ref.listen(getAllPaymentMethodProvider, (previous, next) {
       next.when(
         data: (data) {
-          selectedPayment.value = data.data.first.code;
+          if (data != null && data.data.isNotEmpty) {
+            selectedPayment.value = data.data.first.code;
+          }
         },
         error: (_, __) {},
         loading: () {},
@@ -76,6 +85,9 @@ class PaymentMethodPage extends HookConsumerWidget {
           ),
           child: asyncPaymentMethod.when(
             data: (data) {
+              if (data == null) {
+                return const Center(child: CircularProgressIndicator());
+              }
               List<PaymentMethodDataEntity> methods = data.data;
 
               return ListView.builder(

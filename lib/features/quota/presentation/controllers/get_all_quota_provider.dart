@@ -7,10 +7,23 @@ part 'get_all_quota_provider.g.dart';
 @riverpod
 class GetAllQuota extends _$GetAllQuota {
   @override
-  FutureOr<QuotaResponse> build() async {
+  FutureOr<QuotaResponse?> build() async {
+    return null;
+  }
+
+  Future<void> fetchAllQuota() async {
+    state = const AsyncValue.loading();
+
     final usecase = ref.read(getAllQuotasUsecaseProvider);
     final result = await usecase.call();
 
-    return result.fold((failure) => throw failure, (data) => data);
+    result.fold(
+      (failure) {
+        state = AsyncValue.error(failure, StackTrace.current);
+      },
+      (data) {
+        state = AsyncValue.data(data);
+      },
+    );
   }
 }

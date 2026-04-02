@@ -55,6 +55,8 @@ class EditDevicePage extends HookConsumerWidget {
 
     useEffect(() {
       asyncDetailDevice.whenData((data) {
+        if (data == null) return;
+
         nameController.text = data.data.name;
         addressController.text = data.data.address;
         addressController.text = data.data.address;
@@ -102,6 +104,9 @@ class EditDevicePage extends HookConsumerWidget {
         ),
         child: asyncDetailDevice.when(
           data: (data) {
+            if (data == null) {
+              return const Center(child: CircularProgressIndicator());
+            }
             return Form(
               key: formKey,
               child: SingleChildScrollView(
@@ -250,6 +255,7 @@ class EditDevicePage extends HookConsumerWidget {
       ),
       bottomNavigationBar: asyncDetailDevice.when(
         data: (data) {
+          if (data == null) return SizedBox();
           return Padding(
             padding: const EdgeInsets.all(PaddingSize.horizontal),
             child: Button(

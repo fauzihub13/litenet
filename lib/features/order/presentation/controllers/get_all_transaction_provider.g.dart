@@ -13,7 +13,7 @@ part of 'get_all_transaction_provider.dart';
 const getAllTransactionProvider = GetAllTransactionProvider._();
 
 final class GetAllTransactionProvider
-    extends $AsyncNotifierProvider<GetAllTransaction, TransactionResponse> {
+    extends $AsyncNotifierProvider<GetAllTransaction, TransactionResponse?> {
   const GetAllTransactionProvider._()
     : super(
         from: null,
@@ -33,21 +33,26 @@ final class GetAllTransactionProvider
   GetAllTransaction create() => GetAllTransaction();
 }
 
-String _$getAllTransactionHash() => r'79e05a8d0e2c87ee42bd63e6da7f02ee36163894';
+String _$getAllTransactionHash() => r'0ee3ba1af45bade4fa2ca49b011bc61fe75c2968';
 
-abstract class _$GetAllTransaction extends $AsyncNotifier<TransactionResponse> {
-  FutureOr<TransactionResponse> build();
+abstract class _$GetAllTransaction
+    extends $AsyncNotifier<TransactionResponse?> {
+  FutureOr<TransactionResponse?> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
     final ref =
-        this.ref as $Ref<AsyncValue<TransactionResponse>, TransactionResponse>;
+        this.ref
+            as $Ref<AsyncValue<TransactionResponse?>, TransactionResponse?>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<TransactionResponse>, TransactionResponse>,
-              AsyncValue<TransactionResponse>,
+              AnyNotifier<
+                AsyncValue<TransactionResponse?>,
+                TransactionResponse?
+              >,
+              AsyncValue<TransactionResponse?>,
               Object?,
               Object?
             >;

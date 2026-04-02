@@ -16,7 +16,7 @@ final class GetDetailTransactionProvider
     extends
         $AsyncNotifierProvider<
           GetDetailTransaction,
-          DetailTransactionResponse
+          DetailTransactionResponse?
         > {
   const GetDetailTransactionProvider._({
     required GetDetailTransactionFamily super.from,
@@ -55,15 +55,15 @@ final class GetDetailTransactionProvider
 }
 
 String _$getDetailTransactionHash() =>
-    r'79bdacb9bacac7257bfd40d4c0e81702d411437e';
+    r'f7e4780f1e5a04b58f0bdb4cffd1adf1f3705d33';
 
 final class GetDetailTransactionFamily extends $Family
     with
         $ClassFamilyOverride<
           GetDetailTransaction,
-          AsyncValue<DetailTransactionResponse>,
-          DetailTransactionResponse,
-          FutureOr<DetailTransactionResponse>,
+          AsyncValue<DetailTransactionResponse?>,
+          DetailTransactionResponse?,
+          FutureOr<DetailTransactionResponse?>,
           String
         > {
   const GetDetailTransactionFamily._()
@@ -83,11 +83,11 @@ final class GetDetailTransactionFamily extends $Family
 }
 
 abstract class _$GetDetailTransaction
-    extends $AsyncNotifier<DetailTransactionResponse> {
+    extends $AsyncNotifier<DetailTransactionResponse?> {
   late final _$args = ref.$arg as String;
   String get orderId => _$args;
 
-  FutureOr<DetailTransactionResponse> build({required String orderId});
+  FutureOr<DetailTransactionResponse?> build({required String orderId});
   @$mustCallSuper
   @override
   void runBuild() {
@@ -95,17 +95,17 @@ abstract class _$GetDetailTransaction
     final ref =
         this.ref
             as $Ref<
-              AsyncValue<DetailTransactionResponse>,
-              DetailTransactionResponse
+              AsyncValue<DetailTransactionResponse?>,
+              DetailTransactionResponse?
             >;
     final element =
         ref.element
             as $ClassProviderElement<
               AnyNotifier<
-                AsyncValue<DetailTransactionResponse>,
-                DetailTransactionResponse
+                AsyncValue<DetailTransactionResponse?>,
+                DetailTransactionResponse?
               >,
-              AsyncValue<DetailTransactionResponse>,
+              AsyncValue<DetailTransactionResponse?>,
               Object?,
               Object?
             >;

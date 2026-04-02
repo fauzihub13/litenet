@@ -4,13 +4,13 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:litenet/core/constants/theme.dart';
 import 'package:litenet/core/errors/failure.dart';
-import 'package:litenet/features/auth/presentation/controllers/user_manager_provider.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
 import 'package:litenet/core/widgets/custom_snackbar.dart';
 import 'package:litenet/core/widgets/empty_state.dart';
 import 'package:litenet/core/widgets/form_input.dart';
 import 'package:litenet/core/widgets/row_title.dart';
+import 'package:litenet/features/auth/presentation/controllers/user_manager_provider.dart';
 import 'package:litenet/features/setting/presentation/controllers/change_profile_provider.dart';
 import 'package:litenet/features/setting/presentation/controllers/get_profile_provider.dart';
 
@@ -27,6 +27,22 @@ class ChangeProfilePage extends HookConsumerWidget {
     final asyncGetProfile = ref.watch(getProfileProvider);
     final asyncChangeProfile = ref.watch(changeProfileProvider);
 
+    useEffect(() {
+      Future.microtask(() {
+        ref.read(getProfileProvider.notifier).fetchProfile();
+      });
+      return null;
+    }, []);
+
+    ref.listen(getProfileProvider, (previous, next) {
+      next.whenData((data) {
+        if (data == null) return;
+        nameController.text = data.data.name;
+        emailController.text = data.data.email;
+        phoneNumberController.text = data.data.phoneNumber;
+      });
+    });
+
     ref.listen(changeProfileProvider, (previous, next) {
       next.when(
         data: (data) async {
@@ -42,15 +58,6 @@ class ChangeProfilePage extends HookConsumerWidget {
         loading: () {},
       );
     });
-
-    useEffect(() {
-      asyncGetProfile.whenData((data) {
-        nameController.text = data.data.name;
-        emailController.text = data.data.email;
-        phoneNumberController.text = data.data.phoneNumber;
-      });
-      return null; // dispose
-    }, [asyncGetProfile.hasValue]);
 
     return Scaffold(
       appBar: CustomAppbar(title: 'Ubah Profil'),

@@ -7,10 +7,23 @@ part 'get_promo_provider.g.dart';
 @riverpod
 class GetPromo extends _$GetPromo {
   @override
-  FutureOr<PromoResponse> build() async {
+  FutureOr<PromoResponse?> build() async {
+    return null;
+  }
+
+  Future<void> fetchPromo() async {
+    state = const AsyncValue.loading();
+
     final usecase = ref.read(getPromoUsecaseProvider);
     final result = await usecase.call();
 
-    return result.fold((failure) => throw failure, (data) => data);
+    result.fold(
+      (failure) {
+        state = AsyncValue.error(failure, StackTrace.current);
+      },
+      (data) {
+        state = AsyncValue.data(data);
+      },
+    );
   }
 }

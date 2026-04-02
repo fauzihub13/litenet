@@ -17,6 +17,13 @@ class DeviceListPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    useEffect(() {
+      Future.microtask(
+        () => ref.read(getAllDeviceProvider.notifier).fetchAllDevice(),
+      );
+      return null;
+    }, []);
+
     final asyncAllDevice = ref.watch(getAllDeviceProvider);
     final searchQuery = useState('');
 
@@ -36,17 +43,19 @@ class DeviceListPage extends HookConsumerWidget {
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {
-                ref.invalidate(getAllDeviceProvider);
+                await ref.read(getAllDeviceProvider.notifier).fetchAllDevice();
               },
               child: asyncAllDevice.when(
                 data: (data) {
+                  if (data == null) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
                   final filteredDeviceData = data.data.where((quota) {
                     final nameLower = quota.name.toLowerCase();
                     final queryLower = searchQuery.value.toLowerCase();
                     return nameLower.contains(queryLower);
                   }).toList();
-
-                  // List<DeviceDataEntity> deviceData = data.data;
 
                   if (filteredDeviceData.isEmpty) {
                     return EmptyState(

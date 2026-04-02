@@ -13,7 +13,7 @@ part of 'get_history_device_provider.dart';
 const getHistoryDeviceProvider = GetHistoryDeviceFamily._();
 
 final class GetHistoryDeviceProvider
-    extends $AsyncNotifierProvider<GetHistoryDevice, HistoryDeviceResponse> {
+    extends $AsyncNotifierProvider<GetHistoryDevice, HistoryDeviceResponse?> {
   const GetHistoryDeviceProvider._({
     required GetHistoryDeviceFamily super.from,
     required String super.argument,
@@ -50,15 +50,15 @@ final class GetHistoryDeviceProvider
   }
 }
 
-String _$getHistoryDeviceHash() => r'c16dacdce139e268ddd0d66ad78589289b13da39';
+String _$getHistoryDeviceHash() => r'f803cb0fdc11c99e3b60dc7980ae14518258ef3e';
 
 final class GetHistoryDeviceFamily extends $Family
     with
         $ClassFamilyOverride<
           GetHistoryDevice,
-          AsyncValue<HistoryDeviceResponse>,
-          HistoryDeviceResponse,
-          FutureOr<HistoryDeviceResponse>,
+          AsyncValue<HistoryDeviceResponse?>,
+          HistoryDeviceResponse?,
+          FutureOr<HistoryDeviceResponse?>,
           String
         > {
   const GetHistoryDeviceFamily._()
@@ -78,26 +78,26 @@ final class GetHistoryDeviceFamily extends $Family
 }
 
 abstract class _$GetHistoryDevice
-    extends $AsyncNotifier<HistoryDeviceResponse> {
+    extends $AsyncNotifier<HistoryDeviceResponse?> {
   late final _$args = ref.$arg as String;
   String get deviceId => _$args;
 
-  FutureOr<HistoryDeviceResponse> build({required String deviceId});
+  FutureOr<HistoryDeviceResponse?> build({required String deviceId});
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build(deviceId: _$args);
     final ref =
         this.ref
-            as $Ref<AsyncValue<HistoryDeviceResponse>, HistoryDeviceResponse>;
+            as $Ref<AsyncValue<HistoryDeviceResponse?>, HistoryDeviceResponse?>;
     final element =
         ref.element
             as $ClassProviderElement<
               AnyNotifier<
-                AsyncValue<HistoryDeviceResponse>,
-                HistoryDeviceResponse
+                AsyncValue<HistoryDeviceResponse?>,
+                HistoryDeviceResponse?
               >,
-              AsyncValue<HistoryDeviceResponse>,
+              AsyncValue<HistoryDeviceResponse?>,
               Object?,
               Object?
             >;
