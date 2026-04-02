@@ -42,7 +42,9 @@ void main() {
 
   setUpAll(() {
     registerFallbackValue(const AsyncLoading<DetailTransactionResponse>());
-    registerFallbackValue(AsyncData<DetailTransactionResponse>(tDetailResponse));
+    registerFallbackValue(
+      AsyncData<DetailTransactionResponse>(tDetailResponse),
+    );
   });
 
   setUp(() {
@@ -59,53 +61,88 @@ void main() {
   });
 
   group('GetDetailTransactionProvider', () {
-    test('should fetch detail and emit AsyncData on success', () async {
-      // arrange
-      when(() => mockUsecase.call(orderId: any(named: 'orderId')))
-          .thenAnswer((_) async => Right(tDetailResponse));
-
-      final listener = Listener<AsyncValue<DetailTransactionResponse>>();
-      container.listen(
-        getDetailTransactionProvider(orderId: 'ORD-001'),
-        listener.call,
-        fireImmediately: true,
+    test('initial state should eventually be AsyncData(null)', () async {
+      final state = await container.read(
+        getDetailTransactionProvider(orderId: 'ORD-001').future,
       );
-
-      // act
-      final state = await container.read(getDetailTransactionProvider(orderId: 'ORD-001').future);
-
-      // assert
-      expect(state, tDetailResponse);
-      verify(() => mockUsecase.call(orderId: 'ORD-001')).called(1);
-      
-      verifyInOrder([
-        () => listener(any(), any(that: isA<AsyncLoading>())),
-        () => listener(any(), AsyncData<DetailTransactionResponse>(tDetailResponse)),
-      ]);
+      expect(state, null);
     });
 
-    test('should emit AsyncError when fetching fails', () async {
+    test('should emit AsyncLoading and then AsyncData on success', () async {
       // arrange
-      when(() => mockUsecase.call(orderId: any(named: 'orderId')))
-          .thenAnswer((_) async => Left(tFailure));
+      when(
+        () => mockUsecase.call(orderId: 'ORD-001'),
+      ).thenAnswer((_) async => Right(tDetailResponse));
 
-      final listener = Listener<AsyncValue<DetailTransactionResponse>>();
+      // Wait for build to finish
+      await container.read(
+        getDetailTransactionProvider(orderId: 'ORD-001').future,
+      );
+
+      final listener = Listener<AsyncValue<DetailTransactionResponse?>>();
       container.listen(
         getDetailTransactionProvider(orderId: 'ORD-001'),
         listener.call,
         fireImmediately: true,
       );
 
+      final notifier = container.read(
+        getDetailTransactionProvider(orderId: 'ORD-001').notifier,
+      );
+
       // act
-      try {
-        await container.read(getDetailTransactionProvider(orderId: 'ORD-001').future);
-      } catch (e) {
-        // expect the failure thrown from the fold
-        expect(e, tFailure);
-      }
+      await notifier.fetchDetailTransaction('ORD-001');
 
       // assert
-      final finalState = container.read(getDetailTransactionProvider(orderId: 'ORD-001'));
+      verifyInOrder([
+        () =>
+            listener(any(), const AsyncData<DetailTransactionResponse?>(null)),
+        () => listener(any(), any(that: isA<AsyncLoading>())),
+        () => listener(
+          any(),
+          AsyncData<DetailTransactionResponse?>(tDetailResponse),
+        ),
+      ]);
+
+      verify(() => mockUsecase.call(orderId: 'ORD-001')).called(1);
+    });
+
+    test('should emit AsyncError on failure', () async {
+      // arrange
+      when(
+        () => mockUsecase.call(orderId: 'ORD-001'),
+      ).thenAnswer((_) async => Left(tFailure));
+
+      // Wait for build to finish
+      await container.read(
+        getDetailTransactionProvider(orderId: 'ORD-001').future,
+      );
+
+      final listener = Listener<AsyncValue<DetailTransactionResponse?>>();
+      container.listen(
+        getDetailTransactionProvider(orderId: 'ORD-001'),
+        listener.call,
+        fireImmediately: true,
+      );
+
+      final notifier = container.read(
+        getDetailTransactionProvider(orderId: 'ORD-001').notifier,
+      );
+
+      // act
+      await notifier.fetchDetailTransaction('ORD-001');
+
+      // assert
+      verifyInOrder([
+        () =>
+            listener(any(), const AsyncData<DetailTransactionResponse?>(null)),
+        () => listener(any(), any(that: isA<AsyncLoading>())),
+        () => listener(any(), any(that: isA<AsyncError>())),
+      ]);
+
+      final finalState = container.read(
+        getDetailTransactionProvider(orderId: 'ORD-001'),
+      );
       expect(finalState, isA<AsyncError>());
       expect(finalState.error, tFailure);
     });

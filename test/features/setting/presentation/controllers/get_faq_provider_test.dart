@@ -44,9 +44,7 @@ void main() {
   setUp(() {
     mockUsecase = MockGetFAQUsecase();
     container = ProviderContainer(
-      overrides: [
-        getFAQUsecaseProvider.overrideWithValue(mockUsecase),
-      ],
+      overrides: [getFAQUsecaseProvider.overrideWithValue(mockUsecase)],
     );
   });
 
@@ -55,49 +53,58 @@ void main() {
   });
 
   group('GetFAQProvider', () {
-    test('should fetch FAQs and emit AsyncData on success', () async {
+    test('initial state should eventually be AsyncData(null)', () async {
+      final state = await container.read(getFAQProvider.future);
+      expect(state, null);
+    });
+
+    test('should emit AsyncLoading and then AsyncData on success', () async {
       // arrange
       when(() => mockUsecase.call()).thenAnswer((_) async => Right(tResponse));
 
-      final listener = Listener<AsyncValue<FAQResponse>>();
-      container.listen(
-        getFAQProvider,
-        listener.call,
-        fireImmediately: true,
-      );
+      // Wait for build to finish
+      await container.read(getFAQProvider.future);
+
+      final listener = Listener<AsyncValue<FAQResponse?>>();
+      container.listen(getFAQProvider, listener.call, fireImmediately: true);
+
+      final notifier = container.read(getFAQProvider.notifier);
 
       // act
-      final state = await container.read(getFAQProvider.future);
+      await notifier.fetchFAQ();
 
       // assert
-      expect(state, tResponse);
-      verify(() => mockUsecase.call()).called(1);
-      
       verifyInOrder([
+        () => listener(any(), const AsyncData<FAQResponse?>(null)),
         () => listener(any(), any(that: isA<AsyncLoading>())),
-        () => listener(any(), AsyncData<FAQResponse>(tResponse)),
+        () => listener(any(), AsyncData<FAQResponse?>(tResponse)),
       ]);
+
+      verify(() => mockUsecase.call()).called(1);
     });
 
-    test('should emit AsyncError when fetching fails', () async {
+    test('should emit AsyncError on failure', () async {
       // arrange
       when(() => mockUsecase.call()).thenAnswer((_) async => Left(tFailure));
 
-      final listener = Listener<AsyncValue<FAQResponse>>();
-      container.listen(
-        getFAQProvider,
-        listener.call,
-        fireImmediately: true,
-      );
+      // Wait for build to finish
+      await container.read(getFAQProvider.future);
+
+      final listener = Listener<AsyncValue<FAQResponse?>>();
+      container.listen(getFAQProvider, listener.call, fireImmediately: true);
+
+      final notifier = container.read(getFAQProvider.notifier);
 
       // act
-      try {
-        await container.read(getFAQProvider.future);
-      } catch (e) {
-        expect(e, tFailure);
-      }
+      await notifier.fetchFAQ();
 
       // assert
+      verifyInOrder([
+        () => listener(any(), const AsyncData<FAQResponse?>(null)),
+        () => listener(any(), any(that: isA<AsyncLoading>())),
+        () => listener(any(), any(that: isA<AsyncError>())),
+      ]);
+
       final finalState = container.read(getFAQProvider);
       expect(finalState, isA<AsyncError>());
       expect(finalState.error, tFailure);

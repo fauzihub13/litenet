@@ -60,54 +60,66 @@ void main() {
   });
 
   group('GetAllPaymentMethodProvider', () {
-    test(
-      'should fetch payment methods and emit AsyncData on success',
-      () async {
-        // arrange
-        when(
-          () => mockUsecase.call(),
-        ).thenAnswer((_) async => Right(tResponse));
+    test('initial state should eventually be AsyncData(null)', () async {
+      final state = await container.read(getAllPaymentMethodProvider.future);
+      expect(state, null);
+    });
 
-        final listener = Listener<AsyncValue<PaymentMethodResponse>>();
-        container.listen(
-          getAllPaymentMethodProvider,
-          listener.call,
-          fireImmediately: true,
-        );
-
-        // act
-        final state = await container.read(getAllPaymentMethodProvider.future);
-
-        // assert
-        expect(state, tResponse);
-        verify(() => mockUsecase.call()).called(1);
-
-        verifyInOrder([
-          () => listener(any(), any(that: isA<AsyncLoading>())),
-          () => listener(any(), AsyncData<PaymentMethodResponse>(tResponse)),
-        ]);
-      },
-    );
-
-    test('should emit AsyncError when fetching fails', () async {
+    test('should emit AsyncLoading and then AsyncData on success', () async {
       // arrange
-      when(() => mockUsecase.call()).thenAnswer((_) async => Left(tFailure));
+      when(() => mockUsecase.call()).thenAnswer((_) async => Right(tResponse));
 
-      final listener = Listener<AsyncValue<PaymentMethodResponse>>();
+      // Wait for build to finish
+      await container.read(getAllPaymentMethodProvider.future);
+
+      final listener = Listener<AsyncValue<PaymentMethodResponse?>>();
       container.listen(
         getAllPaymentMethodProvider,
         listener.call,
         fireImmediately: true,
       );
 
+      final notifier = container.read(getAllPaymentMethodProvider.notifier);
+
       // act
-      try {
-        await container.read(getAllPaymentMethodProvider.future);
-      } catch (e) {
-        expect(e, tFailure);
-      }
+      await notifier.fetchAllPaymentMethod();
 
       // assert
+      verifyInOrder([
+        () => listener(any(), const AsyncData<PaymentMethodResponse?>(null)),
+        () => listener(any(), any(that: isA<AsyncLoading>())),
+        () => listener(any(), AsyncData<PaymentMethodResponse?>(tResponse)),
+      ]);
+
+      verify(() => mockUsecase.call()).called(1);
+    });
+
+    test('should emit AsyncError on failure', () async {
+      // arrange
+      when(() => mockUsecase.call()).thenAnswer((_) async => Left(tFailure));
+
+      // Wait for build to finish
+      await container.read(getAllPaymentMethodProvider.future);
+
+      final listener = Listener<AsyncValue<PaymentMethodResponse?>>();
+      container.listen(
+        getAllPaymentMethodProvider,
+        listener.call,
+        fireImmediately: true,
+      );
+
+      final notifier = container.read(getAllPaymentMethodProvider.notifier);
+
+      // act
+      await notifier.fetchAllPaymentMethod();
+
+      // assert
+      verifyInOrder([
+        () => listener(any(), const AsyncData<PaymentMethodResponse?>(null)),
+        () => listener(any(), any(that: isA<AsyncLoading>())),
+        () => listener(any(), any(that: isA<AsyncError>())),
+      ]);
+
       final finalState = container.read(getAllPaymentMethodProvider);
       expect(finalState, isA<AsyncError>());
       expect(finalState.error, tFailure);

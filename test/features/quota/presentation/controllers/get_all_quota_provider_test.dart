@@ -53,9 +53,7 @@ void main() {
   setUp(() {
     mockUsecase = MockGetAllQuotaUsecase();
     container = ProviderContainer(
-      overrides: [
-        getAllQuotasUsecaseProvider.overrideWithValue(mockUsecase),
-      ],
+      overrides: [getAllQuotasUsecaseProvider.overrideWithValue(mockUsecase)],
     );
   });
 
@@ -64,50 +62,66 @@ void main() {
   });
 
   group('GetAllQuotaProvider', () {
-    test('should fetch quotas and emit AsyncData on success', () async {
+    test('initial state should eventually be AsyncData(null)', () async {
+      final state = await container.read(getAllQuotaProvider.future);
+      expect(state, null);
+    });
+
+    test('should emit AsyncLoading and then AsyncData on success', () async {
       // arrange
       when(() => mockUsecase.call()).thenAnswer((_) async => Right(tResponse));
 
-      final listener = Listener<AsyncValue<QuotaResponse>>();
+      // Wait for build to finish
+      await container.read(getAllQuotaProvider.future);
+
+      final listener = Listener<AsyncValue<QuotaResponse?>>();
       container.listen(
         getAllQuotaProvider,
         listener.call,
         fireImmediately: true,
       );
 
+      final notifier = container.read(getAllQuotaProvider.notifier);
+
       // act
-      final state = await container.read(getAllQuotaProvider.future);
+      await notifier.fetchAllQuota();
 
       // assert
-      expect(state, tResponse);
-      verify(() => mockUsecase.call()).called(1);
-      
       verifyInOrder([
+        () => listener(any(), const AsyncData<QuotaResponse?>(null)),
         () => listener(any(), any(that: isA<AsyncLoading>())),
-        () => listener(any(), AsyncData<QuotaResponse>(tResponse)),
+        () => listener(any(), AsyncData<QuotaResponse?>(tResponse)),
       ]);
+
+      verify(() => mockUsecase.call()).called(1);
     });
 
-    test('should emit AsyncError when fetching fails', () async {
+    test('should emit AsyncError on failure', () async {
       // arrange
       when(() => mockUsecase.call()).thenAnswer((_) async => Left(tFailure));
-      
 
-      final listener = Listener<AsyncValue<QuotaResponse>>();
+      // Wait for build to finish
+      await container.read(getAllQuotaProvider.future);
+
+      final listener = Listener<AsyncValue<QuotaResponse?>>();
       container.listen(
         getAllQuotaProvider,
         listener.call,
         fireImmediately: true,
       );
 
+      final notifier = container.read(getAllQuotaProvider.notifier);
+
       // act
-      try {
-        await container.read(getAllQuotaProvider.future);
-      } catch (e) {
-        expect(e, tFailure);
-      }
+      await notifier.fetchAllQuota();
 
       // assert
+      verifyInOrder([
+        () => listener(any(), const AsyncData<QuotaResponse?>(null)),
+        () => listener(any(), any(that: isA<AsyncLoading>())),
+        () => listener(any(), any(that: isA<AsyncError>())),
+      ]);
+
       final finalState = container.read(getAllQuotaProvider);
       expect(finalState, isA<AsyncError>());
       expect(finalState.error, tFailure);

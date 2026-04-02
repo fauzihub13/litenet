@@ -49,9 +49,7 @@ void main() {
   setUp(() {
     mockUsecase = MockGetPromoUsecase();
     container = ProviderContainer(
-      overrides: [
-        getPromoUsecaseProvider.overrideWithValue(mockUsecase),
-      ],
+      overrides: [getPromoUsecaseProvider.overrideWithValue(mockUsecase)],
     );
   });
 
@@ -60,49 +58,58 @@ void main() {
   });
 
   group('GetPromoProvider', () {
-    test('should fetch promos and emit AsyncData on success', () async {
+    test('initial state should eventually be AsyncData(null)', () async {
+      final state = await container.read(getPromoProvider.future);
+      expect(state, null);
+    });
+
+    test('should emit AsyncLoading and then AsyncData on success', () async {
       // arrange
       when(() => mockUsecase.call()).thenAnswer((_) async => Right(tResponse));
 
-      final listener = Listener<AsyncValue<PromoResponse>>();
-      container.listen(
-        getPromoProvider,
-        listener.call,
-        fireImmediately: true,
-      );
+      // Wait for build to finish
+      await container.read(getPromoProvider.future);
+
+      final listener = Listener<AsyncValue<PromoResponse?>>();
+      container.listen(getPromoProvider, listener.call, fireImmediately: true);
+
+      final notifier = container.read(getPromoProvider.notifier);
 
       // act
-      final state = await container.read(getPromoProvider.future);
+      await notifier.fetchPromo();
 
       // assert
-      expect(state, tResponse);
-      verify(() => mockUsecase.call()).called(1);
-      
       verifyInOrder([
+        () => listener(any(), const AsyncData<PromoResponse?>(null)),
         () => listener(any(), any(that: isA<AsyncLoading>())),
-        () => listener(any(), AsyncData<PromoResponse>(tResponse)),
+        () => listener(any(), AsyncData<PromoResponse?>(tResponse)),
       ]);
+
+      verify(() => mockUsecase.call()).called(1);
     });
 
-    test('should emit AsyncError when fetching fails', () async {
+    test('should emit AsyncError on failure', () async {
       // arrange
       when(() => mockUsecase.call()).thenAnswer((_) async => Left(tFailure));
 
-      final listener = Listener<AsyncValue<PromoResponse>>();
-      container.listen(
-        getPromoProvider,
-        listener.call,
-        fireImmediately: true,
-      );
+      // Wait for build to finish
+      await container.read(getPromoProvider.future);
+
+      final listener = Listener<AsyncValue<PromoResponse?>>();
+      container.listen(getPromoProvider, listener.call, fireImmediately: true);
+
+      final notifier = container.read(getPromoProvider.notifier);
 
       // act
-      try {
-        await container.read(getPromoProvider.future);
-      } catch (e) {
-        expect(e, tFailure);
-      }
+      await notifier.fetchPromo();
 
       // assert
+      verifyInOrder([
+        () => listener(any(), const AsyncData<PromoResponse?>(null)),
+        () => listener(any(), any(that: isA<AsyncLoading>())),
+        () => listener(any(), any(that: isA<AsyncError>())),
+      ]);
+
       final finalState = container.read(getPromoProvider);
       expect(finalState, isA<AsyncError>());
       expect(finalState.error, tFailure);

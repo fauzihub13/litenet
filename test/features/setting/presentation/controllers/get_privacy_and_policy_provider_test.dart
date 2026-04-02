@@ -56,52 +56,117 @@ void main() {
   });
 
   group('GetPrivacyAndPolicyProvider', () {
-    test('should fetch privacy policy and emit AsyncData on success', () async {
+    test('initial state should eventually be AsyncData(null)', () async {
+      final state = await container.read(getPrivacyAndPolicyProvider.future);
+      expect(state, null);
+    });
+
+    test('should emit AsyncLoading and then AsyncData on success', () async {
       // arrange
       when(() => mockUsecase.call()).thenAnswer((_) async => Right(tResponse));
 
-      final listener = Listener<AsyncValue<PrivacyAndPolicyResponse>>();
+      // Wait for build to finish
+      await container.read(getPrivacyAndPolicyProvider.future);
+
+      final listener = Listener<AsyncValue<PrivacyAndPolicyResponse?>>();
       container.listen(
         getPrivacyAndPolicyProvider,
         listener.call,
         fireImmediately: true,
       );
 
+      final notifier = container.read(getPrivacyAndPolicyProvider.notifier);
+
       // act
-      final state = await container.read(getPrivacyAndPolicyProvider.future);
+      await notifier.fetchPrivacyAndPolicy();
 
       // assert
-      expect(state, tResponse);
-      verify(() => mockUsecase.call()).called(1);
-      
       verifyInOrder([
+        () => listener(any(), const AsyncData<PrivacyAndPolicyResponse?>(null)),
         () => listener(any(), any(that: isA<AsyncLoading>())),
-        () => listener(any(), AsyncData<PrivacyAndPolicyResponse>(tResponse)),
+        () => listener(any(), AsyncData<PrivacyAndPolicyResponse?>(tResponse)),
       ]);
+
+      verify(() => mockUsecase.call()).called(1);
     });
 
-    test('should emit AsyncError when fetching fails', () async {
+    test('should emit AsyncError on failure', () async {
       // arrange
       when(() => mockUsecase.call()).thenAnswer((_) async => Left(tFailure));
 
-      final listener = Listener<AsyncValue<PrivacyAndPolicyResponse>>();
+      // Wait for build to finish
+      await container.read(getPrivacyAndPolicyProvider.future);
+
+      final listener = Listener<AsyncValue<PrivacyAndPolicyResponse?>>();
       container.listen(
         getPrivacyAndPolicyProvider,
         listener.call,
         fireImmediately: true,
       );
 
+      final notifier = container.read(getPrivacyAndPolicyProvider.notifier);
+
       // act
-      try {
-        await container.read(getPrivacyAndPolicyProvider.future);
-      } catch (e) {
-        expect(e, tFailure);
-      }
+      await notifier.fetchPrivacyAndPolicy();
 
       // assert
+      verifyInOrder([
+        () => listener(any(), const AsyncData<PrivacyAndPolicyResponse?>(null)),
+        () => listener(any(), any(that: isA<AsyncLoading>())),
+        () => listener(any(), any(that: isA<AsyncError>())),
+      ]);
+
       final finalState = container.read(getPrivacyAndPolicyProvider);
       expect(finalState, isA<AsyncError>());
       expect(finalState.error, tFailure);
     });
+
+    // test('should fetch privacy policy and emit AsyncData on success', () async {
+    //   // arrange
+    //   when(() => mockUsecase.call()).thenAnswer((_) async => Right(tResponse));
+
+    //   final listener = Listener<AsyncValue<PrivacyAndPolicyResponse>>();
+    //   container.listen(
+    //     getPrivacyAndPolicyProvider,
+    //     listener.call,
+    //     fireImmediately: true,
+    //   );
+
+    //   // act
+    //   final state = await container.read(getPrivacyAndPolicyProvider.future);
+
+    //   // assert
+    //   expect(state, tResponse);
+    //   verify(() => mockUsecase.call()).called(1);
+
+    //   verifyInOrder([
+    //     () => listener(any(), any(that: isA<AsyncLoading>())),
+    //     () => listener(any(), AsyncData<PrivacyAndPolicyResponse>(tResponse)),
+    //   ]);
+    // });
+
+    // test('should emit AsyncError when fetching fails', () async {
+    //   // arrange
+    //   when(() => mockUsecase.call()).thenAnswer((_) async => Left(tFailure));
+
+    //   final listener = Listener<AsyncValue<PrivacyAndPolicyResponse>>();
+    //   container.listen(
+    //     getPrivacyAndPolicyProvider,
+    //     listener.call,
+    //     fireImmediately: true,
+    //   );
+
+    //   // act
+    //   try {
+    //     await container.read(getPrivacyAndPolicyProvider.future);
+    //   } catch (e) {
+    //     expect(e, tFailure);
+    //   }
+
+    //   // assert
+    //   final finalState = container.read(getPrivacyAndPolicyProvider);
+    //   expect(finalState, isA<AsyncError>());
+    //   expect(finalState.error, tFailure);
+    // });
   });
 }

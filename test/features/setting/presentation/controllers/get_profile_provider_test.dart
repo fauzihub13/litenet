@@ -50,9 +50,7 @@ void main() {
   setUp(() {
     mockUsecase = MockGetProfileUsecase();
     container = ProviderContainer(
-      overrides: [
-        getProfileUsecaseProvider.overrideWithValue(mockUsecase),
-      ],
+      overrides: [getProfileUsecaseProvider.overrideWithValue(mockUsecase)],
     );
   });
 
@@ -61,49 +59,66 @@ void main() {
   });
 
   group('GetProfileProvider', () {
-    test('should fetch profile and emit AsyncData on success', () async {
+    test('initial state should eventually be AsyncData(null)', () async {
+      final state = await container.read(getProfileProvider.future);
+      expect(state, null);
+    });
+
+    test('should emit AsyncLoading and then AsyncData on success', () async {
       // arrange
       when(() => mockUsecase.call()).thenAnswer((_) async => Right(tResponse));
 
-      final listener = Listener<AsyncValue<ProfileResponse>>();
+      // Wait for build to finish
+      await container.read(getProfileProvider.future);
+
+      final listener = Listener<AsyncValue<ProfileResponse?>>();
       container.listen(
         getProfileProvider,
         listener.call,
         fireImmediately: true,
       );
 
+      final notifier = container.read(getProfileProvider.notifier);
+
       // act
-      final state = await container.read(getProfileProvider.future);
+      await notifier.fetchProfile();
 
       // assert
-      expect(state, tResponse);
-      verify(() => mockUsecase.call()).called(1);
-      
       verifyInOrder([
+        () => listener(any(), const AsyncData<ProfileResponse?>(null)),
         () => listener(any(), any(that: isA<AsyncLoading>())),
-        () => listener(any(), AsyncData<ProfileResponse>(tResponse)),
+        () => listener(any(), AsyncData<ProfileResponse?>(tResponse)),
       ]);
+
+      verify(() => mockUsecase.call()).called(1);
     });
 
-    test('should emit AsyncError when fetching fails', () async {
+    test('should emit AsyncError on failure', () async {
       // arrange
       when(() => mockUsecase.call()).thenAnswer((_) async => Left(tFailure));
 
-      final listener = Listener<AsyncValue<ProfileResponse>>();
+      // Wait for build to finish
+      await container.read(getProfileProvider.future);
+
+      final listener = Listener<AsyncValue<ProfileResponse?>>();
       container.listen(
         getProfileProvider,
         listener.call,
         fireImmediately: true,
       );
 
+      final notifier = container.read(getProfileProvider.notifier);
+
       // act
-      try {
-        await container.read(getProfileProvider.future);
-      } catch (e) {
-        expect(e, tFailure);
-      }
+      await notifier.fetchProfile();
 
       // assert
+      verifyInOrder([
+        () => listener(any(), const AsyncData<ProfileResponse?>(null)),
+        () => listener(any(), any(that: isA<AsyncLoading>())),
+        () => listener(any(), any(that: isA<AsyncError>())),
+      ]);
+
       final finalState = container.read(getProfileProvider);
       expect(finalState, isA<AsyncError>());
       expect(finalState.error, tFailure);
