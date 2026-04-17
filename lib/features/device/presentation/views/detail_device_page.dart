@@ -21,14 +21,15 @@ import 'package:litenet/routes/route_name.dart';
 class DetailDevicePage extends HookConsumerWidget {
   final String deviceId;
   const DetailDevicePage({super.key, required this.deviceId});
-  
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     useEffect(() {
-      Future.microtask(() => ref
-          .read(getDetailDeviceProvider(deviceId: deviceId).notifier)
-          .fetchDetailDevice(deviceId));
+      Future.microtask(
+        () => ref
+            .read(getDetailDeviceProvider(deviceId: deviceId).notifier)
+            .fetchDetailDevice(deviceId),
+      );
       return null;
     }, []);
 
@@ -66,6 +67,7 @@ class DetailDevicePage extends HookConsumerWidget {
               }
               DeviceDataEntity device = data.data;
               return SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,

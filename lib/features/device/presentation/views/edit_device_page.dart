@@ -81,10 +81,13 @@ class EditDevicePage extends HookConsumerWidget {
       next.when(
         data: (data) async {
           if (data != null) {
-            ref.invalidate(getDetailDeviceProvider(deviceId: deviceId));
-            ref.invalidate(getAllDeviceProvider);
+            ref
+                .watch(getDetailDeviceProvider(deviceId: deviceId).notifier)
+                .fetchDetailDevice(deviceId);
+            ref.watch(getAllDeviceProvider.notifier).fetchAllDevice();
+            // ref.invalidate(getAllDeviceProvider);
             context.showSuccess(data.message);
-            // context.pushReplacementNamed(RouteName.detailMonitoringPage);
+            context.pop();
           }
         },
         error: (err, _) {
@@ -112,7 +115,6 @@ class EditDevicePage extends HookConsumerWidget {
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-
                   children: [
                     // Name
                     RowTitle(title: "Nama Perangkat"),
