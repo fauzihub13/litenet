@@ -254,8 +254,9 @@ class DetailDevicePage extends HookConsumerWidget {
               return EmptyState(message: errorMessage, isRefreshable: true);
             },
             loading: () {
-              return Expanded(
-                child: Center(child: const CircularProgressIndicator()),
+              return SizedBox(
+                height: MediaQuery.of(context).size.height - kToolbarHeight,
+                child: Center(child: CircularProgressIndicator()),
               );
             },
           ),
