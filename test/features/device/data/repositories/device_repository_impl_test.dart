@@ -7,6 +7,7 @@ import 'package:litenet/features/device/domain/entities/claim_device.dart';
 import 'package:litenet/features/device/domain/entities/detail_device.dart';
 import 'package:litenet/features/device/domain/entities/device.dart';
 import 'package:litenet/features/device/domain/entities/history_device.dart';
+import 'package:litenet/features/device/domain/entities/map_location.dart';
 import 'package:litenet/features/device/domain/entities/topup_history_device.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -105,6 +106,25 @@ void main() {
       ),
     ],
   );
+
+  final tMapLocationEntity = MapLocationEntity(
+    placeId: 403111413,
+    licence: "Data © OpenStreetMap contributors",
+    osmType: "relation",
+    osmId: 6362934,
+    lat: "-6.1754049",
+    lon: "106.8271680",
+    mapLocationClass: "boundary",
+    type: "administrative",
+    placeRank: 8,
+    importance: 0.7480095115175435,
+    addresstype: "city",
+    name: "Daerah Khusus Ibukota Jakarta",
+    displayName: "Daerah Khusus Ibukota Jakarta, Jawa, Indonesia",
+    boundingbox: ["-6.3744575", "-4.9993635", "106.3146732", "106.9739750"],
+  );
+
+  final tMapLocationResponse = MapLocationResponse(data: [tMapLocationEntity]);
 
   group('DeviceRepositoryImpl', () {
     group('claimDevice', () {
@@ -310,6 +330,29 @@ void main() {
           expect(result, Right(tHistoryDeviceResponse));
           verify(
             () => mockDatasource.getHistoryDevice(deviceId: tDeviceId),
+          ).called(1);
+        },
+      );
+    });
+
+    group('getLocationSuggestion', () {
+      test(
+        'should return MapLocationResponse when datasource returns success',
+        () async {
+          // arrange
+          when(
+            () => mockDatasource.getLocationSuggestion(query: "Jakarta"),
+          ).thenAnswer((_) async => tMapLocationResponse);
+
+          // act
+          final result = await repository.getLocationSuggestion(
+            query: "Jakarta",
+          );
+
+          // assert
+          expect(result, Right(tMapLocationResponse));
+          verify(
+            () => mockDatasource.getLocationSuggestion(query: "Jakarta"),
           ).called(1);
         },
       );

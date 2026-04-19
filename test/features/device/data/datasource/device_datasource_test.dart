@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:litenet/features/device/data/datasources/device_datasource.dart';
 import 'package:mocktail/mocktail.dart';
@@ -8,6 +9,11 @@ class MockDio extends Mock implements Dio {}
 void main() {
   late MockDio mockDio;
   late DeviceDatasourceImpl datasource;
+
+  setUpAll(() async {
+    await dotenv.load(fileName: ".env");
+    // pastikan file .env.test berisi MAP_BASE_URL
+  });
 
   setUp(() {
     mockDio = MockDio();
@@ -342,6 +348,63 @@ void main() {
           // assert
           expect(result.success, true);
           expect(result.data.first.id, 'T-01');
+        },
+      );
+    });
+
+    group('getLocationSuggestion', () {
+      final tMapResponse = [
+        {
+          "place_id": 403111413,
+          "licence":
+              "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+          "osm_type": "relation",
+          "osm_id": 6362934,
+          "lat": "-6.1754049",
+          "lon": "106.8271680",
+          "class": "boundary",
+          "type": "administrative",
+          "place_rank": 8,
+          "importance": 0.7480095115175435,
+          "addresstype": "city",
+          "name": "Daerah Khusus Ibukota Jakarta",
+          "display_name": "Daerah Khusus Ibukota Jakarta, Jawa, Indonesia",
+          "address": {
+            "city": "Daerah Khusus Ibukota Jakarta",
+            "ISO3166-2-lvl4": "ID-JK",
+            "region": "Jawa",
+            "ISO3166-2-lvl3": "ID-JW",
+            "country": "Indonesia",
+            "country_code": "id",
+          },
+          "boundingbox": [
+            "-6.3744575",
+            "-4.9993635",
+            "106.3146732",
+            "106.9739750",
+          ],
+        },
+      ];
+
+      test(
+        'should return MapLocationResponseModel when response is successful',
+        () async {
+          // arrange
+          when(() => mockDio.get(any())).thenAnswer(
+            (_) async => Response(
+              data: tMapResponse,
+              statusCode: 200,
+              requestOptions: RequestOptions(path: ''),
+            ),
+          );
+
+          // act
+          final result = await datasource.getLocationSuggestion(
+            query: 'Jakarta',
+          );
+
+          // assert
+          expect(result.data.isNotEmpty, true);
         },
       );
     });

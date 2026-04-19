@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:litenet/features/order/data/datasources/transaction_datasource.dart';
@@ -8,10 +10,18 @@ class MockDio extends Mock implements Dio {}
 void main() {
   late MockDio mockDio;
   late TransactionDatasourceImpl datasource;
+  late Directory tempDir;
 
   setUp(() {
     mockDio = MockDio();
-    datasource = TransactionDatasourceImpl(httpClient: mockDio);
+    tempDir = Directory.systemTemp.createTempSync();
+    datasource = TransactionDatasourceImpl(
+      httpClient: mockDio,
+      injectedDownloadDir: tempDir.path,
+    );
+  });
+  tearDown(() {
+    tempDir.deleteSync(recursive: true);
   });
 
   group('TransactionDatasourceImpl', () {
@@ -236,6 +246,39 @@ void main() {
           expect(result.data.orderId, 'ORD-001');
         },
       );
+    });
+
+    group('downloadInvoice', () {
+      const orderId = '12345';
+      final fileUrl = '/transactions/$orderId/invoice';
+
+      test('returns savePath when download is successful', () async {
+        final savePath = '${tempDir.path}/$orderId.pdf';
+
+        when(
+          () =>
+              mockDio.download(fileUrl, any(), options: any(named: 'options')),
+        ).thenAnswer(
+          (_) async => Response(
+            statusCode: 200,
+            requestOptions: RequestOptions(path: fileUrl),
+          ),
+        );
+
+        final result = await datasource.downloadInvoice(
+          orderId: orderId,
+          injectedDownloadDir: tempDir.path, 
+        );
+
+        expect(result, savePath);
+        verify(
+          () => mockDio.download(
+            fileUrl,
+            savePath,
+            options: any(named: 'options'),
+          ),
+        ).called(1);
+      });
     });
   });
 }

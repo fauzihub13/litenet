@@ -38,7 +38,11 @@ abstract class TransactionDatasource {
 
 class TransactionDatasourceImpl extends TransactionDatasource {
   final Dio httpClient;
-  TransactionDatasourceImpl({required this.httpClient});
+  final String? injectedDownloadDir;
+  TransactionDatasourceImpl({
+    required this.httpClient,
+    this.injectedDownloadDir,
+  });
 
   @override
   Future<PaymentMethodResponse> getAllPaymentMethod() async {
@@ -103,13 +107,18 @@ class TransactionDatasourceImpl extends TransactionDatasource {
   }
 
   @override
-  Future<String> downloadInvoice({required String orderId}) async {
+  Future<String> downloadInvoice({
+    required String orderId,
+    String? injectedDownloadDir,
+  }) async {
     String fileUrl = '/transactions/$orderId/invoice';
 
     Directory directory;
-    if (Platform.isAndroid) {
+    if (injectedDownloadDir != null) {
+      // Unit test pakai path dummy
+      directory = Directory(injectedDownloadDir);
+    } else if (Platform.isAndroid) {
       directory = Directory('/storage/emulated/0/Download');
-      // directory = await getDownloadDirectory();
     } else if (Platform.isIOS) {
       directory = await getApplicationDocumentsDirectory();
     } else {
