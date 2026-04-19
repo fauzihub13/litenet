@@ -1,19 +1,25 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:litenet/features/device/data/mappers/claim_device_mapper.dart';
 import 'package:litenet/features/device/data/mappers/detail_device_mapper.dart';
 import 'package:litenet/features/device/data/mappers/device_mapper.dart';
 import 'package:litenet/features/device/data/mappers/history_device_mapper.dart';
+import 'package:litenet/features/device/data/mappers/map_location_mapper.dart';
 import 'package:litenet/features/device/data/mappers/topup_history_device_mapper.dart';
 import 'package:litenet/features/device/data/models/claim_device_model.dart';
 import 'package:litenet/features/device/data/models/detail_device_model.dart';
 import 'package:litenet/features/device/data/models/device_model.dart';
 import 'package:litenet/features/device/data/models/history_device_model.dart';
+import 'package:litenet/features/device/data/models/map_location_model.dart';
 import 'package:litenet/features/device/data/models/topup_history_device_model.dart';
 import 'package:litenet/features/device/domain/entities/claim_device.dart';
 import 'package:litenet/features/device/domain/entities/detail_device.dart';
 import 'package:litenet/features/device/domain/entities/device.dart';
 import 'package:litenet/features/device/domain/entities/history_device.dart';
+import 'package:litenet/features/device/domain/entities/map_location.dart';
 import 'package:litenet/features/device/domain/entities/topup_history_device.dart';
+
+final mapBaseUrl = dotenv.env['MAP_BASE_URL'];
 
 abstract class DeviceDatasource {
   Future<ClaimDeviceResponse> claimDevice({
@@ -40,6 +46,7 @@ abstract class DeviceDatasource {
     required bool status,
   });
   Future<HistoryDeviceResponse> getHistoryDevice({required String deviceId});
+  Future<MapLocationResponse> getLocationSuggestion({required String query});
 }
 
 class DeviceDatasourceImpl extends DeviceDatasource {
@@ -138,6 +145,18 @@ class DeviceDatasourceImpl extends DeviceDatasource {
     final response = await httpClient.get(url);
 
     final data = HistoryDeviceResponseModel.fromJson(response.data);
+    return data.toEntity();
+  }
+
+  @override
+  Future<MapLocationResponse> getLocationSuggestion({
+    required String query,
+  }) async {
+    String url =
+        '$mapBaseUrl/search?q=$query&format=json&limit=5&addressdetails=1';
+    final response = await httpClient.get(url);
+
+    final data = MapLocationResponseModel.fromJson(response.data);
     return data.toEntity();
   }
 }

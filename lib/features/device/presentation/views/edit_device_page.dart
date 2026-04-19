@@ -87,7 +87,10 @@ class EditDevicePage extends HookConsumerWidget {
             ref.watch(getAllDeviceProvider.notifier).fetchAllDevice();
             // ref.invalidate(getAllDeviceProvider);
             context.showSuccess(data.message);
-            context.pop();
+            context.pushReplacementNamed(
+              RouteName.detailMonitoringPage,
+              extra: {'deviceId': deviceId},
+            );
           }
         },
         error: (err, _) {
@@ -208,7 +211,7 @@ class EditDevicePage extends HookConsumerWidget {
                         height: 44,
                         width: MediaQuery.of(context).size.width * 0.5,
                         onPressed: () {
-                          context.pushReplacementNamed(
+                          context.pushNamed(
                             RouteName.deviceCoordinatePage,
                             extra: {
                               'reqName': nameController.text,

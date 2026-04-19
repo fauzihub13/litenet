@@ -9,11 +9,13 @@ class CustomAppbar extends ConsumerWidget implements PreferredSizeWidget {
   final String title;
   final bool isLeading;
   final bool isRounded;
+  final VoidCallback? onLeadingPressed;
   const CustomAppbar({
     super.key,
     required this.title,
     this.isLeading = true,
     this.isRounded = true,
+    this.onLeadingPressed,
   });
 
   @override
@@ -31,7 +33,7 @@ class CustomAppbar extends ConsumerWidget implements PreferredSizeWidget {
                   BlendMode.srcIn,
                 ),
               ),
-              onPressed: () => context.pop(),
+              onPressed: onLeadingPressed ?? () => context.pop(),
             )
           : Container(),
       title: Text(

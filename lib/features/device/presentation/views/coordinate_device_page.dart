@@ -1,19 +1,22 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:litenet/core/constants/theme.dart';
+import 'package:litenet/core/errors/failure.dart';
 import 'package:litenet/core/helper/permission.dart';
 import 'package:litenet/core/widgets/button.dart';
 import 'package:litenet/core/widgets/custom_appbar.dart';
+import 'package:litenet/core/widgets/custom_snackbar.dart';
 import 'package:litenet/core/widgets/form_input.dart';
+import 'package:litenet/features/device/domain/entities/map_location.dart';
+import 'package:litenet/features/device/presentation/controllers/get_location_suggestion_provider.dart';
 import 'package:litenet/routes/route_name.dart';
 
-class CoordinateDevicePage extends StatefulWidget {
+class CoordinateDevicePage extends ConsumerStatefulWidget {
   final String? reqName;
   final String? redNodelink;
   final String? reqKitSerialNumber;
@@ -37,10 +40,10 @@ class CoordinateDevicePage extends StatefulWidget {
   });
 
   @override
-  State<CoordinateDevicePage> createState() => _CoordinateDevicePageState();
+  ConsumerState createState() => _CoordinateDevicePageState();
 }
 
-class _CoordinateDevicePageState extends State<CoordinateDevicePage>
+class _CoordinateDevicePageState extends ConsumerState<CoordinateDevicePage>
     with TickerProviderStateMixin {
   void _animatedMapMove(LatLng destLocation, double destZoom) {
     // Ambil posisi kamera saat ini
@@ -140,48 +143,12 @@ class _CoordinateDevicePageState extends State<CoordinateDevicePage>
   }
 
   // Variabel baru untuk menampung hasil saran pencarian
-  List<dynamic> _searchResults = [];
+  List<MapLocationEntity> _searchResults = [];
   bool _showSuggestions = false;
-
-  // Fungsi untuk mendapatkan daftar saran lokasi saat mengetik
-  Future<void> _getSuggestions(String query) async {
-    if (query.isEmpty) {
-      setState(() {
-        _searchResults = [];
-        _showSuggestions = false;
-      });
-      return;
-    }
-
-    setState(() => _isSearching = true);
-
-    try {
-      // Kita ambil limit 5 agar tidak terlalu panjang
-      final url = Uri.parse(
-        'https://nominatim.openstreetmap.org/search?q=$query&format=json&limit=5&addressdetails=1',
-      );
-      final response = await http.get(
-        url,
-        headers: {'User-Agent': 'LiteNet_App'},
-      );
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        setState(() {
-          _searchResults = data;
-          _showSuggestions = data.isNotEmpty;
-        });
-      }
-    } catch (e) {
-      debugPrint("⚠️ Error suggestions: $e");
-    } finally {
-      setState(() => _isSearching = false);
-    }
-  }
 
   @override
   void dispose() {
-    _debounce?.cancel(); // Batalkan timer jika ada
+    _debounce?.cancel(); // Batalkan timer
     _searchController.dispose();
     _coordinatController.dispose();
     super.dispose();
@@ -189,6 +156,34 @@ class _CoordinateDevicePageState extends State<CoordinateDevicePage>
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(getLocationSuggestionProvider, (previous, next) {
+      next.when(
+        data: (data) {
+          if (data != null && data.data.isNotEmpty) {
+            setState(() {
+              _searchResults = data.data;
+              _showSuggestions = true;
+              _isSearching = false;
+            });
+          } else if (data != null && data.data.isEmpty) {
+            context.showError('Lokasi tidak ditemukan');
+          }
+        },
+        error: (err, _) {
+          final error = (err as Failure).message ?? 'Terjadi kesalahan';
+          context.showError(' $error');
+          setState(() {
+            _isSearching = false;
+          });
+        },
+        loading: () {
+          setState(() {
+            _isSearching = true;
+          });
+        },
+      );
+    });
+
     return Scaffold(
       appBar: const CustomAppbar(title: 'Lokasi Perangkat', isRounded: false),
       body: Stack(
@@ -204,8 +199,7 @@ class _CoordinateDevicePageState extends State<CoordinateDevicePage>
                   _currentLatLng = point;
                   _coordinatController.text =
                       "${point.latitude}, ${point.longitude}";
-                  _showSuggestions =
-                      false; // Sembunyikan saran jika peta di-tap
+                  _showSuggestions = false;
                 });
                 FocusScope.of(context).unfocus();
               },
@@ -262,12 +256,9 @@ class _CoordinateDevicePageState extends State<CoordinateDevicePage>
                       // Mulai timer baru
                       _debounce = Timer(const Duration(milliseconds: 500), () {
                         if (value.isNotEmpty) {
-                          _getSuggestions(value);
-                        } else {
-                          setState(() {
-                            _searchResults = [];
-                            _showSuggestions = false;
-                          });
+                          ref
+                              .read(getLocationSuggestionProvider.notifier)
+                              .fetchLocationSuggestion(query: value);
                         }
                       });
                     }, // Cari saat mengetik
@@ -285,62 +276,24 @@ class _CoordinateDevicePageState extends State<CoordinateDevicePage>
                               Icons.search,
                               color: DefaultColors.purple500,
                             ),
-                            onPressed: () =>
-                                _getSuggestions(_searchController.text),
+                            onPressed: () {
+                              if (_searchController.text.isNotEmpty) {
+                                ref
+                                    .read(
+                                      getLocationSuggestionProvider.notifier,
+                                    )
+                                    .fetchLocationSuggestion(
+                                      query: _searchController.text,
+                                    );
+                              }
+                              // _getSuggestions(_searchController.text),
+                            },
                           ),
                   ),
                 ),
 
                 // DAFTAR SARAN (MUNCUL JIKA ADA HASIL)
-                if (_showSuggestions)
-                  Container(
-                    margin: const EdgeInsets.only(top: 4),
-                    constraints: const BoxConstraints(maxHeight: 250),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: const [
-                        BoxShadow(color: Colors.black12, blurRadius: 10),
-                      ],
-                    ),
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      padding: EdgeInsets.zero,
-                      itemCount: _searchResults.length,
-                      separatorBuilder: (context, index) =>
-                          const Divider(height: 1),
-                      itemBuilder: (context, index) {
-                        final place = _searchResults[index];
-                        return ListTile(
-                          leading: const Icon(
-                            Icons.location_on_outlined,
-                            color: DefaultColors.purple500,
-                          ),
-                          title: Text(
-                            place['display_name'],
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 13),
-                          ),
-                          onTap: () {
-                            final lat = double.parse(place['lat']);
-                            final lon = double.parse(place['lon']);
-                            final newPos = LatLng(lat, lon);
-
-                            setState(() {
-                              _currentLatLng = newPos;
-                              _coordinatController.text = "$lat, $lon";
-                              _searchController.text = place['display_name'];
-                              _showSuggestions = false;
-                            });
-
-                            _mapController.move(newPos, 15.0);
-                            FocusScope.of(context).unfocus();
-                          },
-                        );
-                      },
-                    ),
-                  ),
+                if (_showSuggestions) _buildSuggestionList(_searchResults),
               ],
             ),
           ),
@@ -374,10 +327,11 @@ class _CoordinateDevicePageState extends State<CoordinateDevicePage>
                   const SizedBox(height: 20),
                   Button(
                     text: "Simpan Lokasi",
+                    isDisabled: _coordinatController.text.isEmpty,
                     onPressed: () {
                       if (_coordinatController.text.isNotEmpty) {
                         if (widget.isEdit) {
-                          context.pushNamed(
+                          context.pushReplacementNamed(
                             RouteName.editDevicePage,
                             extra: {
                               'latitude': _currentLatLng!.latitude,
@@ -411,6 +365,54 @@ class _CoordinateDevicePageState extends State<CoordinateDevicePage>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSuggestionList(List<MapLocationEntity> suggestions) {
+    return Container(
+      margin: const EdgeInsets.only(top: 4),
+      constraints: const BoxConstraints(maxHeight: 250),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 10)],
+      ),
+      child: ListView.separated(
+        shrinkWrap: true,
+        padding: EdgeInsets.zero,
+        itemCount: suggestions.length,
+        separatorBuilder: (context, index) => const Divider(height: 1),
+        itemBuilder: (context, index) {
+          MapLocationEntity place = suggestions[index];
+          return ListTile(
+            leading: const Icon(
+              Icons.location_on_outlined,
+              color: DefaultColors.purple500,
+            ),
+            title: Text(
+              place.displayName,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 13),
+            ),
+            onTap: () {
+              final lat = double.parse(place.lat);
+              final lon = double.parse(place.lon);
+              final newPos = LatLng(lat, lon);
+
+              setState(() {
+                _currentLatLng = newPos;
+                _coordinatController.text = "$lat, $lon";
+                _searchController.text = place.displayName;
+                _showSuggestions = false;
+              });
+
+              _mapController.move(newPos, 15.0);
+              FocusScope.of(context).unfocus();
+            },
+          );
+        },
       ),
     );
   }

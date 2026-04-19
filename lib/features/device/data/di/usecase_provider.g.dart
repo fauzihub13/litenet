@@ -297,3 +297,52 @@ final class GetHistoryDeviceUsecaseProvider
 
 String _$getHistoryDeviceUsecaseHash() =>
     r'4bd34cc30ac4e4be12692e2b26bb3d64f6c51e25';
+
+@ProviderFor(getLocationSuggestionUsecase)
+const getLocationSuggestionUsecaseProvider =
+    GetLocationSuggestionUsecaseProvider._();
+
+final class GetLocationSuggestionUsecaseProvider
+    extends
+        $FunctionalProvider<
+          GetLocationSuggestionUsecase,
+          GetLocationSuggestionUsecase,
+          GetLocationSuggestionUsecase
+        >
+    with $Provider<GetLocationSuggestionUsecase> {
+  const GetLocationSuggestionUsecaseProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'getLocationSuggestionUsecaseProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$getLocationSuggestionUsecaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<GetLocationSuggestionUsecase> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  GetLocationSuggestionUsecase create(Ref ref) {
+    return getLocationSuggestionUsecase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(GetLocationSuggestionUsecase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<GetLocationSuggestionUsecase>(value),
+    );
+  }
+}
+
+String _$getLocationSuggestionUsecaseHash() =>
+    r'7ccca2708b87f5b2a7fad2948afc7dca9a90de27';

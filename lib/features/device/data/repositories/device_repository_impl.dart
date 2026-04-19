@@ -7,6 +7,7 @@ import 'package:litenet/features/device/domain/entities/claim_device.dart';
 import 'package:litenet/features/device/domain/entities/detail_device.dart';
 import 'package:litenet/features/device/domain/entities/device.dart';
 import 'package:litenet/features/device/domain/entities/history_device.dart';
+import 'package:litenet/features/device/domain/entities/map_location.dart';
 import 'package:litenet/features/device/domain/entities/topup_history_device.dart';
 import 'package:litenet/features/device/domain/repositories/device_repository.dart';
 
@@ -49,10 +50,8 @@ class DeviceRepositoryImpl extends DeviceRepository {
 
   @override
   Future<Either<Failure, DeviceResponse>> getAllDevice() async {
-   try {
-      final response = await deviceDatasource.getAllDevice(
-       
-      );
+    try {
+      final response = await deviceDatasource.getAllDevice();
 
       if (!response.success) {
         return Left(Failure(message: response.message));
@@ -68,12 +67,13 @@ class DeviceRepositoryImpl extends DeviceRepository {
   }
 
   @override
-  Future<Either<Failure, DetailDeviceResponse>> getDetailDevice({required String deviceId}) async {
-   try {
+  Future<Either<Failure, DetailDeviceResponse>> getDetailDevice({
+    required String deviceId,
+  }) async {
+    try {
       final response = await deviceDatasource.getDetailDevice(
         deviceId: deviceId,
       );
-       
 
       if (!response.success) {
         return Left(Failure(message: response.message));
@@ -89,12 +89,13 @@ class DeviceRepositoryImpl extends DeviceRepository {
   }
 
   @override
-  Future<Either<Failure, TopupHistoryDeviceResponse>> getTopupHistoryDevice({required String deviceId}) async {
+  Future<Either<Failure, TopupHistoryDeviceResponse>> getTopupHistoryDevice({
+    required String deviceId,
+  }) async {
     try {
       final response = await deviceDatasource.getTopupHistoryDevice(
         deviceId: deviceId,
       );
-       
 
       if (!response.success) {
         return Left(Failure(message: response.message));
@@ -108,10 +109,11 @@ class DeviceRepositoryImpl extends DeviceRepository {
       return Left(Failure(message: e.toString()));
     }
   }
-  
+
   @override
-  Future<Either<Failure, ClaimDeviceResponse>> updateDevice({required String deviceId,
-   required String name,
+  Future<Either<Failure, ClaimDeviceResponse>> updateDevice({
+    required String deviceId,
+    required String name,
     required String adress,
     required String kitSerialNumber,
     required String nodelink,
@@ -119,16 +121,16 @@ class DeviceRepositoryImpl extends DeviceRepository {
     required double longitude,
     required bool status,
   }) async {
-   try {
+    try {
       final response = await deviceDatasource.updateDevice(
-        deviceId:deviceId,
+        deviceId: deviceId,
         name: name,
         address: adress,
         kitSerialNumber: kitSerialNumber,
         nodelink: nodelink,
         latitude: latitude,
         longitude: longitude,
-        status: status
+        status: status,
       );
 
       if (!response.success) {
@@ -145,14 +147,35 @@ class DeviceRepositoryImpl extends DeviceRepository {
   }
 
   @override
-  Future<Either<Failure, HistoryDeviceResponse>> getHistoryDevice({required String deviceId}) async {
-   try {
-      final response = await deviceDatasource.getHistoryDevice(deviceId:deviceId);
+  Future<Either<Failure, HistoryDeviceResponse>> getHistoryDevice({
+    required String deviceId,
+  }) async {
+    try {
+      final response = await deviceDatasource.getHistoryDevice(
+        deviceId: deviceId,
+      );
 
       if (!response.success) {
         return Left(Failure(message: response.message));
       }
 
+      return Right(response);
+    } on DioException catch (e) {
+      final error = await DioErrorHandler.handleError(e);
+      return Left(Failure(message: error));
+    } catch (e) {
+      return Left(Failure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, MapLocationResponse>> getLocationSuggestion({
+    required String query,
+  }) async {
+    try {
+      final response = await deviceDatasource.getLocationSuggestion(
+        query: query,
+      );
       return Right(response);
     } on DioException catch (e) {
       final error = await DioErrorHandler.handleError(e);

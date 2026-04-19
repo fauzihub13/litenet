@@ -4,6 +4,7 @@ import 'package:litenet/features/device/domain/entities/claim_device.dart';
 import 'package:litenet/features/device/domain/entities/detail_device.dart';
 import 'package:litenet/features/device/domain/entities/device.dart';
 import 'package:litenet/features/device/domain/entities/history_device.dart';
+import 'package:litenet/features/device/domain/entities/map_location.dart';
 import 'package:litenet/features/device/domain/entities/topup_history_device.dart';
 
 abstract class DeviceRepository {
@@ -32,7 +33,10 @@ abstract class DeviceRepository {
     required double longitude,
     required bool status,
   });
-   Future<Either<Failure, HistoryDeviceResponse>> getHistoryDevice({
+  Future<Either<Failure, HistoryDeviceResponse>> getHistoryDevice({
     required String deviceId,
+  });
+  Future<Either<Failure, MapLocationResponse>> getLocationSuggestion({
+    required String query,
   });
 }

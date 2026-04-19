@@ -51,7 +51,13 @@ class DetailDevicePage extends HookConsumerWidget {
     });
 
     return Scaffold(
-      appBar: CustomAppbar(title: 'Detail Perangkat', isLeading: true),
+      appBar: CustomAppbar(
+        title: 'Detail Perangkat',
+        isLeading: true,
+        onLeadingPressed: () {
+          context.goNamed(RouteName.monitoringPage);
+        },
+      ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: PaddingSize.horizontal),
         child: RefreshIndicator(

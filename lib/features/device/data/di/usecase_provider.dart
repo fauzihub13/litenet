@@ -3,6 +3,7 @@ import 'package:litenet/features/device/domain/usecases/claim_device_usecase.dar
 import 'package:litenet/features/device/domain/usecases/get_all_device_usecase.dart';
 import 'package:litenet/features/device/domain/usecases/get_detail_device_usecase.dart';
 import 'package:litenet/features/device/domain/usecases/get_history_device_usecase.dart';
+import 'package:litenet/features/device/domain/usecases/get_location_suggestion_usecase.dart';
 import 'package:litenet/features/device/domain/usecases/get_topup_hisotry_device_usecase.dart';
 import 'package:litenet/features/device/domain/usecases/update_device_usecase.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -37,4 +38,9 @@ UpdateDeviceUsecase updateDeviceUsecase(Ref ref) {
 @riverpod
 GetHistoryDeviceUsecase getHistoryDeviceUsecase(Ref ref) {
   return GetHistoryDeviceUsecase(ref.read(deviceRepositoryProvider));
+}
+
+@riverpod
+GetLocationSuggestionUsecase getLocationSuggestionUsecase(Ref ref) {
+  return GetLocationSuggestionUsecase(ref.read(deviceRepositoryProvider));
 }
