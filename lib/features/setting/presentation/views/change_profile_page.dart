@@ -94,25 +94,25 @@ class ChangeProfilePage extends HookConsumerWidget {
                     const SizedBox(height: 20),
 
                     // Email
-                    RowTitle(title: "Email"),
-                    const SizedBox(height: 8),
-                    FormInput(
-                      textController: emailController,
-                      hintText: "sahroni@gmail.com",
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Email tidak boleh kosong';
-                        }
-                        final emailRegex = RegExp(
-                          r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$',
-                        );
-                        if (!emailRegex.hasMatch(value)) {
-                          return 'Masukkan format email yang valid';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 20),
+                    // RowTitle(title: "Email"),
+                    // const SizedBox(height: 8),
+                    // FormInput(
+                    //   textController: emailController,
+                    //   hintText: "sahroni@gmail.com",
+                    //   validator: (value) {
+                    //     if (value == null || value.isEmpty) {
+                    //       return 'Email tidak boleh kosong';
+                    //     }
+                    //     final emailRegex = RegExp(
+                    //       r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$',
+                    //     );
+                    //     if (!emailRegex.hasMatch(value)) {
+                    //       return 'Masukkan format email yang valid';
+                    //     }
+                    //     return null;
+                    //   },
+                    // ),
+                    // const SizedBox(height: 20),
 
                     // Phone Number
                     RowTitle(title: "No HP"),
